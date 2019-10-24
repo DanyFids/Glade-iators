@@ -13,6 +13,7 @@
 #include"Mesh.h"
 #include"Constants.h"
 #include"Test_Primitives.h"
+#include"Hitbox.h"
 
 
 OnePlayer::OnePlayer()
@@ -114,11 +115,13 @@ void OnePlayer::LoadScene()
 
 	Mesh* Square = new Mesh("d6.obj");
 	Mesh* d20 = new Mesh("d20.obj");
-	players.push_back(new Object(Square, DiceTex));
+
+	Hitbox* basicCubeHB = new CubeHitbox(1.0f,1.0f,1.0f);
+	players.push_back(new Object(Square, DiceTex, basicCubeHB));
 	players[PLAYER_1]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_1]->Move({ 0.0f, 0.3f, 0.0f });
 
-	Object* floor = new Object(Square, defaultTex);
+	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	floor->Move({ 0.0f, -0.75f, 0.0f });
 	floor->Scale({ 30.0f, 0.5f, 30.0f });
 
@@ -161,7 +164,9 @@ void TwoPlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void TwoPlayer::Update(float dt)
 {
-	
+	if (players[PLAYER_1]->hitbox->HitDetect(players[PLAYER_1]->GetTransform(), (CubeHitbox*)(players[PLAYER_2]->hitbox), players[PLAYER_2]->GetTransform())) {
+		std::cout << "HOII! HIT DETECTED!" << std::endl;
+	}
 
 	//Square->Update(dt);
 }
@@ -198,12 +203,14 @@ void TwoPlayer::LoadScene()
 
 	Mesh* Square = new Mesh("d6.obj");
 	Mesh* d20 = new Mesh("d20.obj");
-	players.push_back(new Object(Square, DiceTex));
-	players.push_back(new Object(d20, D20Tex));
+	Hitbox* basicCubeHB = new CubeHitbox(1.0f, 1.0f, 1.0f);
+
+	players.push_back(new Object(Square, DiceTex, basicCubeHB));
+	players.push_back(new Object(d20, D20Tex, basicCubeHB));
 
 	players[PLAYER_2]->Scale(glm::vec3(0.75f, 0.75f, 0.75f));
 
-	Object* floor = new Object(Square, defaultTex);
+	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	floor->Move({ 0.0f, -1.5f, 0.0f });
 	floor->Scale({ 30.0f, 0.5f, 30.0f });
 

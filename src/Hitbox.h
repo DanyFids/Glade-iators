@@ -26,3 +26,15 @@ public:
 	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);
 	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT);
 };
+
+class SphereHitbox : public Hitbox {
+	float radius;
+public:
+	SphereHitbox(float r) :radius(r) {};
+
+	float GetRadius() { return radius; }
+
+	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
+	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);
+	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT);
+};

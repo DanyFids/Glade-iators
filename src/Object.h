@@ -22,26 +22,34 @@ struct Transform {
 			glm::scale(glm::mat4(1.0f), scale)
 			;
 	}
+
+	glm::mat4 GetRotScale() const {
+		return
+			glm::mat4_cast(glm::quat(glm::radians(rotation))) *
+			glm::scale(glm::mat4(1.0f), scale);
+	}
 };
 
 class Object {
 protected:
 	Mesh* mesh;
 	Material* material;
-	glm::vec3 position;
-	glm::vec3 scale;
-	glm::mat4 rotation;
+	Transform transform;
 
 public:
+	Hitbox* hitbox;
+
 	Object();
-	Object(Mesh* me, Material* ma);
-	Object(Mesh* me, Material* ma, glm::vec3 pos);
+	Object(Mesh* me, Material* ma, Hitbox* hb);
+	Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos);
 
 	virtual void Update(float dt);
-	virtual void Draw(Shader * shader, std::vector<Camera*> cam);
+	virtual void Draw(Shader* shader, std::vector<Camera*> cam);
+	void Rotate(glm::vec3 rot);
 	void Rotate(float tht, glm::vec3 dir);
 	void Move(glm::vec3 dir);
 	void Scale(glm::vec3 scl);
 
-	glm::vec3 GetPosition() {return position;};
+	glm::vec3 GetPosition() { return transform.position; };
+	Transform GetTransform() { return transform; }
 };

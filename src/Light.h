@@ -15,6 +15,8 @@ protected:
 	float diffuse_strength;
 	float specular_strength;
 
+	float far_plane;
+
 	unsigned int depthMapFBO;
 	unsigned int depthMap;
 	glm::mat4 lightProjection;

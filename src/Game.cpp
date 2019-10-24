@@ -129,7 +129,8 @@ void Game::LoadContent()
 	//auto rotate = [](entt::entity e, float dt) {
 	//	CurrentRegistry().get<TempTransform>(e).EulerRotation += glm::vec3(0, 0, 90 * dt);
 	//};
-	//auto& up = ecs.get_or_assign<UpdateBehaviour>(e1);	//up.Function = rotate;
+	//auto& up = ecs.get_or_assign<UpdateBehaviour>(e1);
+	//up.Function = rotate;
 }
 
 void Game::UnloadContent()

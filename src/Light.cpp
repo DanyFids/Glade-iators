@@ -36,11 +36,15 @@ void Light::SetupOccRender()
 
 Light::Light(glm::vec3 pos, bool orth)
 {
-	if (orth)
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, 100.0f);
-	else
-		lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.0f, 100.0f);
-	lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, 100.0f);
+	if (orth) {
+		far_plane = 100.0f;
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, far_plane);
+	}
+	else {
+		far_plane = 25.0f;
+		lightProjection = glm::perspective(glm::radians(90.0f), ((float)SHADOW_WIDTH / (float)SHADOW_HEIGHT), 0.2f, far_plane);
+	}
+	//lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, 100.0f);
 
 	position = pos;
 	ambient = glm::vec3(1.0, 1.0, 1.0);
@@ -56,10 +60,14 @@ Light::Light(glm::vec3 pos, bool orth)
 
 Light::Light(glm::vec3 pos, glm::vec3 color, float a, float d, float s, bool orth)
 {
-	if (orth)
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, 100.0f);
-	else
-		lightProjection = glm::perspective(glm::radians(90.0f), ((float)SHADOW_WIDTH / (float)SHADOW_HEIGHT), 0.01f, 25.0f);
+	if (orth) {
+		far_plane = 100.0f;
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, far_plane);
+	}
+	else {
+		far_plane = 25.0f;
+		lightProjection = glm::perspective(glm::radians(90.0f), ((float)SHADOW_WIDTH / (float)SHADOW_HEIGHT), 0.2f, far_plane);
+	}
 
 	position = pos;
 
@@ -76,10 +84,14 @@ Light::Light(glm::vec3 pos, glm::vec3 color, float a, float d, float s, bool ort
 
 Light::Light(glm::vec3 pos, glm::vec3 ambi, glm::vec3 diff, glm::vec3 spec, float a, float d, float s, bool orth)
 {
-	if (orth)
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, 100.0f);
-	else
-		lightProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.0f, 100.0f);
+	if (orth) {
+		far_plane = 100.0f;
+		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, far_plane);
+	}
+	else {
+		far_plane = 25.0f;
+		lightProjection = glm::perspective(glm::radians(90.0f), ((float)SHADOW_WIDTH / (float)SHADOW_HEIGHT), 0.2f, far_plane);
+	}
 
 	position = pos;
 
@@ -154,6 +166,7 @@ void DirectionalLight::SetupLight(Shader* shader)
 
 void PointLight::SetupCubeMap()
 {
+	glDeleteTextures(1, &depthMap);
 	glGenTextures(1, &depthMap);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap);
 	for (unsigned int i = 0; i < 6; ++i)
@@ -165,6 +178,8 @@ void PointLight::SetupCubeMap()
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+	glDeleteFramebuffers(1, &depthMapFBO);
+	glGenFramebuffers(1, &depthMapFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthMap, 0);
 	glDrawBuffer(GL_NONE);
@@ -246,5 +261,5 @@ void PointLight::SetupDepthShader(Shader* shader)
 		shader->SetMat4(locName.c_str(), lightTransforms[c]);
 	}
 	shader->SetVec3("lightPos", position);
-	shader->SetF("farPlane", 25.0f);
+	shader->SetF("farPlane", far_plane);
 }

@@ -90,7 +90,10 @@ void Game::Initialize()
 	glfwSetWindowSizeCallback(window, GlfwWindowResizedCallback);
 	glfwSetCursorPosCallback(window, mouse_callback);
 
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	//See the mouse cursor?
+
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);

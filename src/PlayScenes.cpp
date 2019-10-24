@@ -52,7 +52,6 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void OnePlayer::Update(float dt)
 {
-	
 }
 
 void OnePlayer::Draw()
@@ -107,7 +106,7 @@ void OnePlayer::LoadScene()
 
 	Material* DiceTex = new Material("dice-texture.png", "d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
-	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
+	Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
 	Material* defaultTex = new Material("default-texture.png", "default-texture.png");
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 25.0f, 0.5f)), { 1.0f, 1.0f, 1.0f }, 0.1f, 0.2f, 0.2f);
@@ -118,17 +117,9 @@ void OnePlayer::LoadScene()
 	Mesh* d20 = new Mesh("d20.obj");
 
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f,1.0f,1.0f);
-	Hitbox* sphereHB = new SphereHitbox(1.f);
-
 	players.push_back(new Object(Square, DiceTex, basicCubeHB));
-	players.push_back(new Object(d20, D20Tex, sphereHB));
-
 	players[PLAYER_1]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_1]->Move({ 0.0f, 0.3f, 0.0f });
-
-	players[PLAYER_2]->Scale({ 1.5f,1.5f,1.5f });
-	players[PLAYER_2]->Move({ 1.5f,1.0f,1.5f });
-
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	floor->Move({ 0.0f, -0.75f, 0.0f });
@@ -203,7 +194,7 @@ void TwoPlayer::LoadScene()
 
 	Material* DiceTex = new Material("d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
-	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
+	Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
 	Material* defaultTex = new Material("default-texture.png", "default-texture.png");
 
 	//sun = new DirectionalLight(glm::normalize(glm::vec3(1.5f, 1.0f, 0.5f)), { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f);

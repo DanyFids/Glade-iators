@@ -52,14 +52,14 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void OnePlayer::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt)
 {
-	glm::vec3 m = glm::vec3(0.0f, 0.0f, 0.0f);
+	static glm::vec3 m = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		m = glm::vec3(0.0f, 0.0f, 1.0f);
+		m = glm::vec3(0.0f, 0.0f, -1.0f);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		m = glm::vec3(0.0f, 0.0f, 1.0f);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		m = glm::vec3(1.0f, 0.0f, 0.0f);
+		m = glm::vec3(-1.0f, 0.0f, 0.0f);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		m = glm::vec3(1.0f, 0.0f, 0.0f);
 	if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f) {
@@ -144,6 +144,13 @@ void OnePlayer::LoadScene()
 	players.push_back(new Object(Square, DiceTex, basicCubeHB));
 	players[PLAYER_1]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_1]->Move({ 0.0f, 0.3f, 0.0f });
+
+	Object* pellet = new Object(Square, defaultTex, basicCubeHB);
+
+	pellet->Move({ 0.0f, 1.0f, 5.0f });
+	pellet->Scale({ 1.0f, 1.0f, 1.0f });
+
+	terrain.push_back(pellet);
 
 	Object* botWall = new Object(Square, defaultTex, basicCubeHB);
 	botWall->Move({ 0.0f, 1.0f, -9.5f });

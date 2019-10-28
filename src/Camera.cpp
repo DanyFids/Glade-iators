@@ -8,7 +8,7 @@
 
 Camera::Camera(glm::vec3 pos, glm::vec4 s_dim)
 {
-	position = pos;
+	position = pos; //test
 	target = glm::vec3(0.0f, 0.0f, 0.0f);
 	direction = glm::normalize(target - position);
 	glm::vec3 u = glm::vec3(0.0f, 1.0f, 0.0f);

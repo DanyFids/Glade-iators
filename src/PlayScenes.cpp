@@ -63,13 +63,11 @@ void OnePlayer::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		m += glm::vec3(1.0f, 0.0f, 0.0f);
 	if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f) {
+		players[PLAYER_1]->Move(m * PLAYER_SPEED * dt);
 		for (int i = 0; i < terrain.size(); i++) {
 			if (players[PLAYER_1]->hitbox->HitDetect(players[PLAYER_1]->GetTransform(), (CubeHitbox*)(terrain[i]->hitbox), terrain[i]->GetTransform())) {
 				//std::cout << ("HIT DETECTED");
-
-			}
-			else {
-				players[PLAYER_1]->Move(m * PLAYER_SPEED * dt);
+				players[PLAYER_1]->Move(m * -1.0f * PLAYER_SPEED * dt);
 			}
 		}
 	}

@@ -54,14 +54,14 @@ void OnePlayer::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 {
 	glm::vec3 m = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-		m -= glm::vec3(0.0f, 0.0f, 1.0f);
-	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
-		m += glm::vec3(0.0f, 0.0f, 1.0f);
-	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
-		m -= glm::vec3(1.0f, 0.0f, 0.0f);
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-		m += glm::vec3(1.0f, 0.0f, 0.0f);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		m = glm::vec3(0.0f, 0.0f, 1.0f);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		m = glm::vec3(0.0f, 0.0f, 1.0f);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		m = glm::vec3(1.0f, 0.0f, 0.0f);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		m = glm::vec3(1.0f, 0.0f, 0.0f);
 	if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f) {
 		players[PLAYER_1]->Move(m * PLAYER_SPEED * dt);
 		for (int i = 0; i < terrain.size(); i++) {

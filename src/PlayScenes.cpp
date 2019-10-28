@@ -50,8 +50,34 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 		f3_pressed = false;
 }
 
+void OnePlayer::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt)
+{
+	glm::vec3 m = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+		m -= glm::vec3(0.0f, 0.0f, 1.0f);
+	if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+		m += glm::vec3(0.0f, 0.0f, 1.0f);
+	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+		m -= glm::vec3(1.0f, 0.0f, 0.0f);
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+		m += glm::vec3(1.0f, 0.0f, 0.0f);
+	if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f) {
+		for (int i = 0; i < terrain.size(); i++) {
+			if (players[PLAYER_1]->hitbox->HitDetect(players[PLAYER_1]->GetTransform(), (CubeHitbox*)(terrain[i]->hitbox), terrain[i]->GetTransform())) {
+				//std::cout << ("HIT DETECTED");
+
+			}
+			else {
+				players[PLAYER_1]->Move(m * PLAYER_SPEED * dt);
+			}
+		}
+	}
+}
+
 void OnePlayer::Update(float dt)
 {
+	
 }
 
 void OnePlayer::Draw()
@@ -121,6 +147,30 @@ void OnePlayer::LoadScene()
 	players[PLAYER_1]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_1]->Move({ 0.0f, 0.3f, 0.0f });
 
+	Object* botWall = new Object(Square, defaultTex, basicCubeHB);
+	botWall->Move({ 0.0f, 1.0f, -9.5f });
+	botWall->Scale({ 30.0f, 2.0f, 2.0f });
+
+	terrain.push_back(botWall);
+
+	Object* topWall = new Object(Square, defaultTex, basicCubeHB);
+	topWall->Move({ 0.0f, 1.0f, 9.0f });
+	topWall->Scale({ 30.0f, 2.0f, 2.0f });
+
+	terrain.push_back(topWall);
+
+	Object* rightWall = new Object(Square, defaultTex, basicCubeHB);
+	rightWall->Move({ 12.0f, 1.0f, 0.0f });
+	rightWall->Scale({ 2.0f, 2.0f, 30.0f });
+
+	terrain.push_back(rightWall);
+
+	Object* leftWall = new Object(Square, defaultTex, basicCubeHB);
+	leftWall->Move({ -12.0f, 1.0f, 0.0f });
+	leftWall->Scale({ 2.0f, 2.0f, 30.0f });
+
+	terrain.push_back(leftWall);
+
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	floor->Move({ 0.0f, -0.75f, 0.0f });
 	floor->Scale({ 30.0f, 0.5f, 30.0f });
@@ -128,7 +178,7 @@ void OnePlayer::LoadScene()
 	terrain.push_back(floor);
 
 	Cam = {
-		new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT))
+		new Camera(glm::vec3(0.0f, 23.0f, 5.0f), {0.0f, 0.0f, 0.0f}, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT))
 	};
 
 	// DEBUG THINGS
@@ -167,7 +217,7 @@ void TwoPlayer::Update(float dt)
 	if (players[PLAYER_1]->hitbox->HitDetect(players[PLAYER_1]->GetTransform(), (CubeHitbox*)(players[PLAYER_2]->hitbox), players[PLAYER_2]->GetTransform())) {
 		std::cout << "HOII! HIT DETECTED!" << std::endl;
 	}
-
+	
 	//Square->Update(dt);
 }
 

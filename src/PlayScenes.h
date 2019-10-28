@@ -20,6 +20,7 @@ public:
 
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
+	virtual void KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt) override;
 	virtual void Update(float dt) override;
 	virtual void Draw() override;
 	virtual void LoadScene() override;

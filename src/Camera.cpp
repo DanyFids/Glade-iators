@@ -8,7 +8,7 @@
 
 Camera::Camera(glm::vec3 pos, glm::vec4 s_dim)
 {
-	position = pos; //test
+	position = pos; 
 	target = glm::vec3(0.0f, 0.0f, 0.0f);
 	direction = glm::normalize(target - position);
 	glm::vec3 u = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -49,9 +49,12 @@ Camera::Camera(glm::vec3 pos, glm::vec3 targ, glm::vec4 s_dim)
 
 void Camera::Move(glm::vec3 dir, float dt)
 {
-	position = position + (dir * speed * dt);
-
-	UpdateCam();
+	// 
+	// REMOVED
+	// 
+	//position = position + (dir * speed * dt);
+	//
+	//UpdateCam();
 }
 
 void Camera::Rotate(glm::vec2 dir)

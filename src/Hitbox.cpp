@@ -5,6 +5,7 @@ CubeHitbox::CubeHitbox(float w, float h, float d):dim(glm::vec3(w,h,d))
 {
 }
 
+// player[PLAYER_1]->hitbox->HitDetect(player[PLAYER_1]->GetTransform(), (CubeHitbox*) wall->hitbox, wall->GetTransform());
 bool CubeHitbox::HitDetect(Transform t, CubeHitbox* other, Transform oT) // AABB
 {
 	float halfW = GetDim().x / 2 * t.scale.x;

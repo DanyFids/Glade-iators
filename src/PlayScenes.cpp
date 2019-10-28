@@ -78,7 +78,7 @@ void OnePlayer::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 			bodyParts[b]->Move(bodyParts[b]->getLast() * PLAYER_SPEED * dt); // move body in the past directions to generate a follow
 
 			if (players[PLAYER_1]->hitbox->HitDetect(players[PLAYER_1]->GetTransform(), (CubeHitbox*)(bodyParts[b]->hitbox), bodyParts[b]->GetTransform())) {
-				players[PLAYER_1]->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
+				players[PLAYER_1]->setPos(glm::vec3(0.0f, 0.0f, 0.0f)); //body part collision resets positions
 			}
 		}
 
@@ -89,7 +89,7 @@ void OnePlayer::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 					//This makes player stop when touching an object/wall
 					//players[PLAYER_1]->Move(m * -1.0f * PLAYER_SPEED * dt);
 					//resets player when touching object
-					players[PLAYER_1]->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
+					players[PLAYER_1]->setPos(glm::vec3(0.0f, 0.0f, 0.0f)); // wall collision resets position
 
 					//bodyParts.clear(bodyParts.size());
 					//glDeleteVertexArrays

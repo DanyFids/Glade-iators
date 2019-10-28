@@ -6,6 +6,17 @@
 
 #include"Game.h"
 
+//
+// GDW CODE WAS USED
+// GDW GROUP MEMBERS:
+// DANIEL FINDLETON
+// TIA LEE
+// MAIJA KINNUNEN
+// CRAIG HOLDER
+// ANTHONY ONA
+// DYLAN BRUSH
+//
+
 //void Draw(Shader* shaderObj);
 //void Draw(unsigned int VAO, unsigned int shaderObj);
 //void Update();

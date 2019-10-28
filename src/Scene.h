@@ -75,6 +75,7 @@ public:
 class PlayScene : public Scene {
 protected:
 	std::vector<Object*> players;
+	std::vector<Object*> bodyParts;
 	std::vector<Object*> terrain;
 
 	std::vector<PointLight*> lights;

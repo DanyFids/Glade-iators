@@ -35,6 +35,10 @@ protected:
 	Mesh* mesh;
 	Material* material;
 	Transform transform;
+	bool isPellet = false;
+	bool isBody = false;
+	glm::vec3 lastPos = glm::vec3(0.0f, 0.0f, 0.0f);
+
 
 public:
 	Hitbox* hitbox;
@@ -49,6 +53,13 @@ public:
 	void Rotate(float tht, glm::vec3 dir);
 	void Move(glm::vec3 dir);
 	void Scale(glm::vec3 scl);
+	void setLast(glm::vec3 _pos);
+	void setPos(glm::vec3 _pos);
+	glm::vec3 getLast();
+	void setPellet(bool _val);
+	bool getPellet();
+	void setBody(bool _val);
+	bool getBody();
 
 	glm::vec3 GetPosition() { return transform.position; };
 	Transform GetTransform() { return transform; }

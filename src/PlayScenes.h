@@ -24,6 +24,7 @@ public:
 	virtual void Update(float dt) override;
 	virtual void Draw() override;
 	virtual void LoadScene() override;
+
 };
 
 class TwoPlayer: public PlayScene {

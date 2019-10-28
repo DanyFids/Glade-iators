@@ -79,3 +79,39 @@ void Object::Scale(glm::vec3 scl)
 {
 	transform.scale = scl;
 }
+
+void Object::setLast(glm::vec3 _pos)
+{
+	transform.position = _pos;
+}
+
+void Object::setPos(glm::vec3 _pos)
+{
+	transform.position = _pos;
+}
+
+glm::vec3 Object::getLast()
+{
+
+	return transform.position;
+}
+
+void Object::setPellet(bool _val)
+{
+	isPellet = _val;
+}
+
+bool Object::getPellet()
+{
+	return isPellet;
+}
+
+void Object::setBody(bool _val)
+{
+	isBody = _val;
+}
+
+bool Object::getBody()
+{
+	return isBody;
+}

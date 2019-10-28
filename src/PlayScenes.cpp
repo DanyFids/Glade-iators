@@ -3,6 +3,7 @@
 #include<GLFW/glfw3.h>
 #include<GLM/glm.hpp>
 #include <iostream>
+#include <stdlib.h>
 
 #include"Mesh.h"
 #include"Shader.h"
@@ -53,6 +54,14 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 void OnePlayer::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt)
 {
 	static glm::vec3 m = glm::vec3(0.0f, 0.0f, 0.0f);
+	
+	if (bodyParts.size() > 0) {
+		bodyParts[0]->setLast(m); //find the last position before m actually changes to the new direction
+	}
+	for (int b = 1; b < bodyParts.size(); b++) {
+		int l = b - 1;
+		bodyParts[b]->setLast(bodyParts[l]->getLast()); //find the last positions of other body parts
+	}
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		m = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -63,11 +72,48 @@ void OnePlayer::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		m = glm::vec3(1.0f, 0.0f, 0.0f);
 	if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f) {
+		//players[PLAYER_1]->setLast(players[PLAYER_1]->GetPosition());
 		players[PLAYER_1]->Move(m * PLAYER_SPEED * dt);
+		for (int b = 0; b < bodyParts.size(); b++) {
+			bodyParts[b]->Move(bodyParts[b]->getLast() * PLAYER_SPEED * dt); // move body in the past directions to generate a follow
+
+			if (players[PLAYER_1]->hitbox->HitDetect(players[PLAYER_1]->GetTransform(), (CubeHitbox*)(bodyParts[b]->hitbox), bodyParts[b]->GetTransform())) {
+				players[PLAYER_1]->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
+			}
+		}
+
 		for (int i = 0; i < terrain.size(); i++) {
 			if (players[PLAYER_1]->hitbox->HitDetect(players[PLAYER_1]->GetTransform(), (CubeHitbox*)(terrain[i]->hitbox), terrain[i]->GetTransform())) {
 				//std::cout << ("HIT DETECTED");
-				players[PLAYER_1]->Move(m * -1.0f * PLAYER_SPEED * dt);
+				if (!terrain[i]->getPellet()) {
+					//This makes player stop when touching an object/wall
+					//players[PLAYER_1]->Move(m * -1.0f * PLAYER_SPEED * dt);
+					//resets player when touching object
+					players[PLAYER_1]->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
+
+					//bodyParts.clear(bodyParts.size());
+					//glDeleteVertexArrays
+					//This is where the body parts would delete(when you die)
+				} 
+				else {
+
+					glm::vec3 n = glm::vec3(0.0f, 0.6f, 0.0f);
+					float random1 = (rand() % (10 - (-10))) + (-10);
+					float random2 = (rand() % (7 - (-7))) + (-7);
+					n += glm::vec3(random1, 0.0f, random2);
+					terrain[i]->setPos(n);
+					
+					Material* defaultTex = new Material("default-texture.png", "default-texture.png");
+					Hitbox* basicCubeHB = new CubeHitbox(1.0f, 1.0f, 1.0f);
+					Mesh* Square = new Mesh("d6.obj");
+					Object* player = new Object(Square, defaultTex, basicCubeHB);
+					player->Move({ players[PLAYER_1]->GetPosition() });
+					player->Scale({ 0.75f,0.75f,0.75f });
+					player->setBody(true);
+					
+					bodyParts.push_back(player);
+
+				}
 			}
 		}
 	}
@@ -147,8 +193,11 @@ void OnePlayer::LoadScene()
 
 	Object* pellet = new Object(Square, defaultTex, basicCubeHB);
 
-	pellet->Move({ 0.0f, 1.0f, 5.0f });
-	pellet->Scale({ 1.0f, 1.0f, 1.0f });
+	float random1 = (rand() % (10 - (-10))) + (-10);
+	float random2 = (rand() % (7 - (-7))) + (-7);
+	pellet->Move({ random1, 0.6f, random2 });
+	pellet->Scale({ 0.6f, 0.6f, 0.6f });
+	pellet->setPellet(true);
 
 	terrain.push_back(pellet);
 

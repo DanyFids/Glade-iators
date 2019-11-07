@@ -10,6 +10,7 @@ class Shader;
 class Object;
 class PointLight;
 class DirectionalLight;
+class UI;
 
 class SceneD {
 public:
@@ -79,6 +80,8 @@ protected:
 
 	std::vector<PointLight*> lights;
 	DirectionalLight * sun;
+
+	std::vector<UI*> ui;
 
 public:
 	virtual void KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt) override;

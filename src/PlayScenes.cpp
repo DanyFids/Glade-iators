@@ -15,6 +15,7 @@
 #include"Constants.h"
 #include"Test_Primitives.h"
 #include"Hitbox.h"
+#include"UI.h"
 
 
 OnePlayer::OnePlayer()
@@ -53,6 +54,29 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void OnePlayer::Update(float dt)
 {
+	for (int c = 0; c < players.size(); c++) {
+		players[c]->Update(dt);
+
+		for (int p = 0; p < players.size(); p++) {
+			if (players[c] != players[p]) {
+				if (players[c]->HitDetect(players[p])) {
+					std::cout << "Welp\n";
+				}
+			}
+		}
+
+		if (glfwJoystickPresent(c) && glfwJoystickIsGamepad(c)) {
+			Cam[c]->Move(players[c]->phys.move, dt);
+
+			players[c]->ApplyMove();
+
+			Cam[c]->SetTarget(players[c]->GetPosition());
+		}
+	}
+
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Update(dt);
+	}
 }
 
 void OnePlayer::Draw()
@@ -96,6 +120,12 @@ void OnePlayer::Draw()
 		RenderScene(shaderObj);
 	}
 
+	glDisable(GL_DEPTH);
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
+	}
+	glEnable(GL_DEPTH);
+
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
@@ -110,17 +140,22 @@ void OnePlayer::LoadScene()
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
 	Material* defaultTex = new Material("default-texture.png", "default-texture.png");
 
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 25.0f, 0.5f)), { 1.0f, 1.0f, 1.0f }, 0.1f, 0.2f, 0.2f);
+	Material* stamBarMat = new Material("green.png");
+
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 0.8f);
 	//lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
-	lights.push_back(new PointLight({ -4.0f, 3.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
+	//lights.push_back(new PointLight({ -4.0f, 3.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	Mesh* Square = new Mesh("d6.obj");
 	Mesh* d20 = new Mesh("d20.obj");
 
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f,1.0f,1.0f);
-	players.push_back(new Object(d20, D20Tex, basicCubeHB));
-	players[PLAYER_1]->Scale({ 0.75f,0.75f,0.75f });
-	players[PLAYER_1]->Move({ 0.0f, 0.3f, 0.0f });
+	Hitbox* basicSphereHB = new SphereHitbox(0.75f);
+	players.push_back(new Player(Square, DiceTex, basicCubeHB, { 3.0f, 0.3f, 0.0f }));
+	players.push_back(new Object(d20, D20Tex, basicSphereHB));
+
+	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
+	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	floor->Move({ 0.0f, -0.75f, 0.0f });
@@ -130,6 +165,10 @@ void OnePlayer::LoadScene()
 
 	Cam = {
 		new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT))
+	};
+
+	ui = {
+		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(50, 500), stamBarMat)
 	};
 
 	// DEBUG THINGS

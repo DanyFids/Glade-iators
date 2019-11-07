@@ -6,8 +6,8 @@ layout (location = 3) in vec3 aTan;
 layout (location = 4) in vec3 bTan;
 
 out vec3 fragPos;
-out vec3 norm;
 out vec2 texCoord;
+out mat3 TBN;
 out vec4 sunFLP;
 out vec4 fragLightPos[10];
 
@@ -31,7 +31,7 @@ void main()
 	vec3 b = normalize(normMat * bTan);
 	vec3 n = normalize(normMat * aNorm);
 
-	norm = n;
+	TBN = mat3(t,b,n);
 
 	for(int l = 0; l < num_lights; l++){
 		fragLightPos[l] =  corr * lightSpaceMatrix[l] * vec4(fragPos, 1); 

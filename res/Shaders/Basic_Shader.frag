@@ -1,7 +1,7 @@
 #version 450 core
 out vec4 FragColor;
 in vec3 fragPos;
-in vec3 norm;
+in mat3 TBN;
 in vec2 texCoord;
 in vec4 sunFLP;
 in vec4 fragLightPos[10];
@@ -42,7 +42,7 @@ uniform DirLight sun;
 uniform PointLight lights[10];
 uniform int num_lights;
 
-float shadow_bias = 0.0001;
+float shadow_bias = 0.0005;
 
 float far_plane = 25.0;
 
@@ -80,7 +80,7 @@ float ShadowCalc(vec3 fragPos, int light_id){
 
 	float shadow;
 
-	shadow = (curDepth - shadow_bias) > closestDepth ? 1.0 : 0.0;
+	shadow = (curDepth - shadow_bias) > 40 ? 1.0 : 0.0;
 
 	return shadow;
 }
@@ -91,10 +91,10 @@ void main()
 	vec3 specVal = vec3(texture(material.specular, texCoord));
 	vec3 normTex = vec3(texture(material.normal, texCoord));
 
-	vec3 normVal = vec3(0.0);
+	//vec3 normVal = vec3(0.0);
 
-	//vec3 norm = (normTex * 2) - 1; // reverses the normalization to RGB process
-	//norm = normalize(vert_out.TBN * norm);
+	vec3 norm = (normTex * 2) - 1; // reverses the normalization to RGB process
+	norm = normalize(TBN * norm);
 
 	vec3 sunDir = normalize(sun.pos - vec3(0));
 

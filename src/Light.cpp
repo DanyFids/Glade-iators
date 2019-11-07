@@ -36,15 +36,7 @@ void Light::SetupOccRender()
 
 Light::Light(glm::vec3 pos, bool orth)
 {
-	if (orth) {
-		far_plane = 100.0f;
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, far_plane);
-	}
-	else {
-		far_plane = 25.0f;
-		lightProjection = glm::perspective(glm::radians(90.0f), ((float)SHADOW_WIDTH / (float)SHADOW_HEIGHT), 0.2f, far_plane);
-	}
-	//lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, 100.0f);
+	SetupDepthPerspective(orth);
 
 	position = pos;
 	ambient = glm::vec3(1.0, 1.0, 1.0);
@@ -60,14 +52,7 @@ Light::Light(glm::vec3 pos, bool orth)
 
 Light::Light(glm::vec3 pos, glm::vec3 color, float a, float d, float s, bool orth)
 {
-	if (orth) {
-		far_plane = 100.0f;
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, far_plane);
-	}
-	else {
-		far_plane = 25.0f;
-		lightProjection = glm::perspective(glm::radians(90.0f), ((float)SHADOW_WIDTH / (float)SHADOW_HEIGHT), 0.2f, far_plane);
-	}
+	SetupDepthPerspective(orth);
 
 	position = pos;
 
@@ -84,14 +69,7 @@ Light::Light(glm::vec3 pos, glm::vec3 color, float a, float d, float s, bool ort
 
 Light::Light(glm::vec3 pos, glm::vec3 ambi, glm::vec3 diff, glm::vec3 spec, float a, float d, float s, bool orth)
 {
-	if (orth) {
-		far_plane = 100.0f;
-		lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, 0.2f, far_plane);
-	}
-	else {
-		far_plane = 25.0f;
-		lightProjection = glm::perspective(glm::radians(90.0f), ((float)SHADOW_WIDTH / (float)SHADOW_HEIGHT), 0.2f, far_plane);
-	}
+	SetupDepthPerspective(orth);
 
 	position = pos;
 
@@ -121,6 +99,18 @@ void Light::SetSpecular(glm::vec3 color, float str)
 {
 	specular = color;
 	specular_strength = str;
+}
+
+void Light::SetupDepthPerspective(bool ortho)
+{
+	if (ortho) {
+		far_plane = 100.0f;
+		lightProjection = glm::ortho(-25.0f, 25.0f, -25.0f, 25.0f, -10.0f, far_plane);
+	}
+	else {
+		far_plane = 25.0f;
+		lightProjection = glm::perspective(glm::radians(90.0f), ((float)SHADOW_WIDTH / (float)SHADOW_HEIGHT), 0.2f, far_plane);
+	}
 }
 
 void Light::SetStr(float a, float d, float s)
@@ -262,4 +252,10 @@ void PointLight::SetupDepthShader(Shader* shader)
 	}
 	shader->SetVec3("lightPos", position);
 	shader->SetF("farPlane", far_plane);
+}
+
+void PointLight::SetIntensity(float l, float q)
+{
+	linear = l;
+	quadratic = q;
 }

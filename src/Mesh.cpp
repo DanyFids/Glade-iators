@@ -11,6 +11,9 @@
 #include "Camera.h"
 #include "Constants.h"
 
+Mesh::Mesh() {
+}
+
 Mesh::Mesh(float vert[], int num_vert, unsigned int indi[], int num_indi) {
 
 	// setup Vertex Array Object
@@ -104,6 +107,8 @@ Mesh::Mesh(const char* file)
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), &(temp_vert->biTan));
 	glEnableVertexAttribArray(4);
 
+	
+
 	num_indices = num_indi;
 
 	// save buffers
@@ -116,7 +121,6 @@ Mesh::Mesh(const char* file)
 
 Mesh::~Mesh()
 {
-	
 }
 
 void Mesh::Draw(Shader* shader)
@@ -332,4 +336,9 @@ void Mesh::Move(glm::vec3 dir, float dt)
 void Mesh::SetPosition(glm::vec3 pos)
 {
 	model = glm::translate(model, pos);
+}
+
+AnimMesh::AnimMesh(std::string f[])
+{
+
 }

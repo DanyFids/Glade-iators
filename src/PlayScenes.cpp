@@ -60,7 +60,7 @@ void OnePlayer::Update(float dt)
 		for (int p = 0; p < players.size(); p++) {
 			if (players[c] != players[p]) {
 				if (players[c]->HitDetect(players[p])) {
-					std::cout << "Welp\n";
+					//std::cout << "Welp\n";
 				}
 			}
 		}
@@ -120,11 +120,11 @@ void OnePlayer::Draw()
 		RenderScene(shaderObj);
 	}
 
-	glDisable(GL_DEPTH);
+	glDisable(GL_DEPTH_TEST);
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
-	glEnable(GL_DEPTH);
+	glEnable(GL_DEPTH_TEST);
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
@@ -142,20 +142,25 @@ void OnePlayer::LoadScene()
 
 	Material* stamBarMat = new Material("green.png");
 
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 0.8f);
-	//lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
-	//lights.push_back(new PointLight({ -4.0f, 3.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
+	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	Mesh* Square = new Mesh("d6.obj");
 	Mesh* d20 = new Mesh("d20.obj");
+	Mesh* boi = new Mesh("TreePersonThing.obj");
 
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f,1.0f,1.0f);
-	Hitbox* basicSphereHB = new SphereHitbox(0.75f);
+	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
+	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 	players.push_back(new Player(Square, DiceTex, basicCubeHB, { 3.0f, 0.3f, 0.0f }));
 	players.push_back(new Object(d20, D20Tex, basicSphereHB));
 
 	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
+
+	players.push_back(new Object(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
+	players[2]->Scale(glm::vec3(0.1f));
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	floor->Move({ 0.0f, -0.75f, 0.0f });
@@ -164,7 +169,7 @@ void OnePlayer::LoadScene()
 	terrain.push_back(floor);
 
 	Cam = {
-		new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT))
+		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT)) 
 	};
 
 	ui = {
@@ -238,7 +243,7 @@ void TwoPlayer::LoadScene()
 	Material* defaultTex = new Material("default-texture.png", "default-texture.png");
 
 	//sun = new DirectionalLight(glm::normalize(glm::vec3(1.5f, 1.0f, 0.5f)), { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f);
-	lights.push_back(new PointLight({ 0.0f, 30.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	//lights.push_back(new PointLight({ 0.0f, 30.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 1.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	Mesh* Square = new Mesh("d6.obj");

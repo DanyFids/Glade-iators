@@ -60,22 +60,22 @@ Light::Light(glm::vec3 pos, glm::vec3 color, float a, float d, float s, bool ort
 	diffuse = color;
 	specular = color;
 
-	ambient_strength = a;
+	ambient_strength = a; 
 	diffuse_strength = d;
-	specular_strength = s;
+	specular_strength = s; 
 
-	SetupOccRender();
+	SetupOccRender(); 
 }
 
-Light::Light(glm::vec3 pos, glm::vec3 ambi, glm::vec3 diff, glm::vec3 spec, float a, float d, float s, bool orth)
+Light::Light(glm::vec3 pos, glm::vec3 ambi, glm::vec3 diff, glm::vec3 spec, float a, float d, float s, bool orth)    
 {
-	SetupDepthPerspective(orth);
+	SetupDepthPerspective(orth); 
 
-	position = pos;
-
-	ambient = ambi;
-	diffuse = diff;
-	specular = spec;
+	position = pos; 
+	   
+	ambient = ambi; 
+	diffuse = diff; 
+	specular = spec;  
 
 	ambient_strength = a;
 	diffuse_strength = d;
@@ -108,7 +108,7 @@ void Light::SetupDepthPerspective(bool ortho)
 		lightProjection = glm::ortho(-25.0f, 25.0f, -25.0f, 25.0f, -10.0f, far_plane);
 	}
 	else {
-		far_plane = 25.0f;
+		far_plane = 50.0f;
 		lightProjection = glm::perspective(glm::radians(90.0f), ((float)SHADOW_WIDTH / (float)SHADOW_HEIGHT), 0.2f, far_plane);
 	}
 }
@@ -176,15 +176,22 @@ void PointLight::SetupCubeMap()
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	lightTransforms.push_back(glm::lookAt(position, position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-	lightTransforms.push_back(glm::lookAt(position, position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-	lightTransforms.push_back(glm::lookAt(position, position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
-	lightTransforms.push_back(glm::lookAt(position, position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
-	lightTransforms.push_back(glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
-	lightTransforms.push_back(glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+	//right
+	// up ?
+	//
+	// down?
+	// back?
+	// forwards
+
+	lightTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+	lightTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+	lightTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+	lightTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+	lightTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+	lightTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
 }
 
-PointLight::PointLight(glm::vec3 pos):Light(pos, false)
+PointLight::PointLight(glm::vec3 pos):Light(pos, false) 
 {
 	linear = 0.7f;
 	quadratic = 1.8f;
@@ -229,29 +236,32 @@ void PointLight::SetupLight(Shader* shader, int num)
 	temp = name + ".position";
 	shader->SetVec3(temp.c_str(), position);
 	temp = name + ".ambient";
-	shader->SetVec3(temp.c_str(), (ambient * ambient_strength));
-	temp = name + ".diffuse";
-	shader->SetVec3(temp.c_str(), (diffuse * diffuse_strength));
-	temp = name + ".specular";
-	shader->SetVec3(temp.c_str(), (specular * specular_strength));
+	shader->SetVec3(temp.c_str(), (ambient * ambient_strength)); 
+	temp = name + ".diffuse"; 
+	shader->SetVec3(temp.c_str(), (diffuse * diffuse_strength));  
+	temp = name + ".specular"; 
+	shader->SetVec3(temp.c_str(), (specular * specular_strength)); 
 
 	temp = name + ".linear";
 	shader->SetF(temp.c_str(), linear);
 	temp = name + ".quadratic";
 	shader->SetF(temp.c_str(), quadratic);
 
-	temp = name + ".depthMap";
+	temp = name + ".depthMap";  
 	shader->SetI(temp.c_str(), 4 + num);
+
+
+	shader->SetF("far_plane", far_plane);
 }
 
 void PointLight::SetupDepthShader(Shader* shader)
 {
-	for (int c = 0; c < lightTransforms.size(); c++) {
+	for (int c = 0; c < lightTransforms.size(); c++) { 
 		std::string locName = "shadowMatrix[" + std::to_string(c) + "]";
 		shader->SetMat4(locName.c_str(), lightTransforms[c]);
 	}
 	shader->SetVec3("lightPos", position);
-	shader->SetF("farPlane", far_plane);
+	shader->SetF("far_plane", far_plane);
 }
 
 void PointLight::SetIntensity(float l, float q)

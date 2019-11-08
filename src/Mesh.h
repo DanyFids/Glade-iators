@@ -22,11 +22,12 @@ class Mesh {
 
 
 public:
+	Mesh();
 	Mesh(float vert[], int num_vert, unsigned int indi[], int num_indi);
 	Mesh(const char* file);
 	~Mesh();
 
-	void Draw(Shader*);
+	virtual void Draw(Shader*);
 	void SetTexture(Material* t);
 	void Update(float dt);
 
@@ -34,4 +35,15 @@ public:
 
 	void Move(glm::vec3 dir, float dt);
 	void SetPosition(glm::vec3 pos);
+};
+
+class AnimMesh : public Mesh {
+	int num_frames;
+	int curFrame;
+	int nexFrame;
+
+public:
+	AnimMesh(std::string f[]);
+
+	virtual void Draw(Shader*);
 };

@@ -14,3 +14,12 @@ public:
 
 	Material(std::string d, std::string n = "default-normal.png", std::string s = "default-texture.png");
 };
+
+class Skybox {
+public:
+	unsigned int SKY;
+
+	std::string sky_file;
+
+	Skybox(std::string f);
+};

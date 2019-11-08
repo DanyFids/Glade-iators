@@ -39,12 +39,12 @@ struct PointLight{
 uniform vec3 viewPos;
 uniform Material material;
 uniform DirLight sun;
-uniform PointLight lights[10];
+uniform PointLight lights[2];
 uniform int num_lights;
 
 float shadow_bias = 0.0005;
 
-float far_plane = 25.0;
+uniform float far_plane;
 
 float SunShadow(vec4 fragInLightSpace){
 	vec3 projCoords = fragInLightSpace.xyz / fragInLightSpace.w;
@@ -72,15 +72,21 @@ float SunShadow(vec4 fragInLightSpace){
 }
 
 float ShadowCalc(vec3 fragPos, int light_id){
+	float shadowPen = 0.01;
+
 	vec3 fragToLight = fragPos - lights[light_id].position;
-	float closestDepth = texture(lights[light_id].depthMap, fragToLight).r;
+	fragToLight = fragToLight * vec3(1, -1, -1);
+	float closestDepth = texture(lights[light_id].depthMap, normalize(fragToLight)).r;
 	closestDepth *= far_plane;
 
 	float curDepth = length(fragToLight);
 
 	float shadow;
 
-	shadow = (curDepth - shadow_bias) > 40 ? 1.0 : 0.0;
+	if ((curDepth + shadowPen) < closestDepth)
+	    shadow = 1.0;
+	else
+	    shadow = 0.0;
 
 	return shadow;
 }
@@ -141,9 +147,10 @@ void main()
 		float p_spec = pow(max(dot(norm, halfWay), 0.0), material.shine);
 		vec3 p_specular = p_spec * lights[c].specular * specVal;
 
-		float shadow = 1.0 - ShadowCalc(fragPos, c);
+		float shadow = ShadowCalc(fragPos, c);
 
 		pointColor += (p_ambient + shadow * (p_diffuse + p_specular)) * attenuation;
+		//pointColor = vec3(shadow, shadow, shadow);
 	}
 
     FragColor = vec4((pointColor + sunColor), 1.0);

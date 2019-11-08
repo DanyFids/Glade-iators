@@ -123,26 +123,27 @@ void Player::Update(float dt)
 		if (stamina < MAX_STAMINA) {
 			stamina += STAM_RECOV * dt;
 
-			stamina = glm::min(stamina, MAX_STAMINA);
+			stamina = glm::min(stamina, MAX_STAMINA); 
 		}
 	}
 
 	Object::Update(dt);
 }
 
-bool Player::HitDetect(Object* other)
+bool Player::HitDetect(Object* other) 
 {
 	Transform predict = transform;
 	predict.position += phys.move;
 
-	if (other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this, predict)) {
-		for (float t = 1.0f; t >= 0.0f; t -= 0.1f) {
+	if (other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, predict)) { 
+		for (float t = 1.0f; t >= -0.1f; t -= 0.1f) {
+			t = glm::max(t, 0.0f);
 			glm::vec3 fixSpd = lerp(glm::vec3(0.0f, 0.0f, 0.0f), phys.move, t);
 
 			predict = transform;
 			predict.position += fixSpd;
 
-			if (!other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this, predict)) {
+			if (!other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, predict)) {
 				phys.move = fixSpd;
 				break;
 			}

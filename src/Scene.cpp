@@ -5,6 +5,7 @@
 #include"Object.h"
 #include"Light.h"
 #include "Constants.h"
+#include"UI.h"
 
 void MenuScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt)
 {
@@ -55,7 +56,7 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		m += glm::vec3(1.0f, 0.0f, 0.0f);
 	if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f)
-		players[player]->Move(m * PLAYER_SPEED * dt);
+		players[player]->phys.move = m * PLAYER_SPEED * dt;
 
 	glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -97,9 +98,14 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2)
 			t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 		if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
-			players[player]->Move(glm::normalize(t) * 10.f * dt);
-			Cam[player]->Move(glm::normalize(t), dt); 
-			Cam[player]->SetTarget(players[player]->GetPosition());
+			players[player]->phys.move = glm::normalize(t) * 10.f * dt;
+		}
+
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && player == PLAYER_1) {
+			((Player*)players[player])->Run();
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && player == PLAYER_1) {
+			((Player*)players[player])->StopRun();
 		}
 	}
 }

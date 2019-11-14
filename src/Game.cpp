@@ -210,8 +210,10 @@ void Game::ImGuiEndFrame()
 
 void Game::InputHandle(float dt)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
 		glfwSetWindowShouldClose(window, true);
+	}
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS && !w_pressed) {
 		if (wireframe) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

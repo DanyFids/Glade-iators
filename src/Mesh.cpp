@@ -14,6 +14,7 @@
 Mesh::Mesh() {
 }
 
+//Hardcoded Loader
 Mesh::Mesh(float vert[], int num_vert, unsigned int indi[], int num_indi) {
 
 	// setup Vertex Array Object
@@ -46,7 +47,7 @@ Mesh::Mesh(float vert[], int num_vert, unsigned int indi[], int num_indi) {
 	// save buffers
 	buffers[0] = vbo;
 	buffers[1] = ebo;
-
+	
 	// Setup Transformation Matrices
 	model = glm::mat4(1.0f); // world transformations
 	//model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -55,6 +56,7 @@ Mesh::Mesh(float vert[], int num_vert, unsigned int indi[], int num_indi) {
 	//transform = glm::rotate(transform, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 }
 
+//Obj Loader
 Mesh::Mesh(const char* file)
 {
 	unsigned int num_vert, num_indi;
@@ -107,7 +109,6 @@ Mesh::Mesh(const char* file)
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), &(temp_vert->biTan));
 	glEnableVertexAttribArray(4);
 
-	
 
 	num_indices = num_indi;
 
@@ -121,6 +122,7 @@ Mesh::Mesh(const char* file)
 
 Mesh::~Mesh()
 {
+	
 }
 
 void Mesh::Draw(Shader* shader)
@@ -338,7 +340,7 @@ void Mesh::SetPosition(glm::vec3 pos)
 	model = glm::translate(model, pos);
 }
 
-AnimMesh::AnimMesh(std::string f[])
-{
-
-}
+//AnimMesh::AnimMesh(std::string f[])
+//{
+//
+//}

@@ -37,13 +37,17 @@ public:
 	void SetPosition(glm::vec3 pos);
 };
 
-class AnimMesh : public Mesh {
+
+
+class MorphMesh : public Mesh {
+	std::vector<Mesh> poses;
+
 	int num_frames;
 	int curFrame;
 	int nexFrame;
 
 public:
-	AnimMesh(std::string f[]);
-
-	virtual void Draw(Shader*);
+	//AnimMesh(std::string f[]);
+	//
+	//virtual void Draw(Shader*);
 };

@@ -83,6 +83,11 @@ void Object::Scale(glm::vec3 scl)
 	transform.scale = scl;
 }
 
+void Object::SetPosition(glm::vec3 pos)
+{
+	transform.position = pos;
+}
+
 bool Object::HitDetect(Object* other)
 {
 	return false;

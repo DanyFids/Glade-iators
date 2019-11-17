@@ -74,6 +74,16 @@ void OnePlayer::Update(float dt)
 		}
 	}
 
+	for (int a = 0; a < attacks.size(); a++)
+	{
+		attacks[a]->time -= dt;
+		if (attacks[a]->time <= 0)
+		{
+			attacks.erase(attacks.begin() + a);
+			break;
+		}
+	}
+
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
 	}

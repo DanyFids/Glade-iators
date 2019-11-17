@@ -1,6 +1,7 @@
 #pragma once
 #include<GLM/glm.hpp>
 #include<vector>
+//#include <string>
 class Material;
 class Shader;
 class Camera;
@@ -37,7 +38,7 @@ public:
 	void SetPosition(glm::vec3 pos);
 };
 
-class AnimMesh : public Mesh {
+/*class AnimMesh : public Mesh {
 	int num_frames;
 	int curFrame;
 	int nexFrame;
@@ -46,4 +47,4 @@ public:
 	AnimMesh(std::string f[]);
 
 	virtual void Draw(Shader*);
-};
+};*/

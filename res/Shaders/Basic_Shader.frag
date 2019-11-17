@@ -41,6 +41,7 @@ uniform Material material;
 uniform DirLight sun;
 uniform PointLight lights[2];
 uniform int num_lights;
+uniform vec4 indexColor;
 
 float shadow_bias = 0.0005;
 
@@ -72,7 +73,7 @@ float SunShadow(vec4 fragInLightSpace){
 }
 
 float ShadowCalc(vec3 fragPos, int light_id){
-	float shadowPen = 0.01;
+	float shadowPen = 0.0005;
 
 	vec3 fragToLight = fragPos - lights[light_id].position;
 	fragToLight = fragToLight * vec3(1, -1, -1);
@@ -83,7 +84,7 @@ float ShadowCalc(vec3 fragPos, int light_id){
 
 	float shadow;
 
-	if ((curDepth + shadowPen) < closestDepth)
+	if ((curDepth - shadowPen) < closestDepth)
 	    shadow = 1.0;
 	else
 	    shadow = 0.0;
@@ -96,6 +97,11 @@ void main()
 	vec3 objColor = vec3(texture(material.diffuse, texCoord));
 	vec3 specVal = vec3(texture(material.specular, texCoord));
 	vec3 normTex = vec3(texture(material.normal, texCoord));
+
+	if(objColor.r == objColor.b && objColor.g == 0.0){
+		objColor.g = objColor.r;
+		objColor = objColor * vec3(indexColor);
+	}
 
 	//vec3 normVal = vec3(0.0);
 

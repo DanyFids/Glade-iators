@@ -16,6 +16,7 @@
 #include"Test_Primitives.h"
 #include"Hitbox.h"
 #include"UI.h"
+#include"Skeleton.h"
 
 
 OnePlayer::OnePlayer()
@@ -142,13 +143,17 @@ void OnePlayer::LoadScene()
 
 	Material* stamBarMat = new Material("green.png");
 
+	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator.bvh");
+
+	gladiatorSkel->WriteTree();
+
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	Mesh* Square = new Mesh("d6.obj");
 	Mesh* d20 = new Mesh("d20.obj");
-	Mesh* boi = new Mesh("TreePersonThing.obj");
+	Mesh* boi = new Mesh("gladiator.obj");
 
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f,1.0f,1.0f);
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
@@ -160,7 +165,7 @@ void OnePlayer::LoadScene()
 	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
 
 	players.push_back(new Object(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
-	players[2]->Scale(glm::vec3(0.1f));
+	players[2]->Scale(glm::vec3(1.2f)); 
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	floor->Move({ 0.0f, -0.75f, 0.0f });

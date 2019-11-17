@@ -96,6 +96,8 @@ void Game::Initialize()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
+	//glEnable(GL_SCISSOR_TEST);
+
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	std::cout << glGetString(GL_RENDERER) << std::endl;

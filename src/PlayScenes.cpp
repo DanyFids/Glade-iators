@@ -82,6 +82,10 @@ void OnePlayer::Update(float dt)
 			attacks.erase(attacks.begin() + a);
 			break;
 		}
+		if (attacks[a]->HitDetect(players[1]))
+		{
+			std::cout << "Screaming\n";
+		}
 	}
 
 	for (int u = 0; u < ui.size(); u++) {

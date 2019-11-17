@@ -60,7 +60,7 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 	{
-		attacks.push_back(new Attack(1));
+		attacks.push_back(new Attack(0));
 		glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
 		p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
 		p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));

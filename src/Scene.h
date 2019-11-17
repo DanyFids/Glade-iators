@@ -4,7 +4,7 @@
 #include<GLFW/glfw3.h>
 #include<GLM/glm.hpp>
 #include<entt.hpp>
-#include "Gameplay.h"
+#include "Object.h"
 
 class Camera;
 class Shader;

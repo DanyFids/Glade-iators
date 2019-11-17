@@ -93,3 +93,21 @@ public:
 	void Run();
 	void StopRun();
 };
+
+class Attack : public Object
+{
+private:
+
+public:
+	virtual void Update(float dt);
+	virtual bool HitDetect(Object* other);
+
+	static Object* ABox;
+	int player;
+	float time;
+
+	Attack(unsigned int P);
+
+	void init();
+};
+

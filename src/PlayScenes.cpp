@@ -5,6 +5,7 @@
 #include <iostream>
 #include <typeinfo>
 
+
 #include"Mesh.h"
 #include"Shader.h"
 #include"Texture.h"
@@ -68,6 +69,7 @@ void OnePlayer::Update(float dt)
 		if (glfwJoystickPresent(c) && glfwJoystickIsGamepad(c)) {
 			Cam[c]->Move(players[c]->phys.move, dt);
 
+
 			players[c]->ApplyMove();
 
 			Cam[c]->SetTarget(players[c]->GetPosition());
@@ -77,6 +79,9 @@ void OnePlayer::Update(float dt)
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
 	}
+
+	((MorphMesh*)(morphyBoi->GetMesh()))->Update(dt);
+	// m morphyBoi->Update(dt);
 }
 
 void OnePlayer::Draw()
@@ -109,15 +114,23 @@ void OnePlayer::Draw()
 	glCullFace(GL_BACK);
 
 	sun->SetupLight(shaderObj);
+	sun->SetupLight(morphShader);
 	for (int c = 0; c < lights.size(); c++) {
 		lights[c]->SetupLight(shaderObj, c);
+		lights[c]->SetupLight(morphShader, c);
 	}
 	shaderObj->SetI("num_lights", lights.size());
+	morphShader->SetI("num_lights", lights.size());
 
 	for (int c = 0; c < Cam.size(); c++) {
 		Cam[c]->SetupCam(shaderObj);
 
 		RenderScene(shaderObj);
+
+		Cam[c]->SetupCam(morphShader);
+		morphyBoi->Draw(morphShader, Cam);
+		staticBoi->Draw(shaderObj, Cam);
+		//staticBoi->Draw(shaderObj, Cam);
 	}
 
 	glDisable(GL_DEPTH_TEST);
@@ -134,6 +147,7 @@ void OnePlayer::LoadScene()
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
+	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
 	Material* DiceTex = new Material("dice-texture.png", "d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
@@ -149,6 +163,7 @@ void OnePlayer::LoadScene()
 	Mesh* Square = new Mesh("d6.obj");
 	Mesh* d20 = new Mesh("d20.obj");
 	Mesh* boi = new Mesh("TreePersonThing.obj");
+	
 
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f,1.0f,1.0f);
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
@@ -158,6 +173,7 @@ void OnePlayer::LoadScene()
 
 	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
+	
 
 	players.push_back(new Object(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
 	players[2]->Scale(glm::vec3(0.1f));
@@ -175,6 +191,12 @@ void OnePlayer::LoadScene()
 	ui = {
 		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(50, 500), stamBarMat)
 	};
+ 
+
+	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj" };
+
+	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(2.0f,1.0f,2.0f));
+	staticBoi = new Object(new Mesh("wobble/wobble2.obj"), defaultTex, basicCubeHB, glm::vec3(2.0f, 4.0f, 2.0f));
 
 	// DEBUG THINGS
 	DebugShader = new Shader("Shaders/debug.vert", "Shaders/debug.frag");

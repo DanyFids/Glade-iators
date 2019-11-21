@@ -8,12 +8,16 @@ class OnePlayer: public PlayScene {
 	Shader* shaderObj;
 	Shader* depthShader;
 	Shader* sunShader;
+	Shader* morphShader;
 
 	Shader* DebugShader;
 	Mesh* DebugQuad;
 	bool debug = false;
 	bool f3_pressed;
 	int disp_depth = 0;
+
+	Object* morphyBoi;
+	Object* staticBoi;
 
 public:
 	OnePlayer();

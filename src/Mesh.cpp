@@ -4,6 +4,7 @@
 #include <GLM/gtc/type_ptr.hpp>
 #include <fstream>
 #include <sstream>
+#include<iostream>
 #include "Game.h"
 #include "Mesh.h"
 #include "Texture.h"
@@ -85,7 +86,7 @@ Mesh::Mesh(const char* file)
 	glBindVertexArray(vao);
 
 	// setup array Buffer
-	unsigned int vbo;
+	unsigned int vbo;	
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * num_vert, vert, GL_STATIC_DRAW);
@@ -344,3 +345,134 @@ void Mesh::SetPosition(glm::vec3 pos)
 //{
 //
 //}
+
+
+
+MorphMesh::MorphMesh(std::vector<std::string> keyframes)
+{
+	poses = keyframes;
+
+	//Declaring variables
+	unsigned int num_vert, num_vert2, num_indi;
+
+	//Current Pose
+	std::vector<Vertex> vert_vec = std::vector<Vertex>();
+
+	//Next pose
+	std::vector<Vertex> vert_vec2 = std::vector<Vertex>();
+
+	std::vector<unsigned int> indi_vec = std::vector<unsigned int>(); //Vector of indices
+
+	LoadMesh(poses[curFrame].c_str(), vert_vec, num_vert, indi_vec, num_indi);
+
+	Vertex* vert;
+	
+	unsigned int* indi;
+	vert = new Vertex[num_vert];  
+	indi = new unsigned int[num_indi];
+
+
+	for (int c = 0; c < vert_vec.size(); c++) {
+		vert[c] = vert_vec[c];
+	}
+
+	for (int c = 0; c < indi_vec.size(); c++) {
+		indi[c] = indi_vec[c];
+	}
+
+	LoadMesh(poses[nextFrame].c_str(), vert_vec2, num_vert2, indi_vec, num_indi);
+
+	if (num_vert != num_vert2) { // If pose 2 does not have = number of verts
+		std::cout << "Uh oh, stinky" << std::endl;
+		return;
+	}
+
+	Vertex* vert2 = new Vertex[num_vert * 2];
+
+	int id = 0;
+	for (int c = 0; c < vert_vec2.size(); c++) {
+		vert2[id++] = vert_vec[c];
+		vert2[id++] = vert_vec2[c];
+	}
+
+	
+
+	// setup Vertex Array Object
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	// setup array Buffer
+	unsigned int vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * num_vert*2, vert2, GL_DYNAMIC_DRAW); //May need to have a bigger size?
+
+	// setup element buffer
+	unsigned int ebo;
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_indi, indi, GL_STATIC_DRAW);
+
+	bigVert* temp_vert = nullptr;
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(bigVert), &(temp_vert->posi1));
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(bigVert), &(temp_vert->norm1));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(bigVert), &(temp_vert->tex_uv));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(bigVert), &(temp_vert->tang1));
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(bigVert), &(temp_vert->biTa1));
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(bigVert), &(temp_vert->posi2));
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(bigVert), &(temp_vert->norm2));
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(bigVert), &(temp_vert->tang2));
+	glEnableVertexAttribArray(7);
+	glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(bigVert), &(temp_vert->biTa2));
+	glEnableVertexAttribArray(8);
+
+	num_indices = num_indi;
+	// save buffers
+	buffers[0] = vbo;
+	buffers[1] = ebo;
+
+	// Setup Transformation Matrices
+	model = glm::mat4(1.0f); // world transformations
+}
+
+void MorphMesh::Draw(Shader* shdr)
+{
+	shdr->SetF("time", time / ANIM_TIME);
+
+	Mesh::Draw(shdr);
+}
+
+void MorphMesh::addPose( std::string filename)
+{
+	poses.push_back(filename);
+}
+
+void MorphMesh::Update(float dt)
+{
+
+	if (time >= ANIM_TIME) {
+		time = 0;
+	}
+
+	if (time < ANIM_TIME) {
+		time += dt;
+
+		if (time > ANIM_TIME) {
+			time = ANIM_TIME;
+		}
+
+	}
+
+	
+	
+
+	//time = 1.0f;
+}

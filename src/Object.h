@@ -67,6 +67,8 @@ public:
 
 	glm::vec3 GetPosition() { return transform.position; };
 	Transform GetTransform() { return transform; }
+
+	Mesh* GetMesh() { return mesh; }
 };
 
 class Player : public Object {

@@ -1,6 +1,7 @@
 #pragma once
 #include<GLM/glm.hpp>
 #include<vector>
+#include <string>
 class Material;
 class Shader;
 class Camera;
@@ -13,7 +14,21 @@ struct Vertex {
 	glm::vec3 biTan;
 };
 
+struct bigVert {
+	glm::vec3 posi1;
+	glm::vec3 norm1;
+	glm::vec2 tex_uv;
+	glm::vec3 tang1;
+	glm::vec3 biTa1;
+	glm::vec3 posi2;
+	glm::vec3 norm2;
+	glm::vec2 tex_2;
+	glm::vec3 tang2;
+	glm::vec3 biTa2;
+};
+
 class Mesh {
+protected:
 	unsigned int vao;
 	unsigned int buffers[2];
 	int num_indices;
@@ -37,17 +52,20 @@ public:
 	void SetPosition(glm::vec3 pos);
 };
 
-
-
 class MorphMesh : public Mesh {
-	std::vector<Mesh> poses;
+	std::vector<std::string> poses;
 
-	int num_frames;
-	int curFrame;
-	int nexFrame;
+	int num_frames = poses.size();
+	int curFrame = 0;
+	int nextFrame = 1;
 
+	float time;
+	const float ANIM_TIME = 5.0f;
 public:
-	//AnimMesh(std::string f[]);
-	//
-	//virtual void Draw(Shader*);
+	MorphMesh(std::vector<std::string> keyframes);
+	virtual void Draw(Shader*);
+	void addPose( std::string filename);
+	void Update(float dt);
+	//void nextPose();	
 };
+

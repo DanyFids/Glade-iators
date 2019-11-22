@@ -15,6 +15,9 @@ class OnePlayer: public PlayScene {
 	bool f3_pressed;
 	int disp_depth = 0;
 
+	float time = 0.0f;
+	float MAX_TIME = 0.2f;
+
 public:
 	OnePlayer();
 

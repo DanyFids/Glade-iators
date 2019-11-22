@@ -4,6 +4,7 @@
 #include<GLM/glm.hpp>
 #include <iostream>
 #include <typeinfo>
+#include <random>
 
 #include"Mesh.h"
 #include"Shader.h"
@@ -17,6 +18,7 @@
 #include"Hitbox.h"
 #include"UI.h"
 #include"Skeleton.h"
+#include"Lerp.h"
 
 
 OnePlayer::OnePlayer()
@@ -51,6 +53,15 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 	}
 	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_RELEASE)
 		f3_pressed = false;
+
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && time <= 0) {
+		players[PLAYER_1]->dmgHP(10.0f);
+		time = MAX_TIME;
+	}
+
+	if (time > 0) {
+		time -= dt;
+	}
 }
 
 void OnePlayer::Update(float dt)
@@ -78,6 +89,11 @@ void OnePlayer::Update(float dt)
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
 	}
+
+	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
+
+
+	
 }
 
 void OnePlayer::Draw()
@@ -141,7 +157,8 @@ void OnePlayer::LoadScene()
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
 	Material* defaultTex = new Material("default-texture.png", "default-texture.png");
 
-	Material* stamBarMat = new Material("green.png");
+	Material* hpBarMat = new Material("yuck.png");
+	Material* stamBarMat = new Material("blue.png");
 
 	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator.bvh");
 
@@ -159,12 +176,12 @@ void OnePlayer::LoadScene()
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 	players.push_back(new Player(Square, DiceTex, basicCubeHB, { 3.0f, 0.3f, 0.0f }));
-	players.push_back(new Object(d20, D20Tex, basicSphereHB));
+	players.push_back(new Player(d20, D20Tex, basicSphereHB));
 
 	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
 
-	players.push_back(new Object(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
+	players.push_back(new Player(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
 	players[2]->Scale(glm::vec3(1.2f)); 
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
@@ -178,12 +195,13 @@ void OnePlayer::LoadScene()
 	};
 
 	ui = {
+		new HealthBar((Player*)players[PLAYER_1], glm::vec2(50, 550), hpBarMat),
 		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(50, 500), stamBarMat)
 	};
 
 	// DEBUG THINGS
 	DebugShader = new Shader("Shaders/debug.vert", "Shaders/debug.frag");
-	DebugQuad = new Mesh(square, 4, square_index, 6);
+	DebugQuad = new Mesh(square, 4, square_index, 6); 
 }
 
 
@@ -255,8 +273,8 @@ void TwoPlayer::LoadScene()
 	Mesh* d20 = new Mesh("d20.obj");
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f, 1.0f, 1.0f);
 
-	players.push_back(new Object(Square, DiceTex, basicCubeHB));
-	players.push_back(new Object(d20, D20Tex, basicCubeHB));
+	players.push_back(new Player(Square, DiceTex, basicCubeHB));
+	players.push_back(new Player(d20, D20Tex, basicCubeHB));
 
 	players[PLAYER_2]->Scale(glm::vec3(0.75f, 0.75f, 0.75f));
 

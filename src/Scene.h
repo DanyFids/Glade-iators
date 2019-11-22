@@ -11,6 +11,7 @@ class Object;
 class PointLight;
 class DirectionalLight;
 class UI;
+class Player;
 
 class SceneD {
 public:
@@ -75,7 +76,7 @@ public:
 
 class PlayScene : public Scene {
 protected:
-	std::vector<Object*> players;
+	std::vector<Player*> players;
 	std::vector<Object*> terrain;
 
 	std::vector<PointLight*> lights;

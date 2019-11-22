@@ -5,6 +5,7 @@
 #include<GLM/gtc/matrix_transform.hpp>
 #include "Constants.h"
 #include "Object.h"
+#include"Lerp.h"
 
 float quad_prim[] = {
 	// x, y, z, r, g, b, u, v
@@ -72,4 +73,131 @@ void StaminaBar::Update(float dt)
 	float perc = player->GetStam() / Player::MAX_STAMINA;
 
 	dim.x = (float)MAX_WIDTH * perc;
+}
+
+const int HealthBar::MAX_WIDTH = 200;
+const int HealthBar::HEIGHT = 20;
+
+HealthBar::HealthBar(Player* p, glm::vec2 pos, Material* ma) : UI(MAX_WIDTH, HEIGHT, pos, ma)
+{
+	player = p;
+	BackBar back(pos, HEIGHT, MAX_WIDTH);
+}
+
+void HealthBar::Update(float dt)
+{
+	float perc = player->GetHP() / Player::MAX_HEALTH;
+
+	dim.x = (float)MAX_WIDTH * perc;
+
+	if (time < MAX_TIME) {
+		time += dt;
+	}
+
+}
+
+void HealthBar::Draw(glm::vec2 scrn)
+{
+	glm::vec3 green(0.0f, 1.0f, 0.0f);
+	glm::vec3 ylw(1.0f, 1.0f, 0.0f);
+	glm::vec3 orange(1.0f, 0.65f, 0.0f);
+	glm::vec3 red(1.0f, 0.0f, 0.0f);
+	glm::vec3 brown(0.3f, 0.2f, 0.0f);
+
+	/*
+	green 100-81
+	yellow 80-61
+	orange 60-41
+	red 40-21
+	brown 20-0
+	glm::vec3 color = lerp(ylw, orange, player->GetHP() / player->MAX_HEALTH);
+	*/
+
+	if (player->GetHP() <= 100 && player->GetHP() > 80) {
+		glm::vec3 color = green;
+		GREEN = true;
+		UI::SHADER->SetVec3("indexColor", color);
+	}
+	else if (player->GetHP() < 81 && player->GetHP() > 60) {
+		if (!YELLOW) {
+			glm::vec3 color = lerp(green, ylw, time / MAX_TIME);
+			UI::SHADER->SetVec3("indexColor", color);
+		}
+		else {
+			glm::vec3 color = ylw;
+			UI::SHADER->SetVec3("indexColor", color);
+		}
+
+		if (!LERPING && !YELLOW) {
+			time = 0.0f;
+			LERPING = true;
+		}
+
+		if (time >= MAX_TIME) {
+			YELLOW = true;
+			LERPING = false;
+		}
+	}
+	else if (player->GetHP() < 61 && player->GetHP() > 40) {
+		if (!ORANGE) {
+			glm::vec3 color = lerp(ylw, orange, time / MAX_TIME);
+			UI::SHADER->SetVec3("indexColor", color);
+		}
+		else {
+			glm::vec3 color = orange;
+			UI::SHADER->SetVec3("indexColor", color);
+		}
+
+		if (!LERPING && !ORANGE) {
+			time = 0.0f;
+			LERPING = true;
+		}
+
+		if (time >= MAX_TIME) {
+			ORANGE = true;
+			LERPING = false;
+		}
+	}
+	else if (player->GetHP() < 41 && player->GetHP() > 20) {
+		if (!RED) {
+			glm::vec3 color = lerp(orange, red, time / MAX_TIME);
+			UI::SHADER->SetVec3("indexColor", color);
+		}
+		else {
+			glm::vec3 color = red;
+			UI::SHADER->SetVec3("indexColor", color);
+		}
+
+		if (!LERPING && !RED) {
+			time = 0.0f;
+			LERPING = true;
+		}
+
+		if (time >= MAX_TIME) {
+			RED = true;
+			LERPING = false;
+		}
+	}
+	else if (player->GetHP() < 21 && player->GetHP() >= 0) {
+		if (!BROWN) {
+			glm::vec3 color = lerp(red, brown, time / MAX_TIME);
+			UI::SHADER->SetVec3("indexColor", color);
+		}
+		else {
+			glm::vec3 color = brown;
+			UI::SHADER->SetVec3("indexColor", color);
+		}
+
+		if (!LERPING && !BROWN) {
+			time = 0.0f;
+			LERPING = true;
+		}
+
+		if (time >= MAX_TIME) {
+			BROWN = true;
+			LERPING = false;
+		}
+	}
+
+	UI::Draw(scrn);
 }

@@ -93,14 +93,47 @@ void Object::ApplyMove() {
 	phys.move = glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
+const float Player::MAX_HEALTH = 100.0f;
 const float Player::MAX_STAMINA = 100.0f;
 const float Player::STAM_DECAY = 30.0f;
 const float Player::STAM_RECOV = 20.0f;
 const float Player::RECOV_TIME = 2.0f;
 
+Player::Player() {
+	health = MAX_HEALTH;
+	stamina = MAX_STAMINA;
+
+	mesh = nullptr;
+	material = nullptr;
+	hitbox = nullptr;
+	transform.position = glm::vec3();
+	transform.scale = glm::vec3(1.0f);
+	transform.rotation = glm::vec3();
+}
+
+Player::Player(Mesh* me, Material* ma, Hitbox* hb) {
+	health = MAX_HEALTH;
+	stamina = MAX_STAMINA;
+
+	mesh = me;
+	material = ma;
+	hitbox = hb;
+	transform.position = glm::vec3();
+	transform.scale = glm::vec3(1.0f);
+	transform.rotation = glm::vec3();
+}
+
 Player::Player(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos) : Object(me, ma, hb, pos)
 {
+	health = MAX_HEALTH;
 	stamina = MAX_STAMINA;
+
+	mesh = me;
+	material = ma;
+	hitbox = hb;
+	transform.position = pos;
+	transform.scale = glm::vec3(1.0f);
+	transform.rotation = glm::vec3();
 }
 
 void Player::Update(float dt)

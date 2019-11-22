@@ -75,17 +75,23 @@ class Player : public Object {
 	static const float RECOV_TIME;
 
 	bool run = false;
+	float health;
 	float stamina;
 	float recov_timer = 0.0f;
 
 public:
+	static const float MAX_HEALTH;
 	static const float MAX_STAMINA;
 
+	Player();
+	Player(Mesh* me, Material* ma, Hitbox* hb);
 	Player(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos);
 
 	virtual void Update(float dt);
 	virtual bool HitDetect(Object* other);
 
+	float GetHP() { return health; }
+	void dmgHP(float _dmg) { health -= _dmg; }
 	float GetStam() { return stamina; }
 	bool CanRun() { return recov_timer <= 0.0f; }
 

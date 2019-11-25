@@ -81,7 +81,6 @@ const int HealthBar::HEIGHT = 20;
 HealthBar::HealthBar(Player* p, glm::vec2 pos, Material* ma) : UI(MAX_WIDTH, HEIGHT, pos, ma)
 {
 	player = p;
-	BackBar back(pos, HEIGHT, MAX_WIDTH);
 }
 
 void HealthBar::Update(float dt)

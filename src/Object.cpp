@@ -187,7 +187,8 @@ void Attack::Update(float dt)
 
 bool Attack::HitDetect(Object* other)
 {
-	if (other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, this->GetTransform())) {
+	if (other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, this->GetTransform()) && Hit == false) {
+		this->Hit = true;
 		return true;
 	}
 
@@ -197,7 +198,8 @@ bool Attack::HitDetect(Object* other)
 Attack::Attack(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P) : Object(me, ma, hb, pos)
 {
 	player = P;
-	time = 2;
+	time = 0.5f;
+	Hit = false;
 }
 //
 //void Attack::init() {
@@ -208,3 +210,16 @@ Attack::Attack(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P
 //	ABox = new Object(Amesh, Amat, basicCubeHB);
 //}
 
+void Shield::Update(float dt)
+{
+}
+
+bool Shield::HitDetect(Object* other)
+{
+	return false;
+}
+
+Shield::Shield(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P)
+{
+	player = P;
+}

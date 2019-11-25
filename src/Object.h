@@ -105,9 +105,25 @@ public:
 	//static Object* ABox;
 	int player;
 	float time;
+	bool Hit = false;
 
 	Attack(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P);
 
 	//void init();
 };
 
+class Shield : public Object
+{
+private:
+
+public:
+	virtual void Update(float dt);
+	virtual bool HitDetect(Object* other);
+
+	//static Object* ABox;
+	int player;
+
+	Shield(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P);
+
+	//void init();
+};

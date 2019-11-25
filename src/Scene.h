@@ -83,14 +83,25 @@ class PlayScene : public Scene {
 protected:
 	std::vector<Object*> players;
 	std::vector<Object*> terrain;
-	std::vector<Attack*>attacks;
-	float dodge1 = false;
-	float dodge2 = false;
+	std::vector<Shield*> shields;
+	std::vector<Attack*> attacks;
+	bool dodge1 = true;
+	bool dodge2 = true;
 	float dodge1t;
 	float dodge2t;
 
+	bool atk1 = false;
+	bool atk2 = false;
+
+	bool block1 = false;
+	bool block2 = false;
+
+	
+
+
 	Mesh* Amesh = new Mesh("d6.obj");
 	Material* Amat = new Material("missing_tex.png");
+	Material* Bmat = new Material("green.png");
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f, 1.0f, 1.0f);
 
 	std::vector<PointLight*> lights;

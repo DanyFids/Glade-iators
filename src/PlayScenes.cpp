@@ -89,6 +89,17 @@ void OnePlayer::Update(float dt)
 		}
 	}
 
+	for (int a = 0; a < shields.size(); a++)
+	{
+		
+		if (shields[a]->player == 0 && block1 == false)
+		{
+			shields.erase(shields.begin() + a);
+			break;
+		}
+		
+	}
+
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
 	}

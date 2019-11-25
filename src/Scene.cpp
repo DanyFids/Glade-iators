@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include <iostream>
 
 #include"Camera.h"
 #include"Mesh.h"
@@ -55,20 +56,33 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 		m -= glm::vec3(1.0f, 0.0f, 0.0f);
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		m += glm::vec3(1.0f, 0.0f, 0.0f);
-	if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f)
-		players[player]->phys.move = m * PLAYER_SPEED * dt;
+	
 
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 	{
-		attacks.push_back(new Attack(0));
+		attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));
 		glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
 		p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
 		p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));
 		p1.y = players[0]->GetPosition().y;
-		attacks.back()->ABox->SetPosition(p1);
+		attacks.back()->SetPosition(p1);
 		//attacks.back()->ABox->SetPosition(glm::vec3(0,2,4));
 	}
-
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && dodge1 == false)
+	{
+		players[player]->phys.move = m * (PLAYER_SPEED * 2) * dt;
+		dodge1 = false;
+		dodge1t = 3;
+	}
+	else if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f)
+	{
+		players[player]->phys.move = m * PLAYER_SPEED * dt;
+	}
+		
+	if (dodge1t <= 0)
+	{
+		dodge1 = true;
+	}
 
 
 	glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -120,6 +134,18 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && player == PLAYER_1) {
 			((Player*)players[player])->StopRun();
 		}
+		if (state.buttons[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] == GLFW_PRESS && player == PLAYER_1)
+		{
+			
+			attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), player));
+			glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
+			p1.x += 2 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+			p1.z += 2 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+			p1.y = players[player]->GetPosition().y;
+			attacks.back()->SetPosition(p1);
+			std::cout << "Fuck\n";
+		}
+		
 	}
 }
 
@@ -135,7 +161,7 @@ void PlayScene::RenderScene(Shader* shader)
 
 	for (int a = 0; a < attacks.size(); a++)
 	{
-		attacks[a]->ABox->Draw(shader, Cam);
+		attacks[a]->Draw(shader, Cam);
 
 	}
 }

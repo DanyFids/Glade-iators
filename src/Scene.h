@@ -5,6 +5,9 @@
 #include<GLM/glm.hpp>
 #include<entt.hpp>
 #include "Object.h"
+#include "Hitbox.h"
+#include "Texture.h"
+#include "Mesh.h"
 
 class Camera;
 class Shader;
@@ -12,6 +15,8 @@ class Object;
 class PointLight;
 class DirectionalLight;
 class UI;
+class Material;
+class Hitbox;
 
 class SceneD {
 public:
@@ -79,6 +84,14 @@ protected:
 	std::vector<Object*> players;
 	std::vector<Object*> terrain;
 	std::vector<Attack*>attacks;
+	float dodge1 = false;
+	float dodge2 = false;
+	float dodge1t;
+	float dodge2t;
+
+	Mesh* Amesh = new Mesh("d6.obj");
+	Material* Amat = new Material("missing_tex.png");
+	Hitbox* basicCubeHB = new CubeHitbox(1.0f, 1.0f, 1.0f);
 
 	std::vector<PointLight*> lights;
 	DirectionalLight * sun;

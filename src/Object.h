@@ -102,12 +102,12 @@ public:
 	virtual void Update(float dt);
 	virtual bool HitDetect(Object* other);
 
-	static Object* ABox;
+	//static Object* ABox;
 	int player;
 	float time;
 
-	Attack(unsigned int P);
+	Attack(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P);
 
-	void init();
+	//void init();
 };
 

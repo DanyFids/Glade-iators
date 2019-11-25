@@ -27,6 +27,7 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 {
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
 		ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+
 	}
 	else {
 		KeyboardInput(window, mousePos, PLAYER_1, dt);

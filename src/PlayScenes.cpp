@@ -261,10 +261,6 @@ void OnePlayer::LoadScene()
 		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(395, 550), crowdBarMat, crowdBG2)
 	};
 
-	//ui[2]->scaleX(-1);
-	//ui[3]->scaleX(-1);
-	//ui[4]->scaleX(-1);
-
 	// DEBUG THINGS
 	DebugShader = new Shader("Shaders/debug.vert", "Shaders/debug.frag");
 	DebugQuad = new Mesh(square, 4, square_index, 6); 

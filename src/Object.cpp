@@ -48,7 +48,7 @@ void Object::Draw(Shader* shader, std::vector<Camera*> cams)
 	shader->SetI("material.diffuse", 0);
 	shader->SetI("material.normal", 1);
 	shader->SetI("material.specular", 2);
-
+	
 	glm::mat4 model = transform.GetWorldTransform();
 
 	unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");

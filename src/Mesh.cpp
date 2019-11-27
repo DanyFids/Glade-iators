@@ -11,6 +11,8 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Constants.h"
+#include "Object.h"
+#include "Skeleton.h"
 
 Mesh::Mesh() {
 }
@@ -109,6 +111,8 @@ Mesh::Mesh(const char* file)
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), &(temp_vert->biTan));
 	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(5, 1, GL_INT, GL_FALSE, sizeof(Vertex), &(temp_vert->id));
+	glEnableVertexAttribArray(5);
 
 
 	num_indices = num_indi;
@@ -221,6 +225,7 @@ void Mesh::LoadMesh(const char* f, std::vector<Vertex>& vertices, unsigned int& 
 				temp.position = positions[pos-1];
 				temp.normal = norms[nor-1];
 				temp.tex_uv = texUVs[tex-1];
+				temp.id = pos - 1;
 
 				vertices.push_back(Vertex(temp));
 				count++;
@@ -340,13 +345,6 @@ void Mesh::SetPosition(glm::vec3 pos)
 {
 	model = glm::translate(model, pos);
 }
-
-//AnimMesh::AnimMesh(std::string f[])
-//{
-//
-//}
-
-
 
 MorphMesh::MorphMesh(std::vector<std::string> keyframes)
 {

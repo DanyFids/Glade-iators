@@ -122,6 +122,8 @@ void Camera::UpdateCam()
 
 void Camera::SetupCam(Shader* shader)
 {
+	shader->Use();
+
 	glViewport(screen_dim.x, screen_dim.y, screen_dim.z, screen_dim.w);
 
 	glUseProgram(shader->ID);

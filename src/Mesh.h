@@ -5,6 +5,7 @@
 class Material;
 class Shader;
 class Camera;
+class Skeleton;
 
 struct Vertex {
 	glm::vec3 position;
@@ -12,6 +13,7 @@ struct Vertex {
 	glm::vec2 tex_uv;
 	glm::vec3 tangent;
 	glm::vec3 biTan;
+	int id;
 };
 
 struct Pose {

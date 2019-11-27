@@ -24,6 +24,9 @@ class OnePlayer: public PlayScene {
 	Object* morphyBoi;
 	Object* staticBoi;
 
+	float time = 0.0f;
+	float MAX_TIME = 0.2f;
+
 public:
 	OnePlayer();
 
@@ -37,6 +40,8 @@ public:
 class TwoPlayer: public PlayScene {
 	Shader* shaderObj;
 	Shader* depthShader;
+
+	Shader* sunShader;
 
 public:
 	TwoPlayer();

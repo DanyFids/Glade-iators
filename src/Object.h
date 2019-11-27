@@ -3,6 +3,8 @@
 #include<GLM/gtc/matrix_transform.hpp>
 #include<GLM/gtc/quaternion.hpp>
 #include<vector>
+#include <cmath>
+//#include <chrono>
 
 class Camera;
 class Material;
@@ -60,6 +62,7 @@ public:
 	void Rotate(float tht, glm::vec3 dir);
 	void Move(glm::vec3 dir);
 	void Scale(glm::vec3 scl);
+	void SetPosition(glm::vec3 pos);
 
 	virtual bool HitDetect(Object* other);
 
@@ -77,20 +80,81 @@ class Player : public Object {
 	static const float RECOV_TIME;
 
 	bool run = false;
+	float health;
 	float stamina;
 	float recov_timer = 0.0f;
 
 public:
+	static const float MAX_HEALTH;
 	static const float MAX_STAMINA;
 
+	Player();
+	Player(Mesh* me, Material* ma, Hitbox* hb);
 	Player(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos);
 
 	virtual void Update(float dt);
 	virtual bool HitDetect(Object* other);
 
+	float GetHP() { return health; }
+	void dmgHP(float _dmg) { health -= _dmg; }
 	float GetStam() { return stamina; }
 	bool CanRun() { return recov_timer <= 0.0f; }
 
 	void Run();
 	void StopRun();
+};
+
+class Attack : public Object
+{
+private:
+
+public:
+	virtual void Update(float dt);
+	virtual bool HitDetect(Object* other);
+
+	//static Object* ABox;
+	int player;
+	float time;
+	bool Hit = false;
+
+	Attack(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P);
+
+	//void init();
+};
+
+class Shield : public Object
+{
+private:
+
+public:
+	virtual void Update(float dt);
+	virtual bool HitDetect(Object* other);
+
+	//static Object* ABox;
+	int player;
+
+	Shield(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P);
+
+	//void init();
+};
+
+class SplineMan : public Object
+{
+public:
+	virtual void Update(float dt);
+	virtual bool HitDetect(Object* other);
+
+	//float StartT;
+	float CurrT = 0;
+	float MaxT = 0.2f;
+	int current = 0;
+	bool init;
+	int direction = 1;
+	std::vector<glm::vec3> pathPos;
+
+	void CatmullBetweenPoints(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 d);
+
+	SplineMan(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<glm::vec3> wasd);
+
+
 };

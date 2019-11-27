@@ -99,6 +99,9 @@ protected:
 	bool block1 = false;
 	bool block2 = false;
 
+	bool Target1 = false;
+	bool Target2 = false;
+
 	SplineMan* DUUDE;
 
 	Mesh* Amesh = new Mesh("d6.obj");

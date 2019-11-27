@@ -97,7 +97,11 @@ void OnePlayer::Update(float dt)
 			attacks.erase(attacks.begin() + a);
 			break;
 		}
-		if (attacks[a]->HitDetect(players[1]))
+		if (attacks[a]->HitDetect(players[0]) && attacks[a]->player != 0)
+		{
+			std::cout << "Screaming\n";
+		}
+		if (attacks[a]->HitDetect(players[1]) && attacks[a]->player != 1)
 		{
 			std::cout << "Screaming\n";
 		}
@@ -300,7 +304,7 @@ void TwoPlayer::Update(float dt)
 		for (int p = 0; p < players.size(); p++) {
 			if (players[c] != players[p]) {
 				if (players[c]->HitDetect(players[p])) {
-					//std::cout << "Welp\n";
+					std::cout << "Welp\n";
 				}
 			}
 		}
@@ -322,7 +326,11 @@ void TwoPlayer::Update(float dt)
 			attacks.erase(attacks.begin() + a);
 			break;
 		}
-		if (attacks[a]->HitDetect(players[1]))
+		if (attacks[a]->HitDetect(players[0]) && attacks[a]->player != 0)
+		{
+			std::cout << "Screaming\n";
+		}
+		if (attacks[a]->HitDetect(players[1]) && attacks[a]->player != 1)
 		{
 			std::cout << "Screaming\n";
 		}
@@ -457,9 +465,9 @@ void TwoPlayer::LoadScene()
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
 	players.push_back(new Player(Square, DiceTex, basicCubeHB, { 3.0f, 0.3f, 0.0f }));
-	players.push_back(new Player(d20, D20Tex, basicSphereHB));
+	players.push_back(new Player(Square, DiceTex, basicCubeHB));
 
-	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
+	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
 
 	//terrain.push_back(new Object(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));

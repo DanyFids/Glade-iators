@@ -139,7 +139,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_1 && atk1 == false)
 		{
-			attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), player));
+			attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_1));
 			glm::vec3 p1 = players[player]->GetPosition();
 			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
@@ -162,11 +162,11 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			dodge1t = 0.1;
 		}
 		
-		if (dodge1t <= -0.4 && dodge1 == false)
+		if (dodge1t <= -0.4 && dodge1 == false && player == PLAYER_1)
 		{
 			dodge1 = true;
 		}
-		else if (dodge1 == false && dodge1t >= 0)
+		else if (dodge1 == false && dodge1t >= 0 && player == PLAYER_1)
 		{
 			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
 			dodge1t -= dt;
@@ -175,7 +175,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		{
 			dodge1t -= dt;
 		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS && player == PLAYER_1 && block1 == false) {
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS && player == PLAYER_1 && block1 == false) {
 			std::cout << "Parry God\n";
 			block1 = true;
 			shields.push_back(new Shield(Amesh, Bmat, basicCubeHB, glm::vec3(0, 0, 0), player));
@@ -185,7 +185,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			p1.y = players[player]->GetPosition().y;
 			shields.back()->SetPosition(p1);
 		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_RELEASE && player == PLAYER_1) {
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && player == PLAYER_1) {
 
 			block1 = false;
 		}
@@ -200,7 +200,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_2 && atk2 == false)
 		{
-			attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), player));
+			attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_2));
 			glm::vec3 p1 = players[player]->GetPosition();
 			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
@@ -223,11 +223,11 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			dodge2t = 0.1;
 		}
 
-		if (dodge2t <= -0.4 && dodge2 == false)
+		if (dodge2t <= -0.4 && dodge2 == false && player == PLAYER_2)
 		{
 			dodge2 = true;
 		}
-		else if (dodge2 == false && dodge2t >= 0)
+		else if (dodge2 == false && dodge2t >= 0 && player == PLAYER_2)
 		{
 			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
 			dodge2t -= dt;
@@ -236,7 +236,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		{
 			dodge2t -= dt;
 		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS && player == PLAYER_2 && block2 == false) {
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS && player == PLAYER_2 && block2 == false) {
 			std::cout << "Parry God\n";
 			block2 = true;
 			shields.push_back(new Shield(Amesh, Bmat, basicCubeHB, glm::vec3(0, 0, 0), player));
@@ -246,12 +246,20 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			p1.y = players[player]->GetPosition().y;
 			shields.back()->SetPosition(p1);
 		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_RELEASE && player == PLAYER_2) {
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && player == PLAYER_2) {
 
 			block2 = false;
 		}
 		
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && player == PLAYER_2 && Target2 == false) {
+			std::cout << "Look at me\n";
+			//glm::vec3 direction = glm::normalize(players[0]->GetPosition() - players[1]->GetPosition());
+			Target2 == true;
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_RELEASE && player == PLAYER_2) {
 
+			Target2 = false;
+		}
 	}
 }
 

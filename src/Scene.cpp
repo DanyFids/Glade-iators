@@ -58,6 +58,19 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 	if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f)
 		players[player]->phys.move = m * PLAYER_SPEED * dt;
 
+	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+	{
+		attacks.push_back(new Attack(0));
+		glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
+		p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
+		p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));
+		p1.y = players[0]->GetPosition().y;
+		attacks.back()->ABox->SetPosition(p1);
+		//attacks.back()->ABox->SetPosition(glm::vec3(0,2,4));
+	}
+
+
+
 	glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		t += Cam[player]->GetDirection();
@@ -118,5 +131,11 @@ void PlayScene::RenderScene(Shader* shader)
 
 	for (int t = 0; t < terrain.size(); t++) {
 		terrain[t]->Draw(shader, Cam);
+	}
+
+	for (int a = 0; a < attacks.size(); a++)
+	{
+		attacks[a]->ABox->Draw(shader, Cam);
+
 	}
 }

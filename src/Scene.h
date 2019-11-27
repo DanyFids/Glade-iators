@@ -4,6 +4,7 @@
 #include<GLFW/glfw3.h>
 #include<GLM/glm.hpp>
 #include<entt.hpp>
+#include "Object.h"
 
 class Camera;
 class Shader;
@@ -78,6 +79,7 @@ class PlayScene : public Scene {
 protected:
 	std::vector<Player*> players;
 	std::vector<Object*> terrain;
+	std::vector<Attack*>attacks;
 
 	std::vector<PointLight*> lights;
 	DirectionalLight * sun;

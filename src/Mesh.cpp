@@ -337,8 +337,3 @@ void Mesh::SetPosition(glm::vec3 pos)
 {
 	model = glm::translate(model, pos);
 }
-
-/*AnimMesh::AnimMesh(std::string f[])
-{
-
-}*/

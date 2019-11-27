@@ -60,6 +60,7 @@ public:
 	void Rotate(float tht, glm::vec3 dir);
 	void Move(glm::vec3 dir);
 	void Scale(glm::vec3 scl);
+	void SetPosition(glm::vec3 pos);
 
 	virtual bool HitDetect(Object* other);
 
@@ -98,3 +99,21 @@ public:
 	void Run();
 	void StopRun();
 };
+
+class Attack : public Object
+{
+private:
+
+public:
+	virtual void Update(float dt);
+	virtual bool HitDetect(Object* other);
+
+	static Object* ABox;
+	int player;
+	float time;
+
+	Attack(unsigned int P);
+
+	void init();
+};
+

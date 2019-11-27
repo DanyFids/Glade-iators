@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include <iostream>
 
 #include"Camera.h"
 #include"Mesh.h"
@@ -31,6 +32,7 @@ void MenuScene::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 {
 }
 
+
 void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt)
 {
 	float offsetX = ((float)mousePos.x - m_lastX) * MOUSE_SENSITIVITY;
@@ -55,20 +57,33 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 		m -= glm::vec3(1.0f, 0.0f, 0.0f);
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		m += glm::vec3(1.0f, 0.0f, 0.0f);
-	if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f)
-		players[player]->phys.move = m * PLAYER_SPEED * dt;
+	
 
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 	{
-		attacks.push_back(new Attack(0));
+		attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));
 		glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
 		p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
 		p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));
 		p1.y = players[0]->GetPosition().y;
-		attacks.back()->ABox->SetPosition(p1);
+		attacks.back()->SetPosition(p1);
 		//attacks.back()->ABox->SetPosition(glm::vec3(0,2,4));
 	}
-
+	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && dodge1 == false)
+	{
+		players[player]->phys.move = m * (PLAYER_SPEED * 2) * dt;
+		dodge1 = false;
+		dodge1t = 3;
+	}
+	else if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f)
+	{
+		players[player]->phys.move = m * PLAYER_SPEED * dt;
+	}
+		
+	if (dodge1t <= 0)
+	{
+		dodge1 = true;
+	}
 
 
 	glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -112,14 +127,71 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 		if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
 			players[player]->phys.move = glm::normalize(t) * 10.f * dt;
+
+			//std::cout << "move\n";
 		}
 
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && player == PLAYER_1) {
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && player == PLAYER_1) {
 			((Player*)players[player])->Run();
 		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && player == PLAYER_1) {
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && player == PLAYER_1) {
 			((Player*)players[player])->StopRun();
 		}
+		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_1 && atk1 == false)
+		{
+			attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), player));
+			glm::vec3 p1 = players[player]->GetPosition();
+			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+			p1.y = players[player]->GetPosition().y;
+			attacks.back()->SetPosition(p1);
+			std::cout << "Fuck\n";
+			atk1 = true;
+		}
+		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2 && player == PLAYER_1)
+		{
+			atk1 = false;
+		}
+
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && player == PLAYER_1 && dodge1 == true && t != glm::vec3(0.0f, 0.0f, 0.0f))
+		{
+			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
+			std::cout << "Dodgy boi\n";
+			
+			dodge1 = false;
+			dodge1t = 0.1;
+		}
+		
+		if (dodge1t <= -0.4 && dodge1 == false)
+		{
+			dodge1 = true;
+		}
+		else if (dodge1 == false && dodge1t >= 0)
+		{
+			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
+			dodge1t -= dt;
+		}
+		else
+		{
+			dodge1t -= dt;
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS && player == PLAYER_1 && block1 == false) {
+			std::cout << "Parry God\n";
+			block1 = true;
+			shields.push_back(new Shield(Amesh, Bmat, basicCubeHB, glm::vec3(0, 0, 0), player));
+			glm::vec3 p1 = players[player]->GetPosition();
+			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+			p1.y = players[player]->GetPosition().y;
+			shields.back()->SetPosition(p1);
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_RELEASE && player == PLAYER_1) {
+
+			block1 = false;
+		}
+
+		
+
 	}
 }
 
@@ -135,7 +207,15 @@ void PlayScene::RenderScene(Shader* shader)
 
 	for (int a = 0; a < attacks.size(); a++)
 	{
-		attacks[a]->ABox->Draw(shader, Cam);
+		attacks[a]->Draw(shader, Cam);
 
 	}
+
+	for (int s = 0; s < shields.size(); s++)
+	{
+		shields[s]->Draw(shader, Cam);
+
+	}
+
+	DUUDE->Draw(shader, Cam);
 }

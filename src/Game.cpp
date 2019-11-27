@@ -107,8 +107,9 @@ void Game::Initialize()
 
 	OnePlayerScn = new OnePlayer();
 	TwoPlayerScn = new TwoPlayer();
-	Attack Init(0);
-	Init.init();
+	//Attack Init(0);
+	//Init.init();
+
 
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) && 
 		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {

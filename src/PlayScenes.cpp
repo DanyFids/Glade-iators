@@ -30,6 +30,7 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 {
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
 		ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+
 	}
 	else {
 		KeyboardInput(window, mousePos, PLAYER_1, dt);
@@ -101,6 +102,19 @@ void OnePlayer::Update(float dt)
 			std::cout << "Screaming\n";
 		}
 	}
+
+	for (int a = 0; a < shields.size(); a++)
+	{
+		
+		if (shields[a]->player == 0 && block1 == false)
+		{
+			shields.erase(shields.begin() + a);
+			break;
+		}
+		
+	}
+
+	DUUDE->Update(dt);
 
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
@@ -207,6 +221,22 @@ void OnePlayer::LoadScene()
 	floor->Scale({ 30.0f, 0.5f, 30.0f });
 
 	terrain.push_back(floor);
+
+	beacons.push_back(glm::vec3(glm::vec3(1,1,1)));
+	beacons.push_back(glm::vec3(glm::vec3(1,1,3)));
+	beacons.push_back(glm::vec3(glm::vec3(1,2,5)));
+	beacons.push_back(glm::vec3(glm::vec3(2,1,4)));
+	beacons.push_back(glm::vec3(glm::vec3(3, 2, 5)));
+	beacons.push_back(glm::vec3(glm::vec3(7, 1, 4)));
+	beacons.push_back(glm::vec3(glm::vec3(9, 2, 5)));
+	beacons.push_back(glm::vec3(glm::vec3(12, 1, 4)));
+	beacons.push_back(glm::vec3(glm::vec3(4, 2, 5)));
+	beacons.push_back(glm::vec3(glm::vec3(2, 1, 4)));
+
+	Mesh* BsMesh = new Mesh("d6.obj");
+	Material* BsMat = new Material("missing_tex.png");
+
+	DUUDE = new SplineMan(BsMesh, BsMat, basicCubeHB, glm::vec3(1, 1, 1), beacons);
 
 	Cam = {
 		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT)) 

@@ -32,6 +32,8 @@ class TwoPlayer: public PlayScene {
 	Shader* shaderObj;
 	Shader* depthShader;
 
+	Shader* sunShader;
+
 public:
 	TwoPlayer();
 	// Inherited via Scene

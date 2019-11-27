@@ -145,7 +145,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
 			p1.y = players[player]->GetPosition().y;
 			attacks.back()->SetPosition(p1);
-			std::cout << "Fuck\n";
+			std::cout << "OOF\n";
 			atk1 = true;
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2 && player == PLAYER_1)
@@ -190,6 +190,66 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			block1 = false;
 		}
 
+		////////////////////////////PLAYER 2
+
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && player == PLAYER_2) {
+			((Player*)players[player])->Run();
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && player == PLAYER_2) {
+			((Player*)players[player])->StopRun();
+		}
+		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_2 && atk2 == false)
+		{
+			attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), player));
+			glm::vec3 p1 = players[player]->GetPosition();
+			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+			p1.y = players[player]->GetPosition().y;
+			attacks.back()->SetPosition(p1);
+			std::cout << "OOF\n";
+			atk2 = true;
+		}
+		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2 && player == PLAYER_2)
+		{
+			atk2 = false;
+		}
+
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && player == PLAYER_2 && dodge2 == true && t != glm::vec3(0.0f, 0.0f, 0.0f))
+		{
+			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
+			std::cout << "Dodgy boi\n";
+
+			dodge2 = false;
+			dodge2t = 0.1;
+		}
+
+		if (dodge2t <= -0.4 && dodge2 == false)
+		{
+			dodge2 = true;
+		}
+		else if (dodge2 == false && dodge2t >= 0)
+		{
+			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
+			dodge2t -= dt;
+		}
+		else
+		{
+			dodge2t -= dt;
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS && player == PLAYER_2 && block2 == false) {
+			std::cout << "Parry God\n";
+			block2 = true;
+			shields.push_back(new Shield(Amesh, Bmat, basicCubeHB, glm::vec3(0, 0, 0), player));
+			glm::vec3 p1 = players[player]->GetPosition();
+			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+			p1.y = players[player]->GetPosition().y;
+			shields.back()->SetPosition(p1);
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_RELEASE && player == PLAYER_2) {
+
+			block2 = false;
+		}
 		
 
 	}

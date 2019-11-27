@@ -260,7 +260,7 @@ void CrowdBar::Update(float dt)
 
 	dim.x = (float)MAX_WIDTH * perc;
 	 
-	//time -= dt;
+	time -= dt;
 }
 
 void CrowdBar::Draw(glm::vec2 scrn)

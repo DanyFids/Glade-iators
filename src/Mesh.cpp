@@ -471,51 +471,13 @@ void MorphMesh::addPose( std::string filename)
 
 void MorphMesh::Update(float dt)
 {
-	if (!looping && !reversed) { //forwards
+	if (!paused) {
 
-		if (time >= ANIM_TIME) {
-			time = 0;
-			NextPose();
-		}
-
-		if (time < ANIM_TIME) {
-			time += dt;
-
-			if (time > ANIM_TIME) {
-				time = ANIM_TIME;
-			}
-
-		}
-	}
-
-	else if (!looping && reversed) { //backwards
-
-		if (time <= 0) {
-			time = ANIM_TIME;
-			PrevPose();
-		}
-
-		if (time > 0) {
-			time -= dt;
-
-			if (time < 0.0f) {
-				time = 0.0f;
-			}
-		}
-	}
-
-
-	else if (looping) {
-
-		if (curFrame < num_frames-1 && !reversed) {
+		if (!looping && !reversed) { //forwards
 
 			if (time >= ANIM_TIME) {
-				time = ANIM_TIME;
+				time = 0;
 				NextPose();
-
-				if (curFrame == num_frames - 1) {
-					setReverse();
-				}
 			}
 
 			if (time < ANIM_TIME) {
@@ -526,17 +488,13 @@ void MorphMesh::Update(float dt)
 				}
 
 			}
-
 		}
-		
-		if (curFrame > 0 && reversed) {
+
+		else if (!looping && reversed) { //backwards
 
 			if (time <= 0) {
-				time = 0;
+				time = ANIM_TIME;
 				PrevPose();
-				if (curFrame == 0) {
-					setReverse();
-				}
 			}
 
 			if (time > 0) {
@@ -546,10 +504,15 @@ void MorphMesh::Update(float dt)
 					time = 0.0f;
 				}
 			}
+		}
+
+
+		else if (looping) {
+
 
 		}
+
 	}
-	
 	//time = 1.0f;
 }
 
@@ -672,7 +635,10 @@ void MorphMesh::setPose(int frame, float t)
 
 void MorphMesh::play()
 {
-	//for (int i = 0; i < num_frames - 1; i++) {
-	//
-	//}
+	paused = true;
+}
+
+void MorphMesh::pause()
+{
+	paused = true;
 }

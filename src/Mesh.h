@@ -77,6 +77,7 @@ class MorphMesh : public Mesh {
 	
 	bool looping = false;
 	bool reversed = false;
+	bool paused = false;
 
 public:
 	MorphMesh(std::vector<std::string> keyframes);
@@ -91,5 +92,6 @@ public:
 	void setReverse();
 	void setPose(int frame, float time);
 	void play();
+	void pause();
 };
 

@@ -346,6 +346,31 @@ void Mesh::SetPosition(glm::vec3 pos)
 	model = glm::translate(model, pos);
 }
 
+SkelMesh::SkelMesh(std::string f, Skeleton* s, Material* w) : Mesh(f.c_str())
+{
+	skeleton = s;
+	weightMap = w;
+	curFrame = 0;
+	nexFrame = 0;
+}
+
+void SkelMesh::Draw(Shader* shdr)
+{
+	Transform* arr = skeleton->GetTransformArray(anim, curFrame);
+	int num_b = skeleton->GetNumBones();
+
+	glActiveTexture(GL_TEXTURE20);
+	glBindTexture(GL_TEXTURE_2D, weightMap->DIFF);
+	shdr->SetI("weightMap", 20);
+
+	shdr->SetI("num_bones", num_b);
+	for (int b = 0; b < num_b; b++) {
+		shdr->SetMat4("bone_t[" + std::to_string(b) + "]", arr[b].GetWorldTransform());
+	}
+
+	Mesh::Draw(shdr);
+}
+
 MorphMesh::MorphMesh(std::vector<std::string> keyframes)
 {
 	keyFrames = keyframes;

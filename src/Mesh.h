@@ -32,11 +32,13 @@ struct bigVert {
 	glm::vec2 tex_uv;
 	glm::vec3 tang1;
 	glm::vec3 biTa1;
+	int id1;
 	glm::vec3 posi2;
 	glm::vec3 norm2;
 	glm::vec2 tex_2;
 	glm::vec3 tang2;
 	glm::vec3 biTa2;
+	int id2;
 };
 
 class Mesh {
@@ -63,6 +65,20 @@ public:
 
 	void Move(glm::vec3 dir, float dt);
 	void SetPosition(glm::vec3 pos);
+};
+
+class SkelMesh : public Mesh {
+	int curFrame;
+	int nexFrame;
+	int anim = 0;
+
+	Skeleton* skeleton;
+	Material* weightMap;
+
+public:
+	SkelMesh(std::string f, Skeleton* s, Material* w);
+
+	virtual void Draw(Shader*);
 };
 
 class MorphMesh : public Mesh {

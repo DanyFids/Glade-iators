@@ -10,6 +10,8 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Constants.h"
+#include "Object.h"
+#include "Skeleton.h"
 
 Mesh::Mesh() {
 }
@@ -106,8 +108,8 @@ Mesh::Mesh(const char* file)
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), &(temp_vert->biTan));
 	glEnableVertexAttribArray(4);
-
-	
+	glVertexAttribPointer(5, 1, GL_INT, GL_FALSE, sizeof(Vertex), &(temp_vert->id));
+	glEnableVertexAttribArray(5);
 
 	num_indices = num_indi;
 
@@ -218,6 +220,7 @@ void Mesh::LoadMesh(const char* f, std::vector<Vertex>& vertices, unsigned int& 
 				temp.position = positions[pos-1];
 				temp.normal = norms[nor-1];
 				temp.tex_uv = texUVs[tex-1];
+				temp.id = pos - 1;
 
 				vertices.push_back(Vertex(temp));
 				count++;
@@ -338,7 +341,27 @@ void Mesh::SetPosition(glm::vec3 pos)
 	model = glm::translate(model, pos);
 }
 
-/*AnimMesh::AnimMesh(std::string f[])
+SkelMesh::SkelMesh(std::string f, Skeleton* s, Material* w): Mesh(f.c_str())
 {
+	skeleton = s;
+	weightMap = w;
+	curFrame = 0;
+	nexFrame = 0;
+}
 
-}*/
+void SkelMesh::Draw(Shader* shdr)
+{
+	Transform* arr = skeleton->GetTransformArray(anim, curFrame);
+	int num_b = skeleton->GetNumBones();
+
+	glActiveTexture(GL_TEXTURE20);
+	glBindTexture(GL_TEXTURE_2D, weightMap->DIFF);
+	shdr->SetI("weightMap", 20);
+	
+	shdr->SetI("num_bones", num_b);
+	for (int b = 0; b < num_b; b++) {
+		shdr->SetMat4("bone_t[" + std::to_string(b) + "]", arr[b].GetWorldTransform());
+	}
+
+	Mesh::Draw(shdr);
+}

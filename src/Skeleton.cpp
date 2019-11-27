@@ -1,4 +1,5 @@
 #include "Skeleton.h"
+#include "Object.h"
 #include<fstream>
 #include<iostream>
 
@@ -31,12 +32,21 @@ Joint::Joint(std::string n, Joint* p):name(n), parent(p)
 	children = {};
 	channels = {};
 
-	rotation = position = offset = glm::vec3(0.0f, 0.0f, 0.0f);
+	Transform t;
+
+	t.rotation = t.position = offset = glm::vec3(0.0f, 0.0f, 0.0f);
+
+	animations = { { t } };
 }
 
 Joint* Joint::Find(std::string name)
 {
 	Joint* ret = nullptr;
+
+	if (this->name.compare(name) == 0) {
+		return this;
+	}
+
 	for (int c = 0; c < children.size(); c++) {
 		ret = children[c]->Find(name);
 		if (ret != nullptr)
@@ -77,6 +87,16 @@ void Joint::WriteOutput(std::string pref)
 	}
 }
 
+void Joint::FillJointArray(Transform* arr, int& cur, int anim = 0, int frame = 0)
+{
+	arr[cur] = animations[anim][frame];
+	cur++;
+
+	for (int c = 0; c < children.size(); c++) {
+		children[c]->FillJointArray(arr, cur);
+	}
+}
+
 Skeleton::Skeleton(std::string name, std::string file)
 {
 	this->name = name;
@@ -100,6 +120,8 @@ int Skeleton::LoadFromFile(std::string f)
 	std::string read;
 	Joint* cur = nullptr;
 
+	num_bones = 0;
+
 	while (!file.eof()) {
 		if (file.peek() == '#') {
 			file.ignore(512, (int)'\n');
@@ -111,6 +133,7 @@ int Skeleton::LoadFromFile(std::string f)
 			file >> read;
 			root = new Joint(read, nullptr);
 			cur = root;
+			//num_bones++;
 			continue;
 		}
 		else if (read.compare("JOINT") == 0) {
@@ -119,6 +142,7 @@ int Skeleton::LoadFromFile(std::string f)
 				Joint* next = new Joint(read, cur);
 				cur->children.push_back(next);
 				cur = next;
+				num_bones++;
 				continue;
 			}
 			else {
@@ -174,6 +198,19 @@ Joint* Skeleton::Find(std::string name)
 	Joint* ret = nullptr;
 	if (root != nullptr) {
 		ret = root->Find(name);
+	}
+
+	return ret;
+}
+
+Transform* Skeleton::GetTransformArray(int anim = 0, int frame = 0)
+{
+	Transform* ret = new Transform[num_bones];
+
+	int id = 0;
+
+	for (int c = 0; c < root->children.size(); c++) {
+		root->children[c]->FillJointArray(ret, id, anim, frame);
 	}
 
 	return ret;

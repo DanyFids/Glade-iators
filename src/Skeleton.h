@@ -18,6 +18,8 @@ ChannelType StringToChnlTp(std::string name);
 
 class Skeleton;
 
+struct Transform;
+
 class Joint {
 protected:
 	std::string name;
@@ -26,15 +28,17 @@ protected:
 	std::vector<ChannelType> channels;
 
 	glm::vec3 offset;
-	glm::vec3 rotation;
-	glm::vec3 position;
 
 public:
+	std::vector<std::vector<Transform>> animations;
+
 	Joint(std::string n, Joint* p);
 
 	Joint* Find(std::string name);
 
 	void WriteOutput(std::string pref);
+
+	void FillJointArray(Transform* arr, int& cur, int anim, int frame);
 
 	friend class Skeleton;
 };
@@ -43,6 +47,8 @@ class Skeleton {
 	std::string name;
 	Joint* root;
 
+
+	int num_bones;
 public:
 	Skeleton(std::string name, std::string file);
 
@@ -50,4 +56,8 @@ public:
 
 	int LoadFromFile(std::string file);
 	Joint* Find(std::string name);
+
+	Transform* GetTransformArray(int anim, int frame);
+	int GetNumBones() { return num_bones; }
+	int GetNumFrames(int a) { return root->animations[a].size(); }
 };

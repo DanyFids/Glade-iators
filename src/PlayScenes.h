@@ -3,14 +3,19 @@
 
 class Light;
 class Mesh;
+class Player;
 
 class OnePlayer: public PlayScene {
 	Shader* shaderObj;
 	Shader* depthShader;
 	Shader* sunShader;
+	Shader* skelShader;
 
 	Shader* DebugShader;
 	Mesh* DebugQuad;
+	
+	Player* test_player;
+
 	bool debug = false;
 	bool f3_pressed;
 	int disp_depth = 0;

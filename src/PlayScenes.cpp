@@ -110,15 +110,22 @@ void OnePlayer::Draw()
 	glCullFace(GL_BACK);
 
 	sun->SetupLight(shaderObj);
+	sun->SetupLight(skelShader);
 	for (int c = 0; c < lights.size(); c++) {
 		lights[c]->SetupLight(shaderObj, c);
+		lights[c]->SetupLight(skelShader, c);
 	}
 	shaderObj->SetI("num_lights", lights.size());
+	skelShader->SetI("num_lights", lights.size());
 
 	for (int c = 0; c < Cam.size(); c++) {
 		Cam[c]->SetupCam(shaderObj);
 
 		RenderScene(shaderObj);
+
+		Cam[c]->SetupCam(skelShader);
+
+		test_player->Draw(skelShader, Cam);
 	}
 
 	glDisable(GL_DEPTH_TEST);
@@ -135,17 +142,23 @@ void OnePlayer::LoadScene()
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
+	skelShader = new Shader("Shaders/skeleton_shader.vert", "Shaders/Basic_Shader.frag");
 
 	Material* DiceTex = new Material("dice-texture.png", "d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
 	Material* defaultTex = new Material("default-texture.png", "default-texture.png");
+	
+	Material* GladiatorWM = new Material("WeightMap.png");
 
 	Material* stamBarMat = new Material("green.png");
 
 	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator.bvh");
+	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, GladiatorWM);
 
 	gladiatorSkel->WriteTree();
+	//gladiatorSkel->Find("l_arm2")->animations[0][0].position += glm::vec3(1.0f, 0.0f, 0.0f);
+	gladiatorSkel->Find("r_leg2")->animations[0][0].rotation += glm::vec3(0.0f, 0.0f, 0.0f);
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
@@ -164,8 +177,8 @@ void OnePlayer::LoadScene()
 	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
 
-	players.push_back(new Object(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
-	players[2]->Scale(glm::vec3(1.2f)); 
+	test_player = new Player(GladiatorMesh, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f });
+	test_player->Scale(glm::vec3(1.2f));
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	floor->Move({ 0.0f, -0.75f, 0.0f });

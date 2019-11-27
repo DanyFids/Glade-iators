@@ -1,9 +1,12 @@
 #pragma once
 #include<GLM/glm.hpp>
 #include<vector>
+#include<string>
+
 class Material;
 class Shader;
 class Camera;
+class Skeleton;
 
 struct Vertex {
 	glm::vec3 position;
@@ -11,6 +14,7 @@ struct Vertex {
 	glm::vec2 tex_uv;
 	glm::vec3 tangent;
 	glm::vec3 biTan;
+	int id;
 };
 
 class Mesh {
@@ -37,13 +41,16 @@ public:
 	void SetPosition(glm::vec3 pos);
 };
 
-/*class AnimMesh : public Mesh {
-	int num_frames;
+class SkelMesh : public Mesh {
 	int curFrame;
 	int nexFrame;
+	int anim = 0;
+
+	Skeleton* skeleton;
+	Material* weightMap;
 
 public:
-	AnimMesh(std::string f[]);
+	SkelMesh(std::string f, Skeleton* s, Material * w);
 
 	virtual void Draw(Shader*);
-};*/
+};

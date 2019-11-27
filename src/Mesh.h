@@ -14,6 +14,16 @@ struct Vertex {
 	glm::vec3 biTan;
 };
 
+struct Pose {
+	unsigned int id;
+
+	unsigned int num_vert;
+	unsigned int num_indi;
+	std::vector<Vertex> vert_vec = std::vector<Vertex>();
+	std::vector<unsigned int>indi_vec = std::vector<unsigned int>();
+
+};
+
 struct bigVert {
 	glm::vec3 posi1;
 	glm::vec3 norm1;
@@ -30,6 +40,7 @@ struct bigVert {
 class Mesh {
 protected:
 	unsigned int vao;
+	unsigned int vbo;
 	unsigned int buffers[2];
 	int num_indices;
 	Material * tex;
@@ -53,19 +64,32 @@ public:
 };
 
 class MorphMesh : public Mesh {
-	std::vector<std::string> poses;
+	std::vector<std::string> keyFrames;
+	std::vector<Pose> poses;
 
-	int num_frames = poses.size();
+	int num_frames;
 	int curFrame = 0;
 	int nextFrame = 1;
 
-	float time;
-	const float ANIM_TIME = 5.0f;
+	float time = 0.0f;
+
+	const float ANIM_TIME = 2.0f;
+	
+	bool looping = false;
+	bool reversed = false;
+
 public:
 	MorphMesh(std::vector<std::string> keyframes);
+
 	virtual void Draw(Shader*);
 	void addPose( std::string filename);
 	void Update(float dt);
-	//void nextPose();	
+	void NextPose();
+	void PrevPose();
+	
+	void setLooping();
+	void setReverse();
+	void setPose(int frame, float time);
+	void play();
 };
 

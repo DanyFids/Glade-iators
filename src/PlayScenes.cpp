@@ -193,7 +193,7 @@ void OnePlayer::LoadScene()
 	};
  
 
-	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj" };
+	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 
 	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(2.0f,1.0f,2.0f));
 	staticBoi = new Object(new Mesh("wobble/wobble2.obj"), defaultTex, basicCubeHB, glm::vec3(2.0f, 4.0f, 2.0f));

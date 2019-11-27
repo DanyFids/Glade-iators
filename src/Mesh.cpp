@@ -350,49 +350,63 @@ void Mesh::SetPosition(glm::vec3 pos)
 
 MorphMesh::MorphMesh(std::vector<std::string> keyframes)
 {
-	poses = keyframes;
+	keyFrames = keyframes;
+	num_frames = keyFrames.size();
+
+	for (int i = 0; i < num_frames; i++) {
+		Pose temp; // create a Pose
+
+		temp.id = i; // give it an ID so debugging isnt stupid
+
+		LoadMesh(keyFrames[i].c_str(), temp.vert_vec, temp.num_vert, temp.indi_vec, temp.num_indi); //load the things.
+
+		poses.push_back(temp); // add it to a list of poses.
+	}
 
 	//Declaring variables
 	unsigned int num_vert, num_vert2, num_indi;
 
 	//Current Pose
-	std::vector<Vertex> vert_vec = std::vector<Vertex>();
+	//std::vector<Vertex> vert_vec = std::vector<Vertex>();
 
 	//Next pose
 	std::vector<Vertex> vert_vec2 = std::vector<Vertex>();
 
 	std::vector<unsigned int> indi_vec = std::vector<unsigned int>(); //Vector of indices
 
-	LoadMesh(poses[curFrame].c_str(), vert_vec, num_vert, indi_vec, num_indi);
+	//LoadMesh(keyFrames[curFrame].c_str(), vert_vec, num_vert, indi_vec, num_indi);
 
-	Vertex* vert;
+	num_indi = poses[curFrame].num_indi;
+
+	//Vertex* vert;
 	
 	unsigned int* indi;
-	vert = new Vertex[num_vert];  
+
+	//vert = new Vertex[num_vert];  
 	indi = new unsigned int[num_indi];
 
 
-	for (int c = 0; c < vert_vec.size(); c++) {
-		vert[c] = vert_vec[c];
+	//for (int c = 0; c < vert_vec.size(); c++) {
+	//	vert[c] = vert_vec[c];
+	//}
+
+	for (int c = 0; c < poses[curFrame].indi_vec.size(); c++) {
+		indi[c] = poses[curFrame].indi_vec[c];
 	}
 
-	for (int c = 0; c < indi_vec.size(); c++) {
-		indi[c] = indi_vec[c];
-	}
+	//LoadMesh(keyFrames[nextFrame].c_str(), vert_vec2, num_vert2, indi_vec, num_indi);
 
-	LoadMesh(poses[nextFrame].c_str(), vert_vec2, num_vert2, indi_vec, num_indi);
-
-	if (num_vert != num_vert2) { // If pose 2 does not have = number of verts
+	if (poses[curFrame].num_vert != poses[nextFrame].num_vert) { // If pose 2 does not have = number of verts
 		std::cout << "Uh oh, stinky" << std::endl;
 		return;
 	}
 
-	Vertex* vert2 = new Vertex[num_vert * 2];
+	Vertex* vert2 = new Vertex[poses[nextFrame].num_vert * 2];
 
 	int id = 0;
-	for (int c = 0; c < vert_vec2.size(); c++) {
-		vert2[id++] = vert_vec[c];
-		vert2[id++] = vert_vec2[c];
+	for (int c = 0; c < poses[nextFrame].vert_vec.size(); c++) {
+		vert2[id++] = poses[curFrame].vert_vec[c];
+		vert2[id++] = poses[nextFrame].vert_vec[c];
 	}
 
 	
@@ -402,16 +416,16 @@ MorphMesh::MorphMesh(std::vector<std::string> keyframes)
 	glBindVertexArray(vao);
 
 	// setup array Buffer
-	unsigned int vbo;
+	//unsigned int vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * num_vert*2, vert2, GL_DYNAMIC_DRAW); //May need to have a bigger size?
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * poses[curFrame].num_vert * 2, vert2, GL_DYNAMIC_DRAW); //May need to have a bigger size?
 
 	// setup element buffer
 	unsigned int ebo;
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * num_indi, indi, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * poses[curFrame].num_indi, indi, GL_STATIC_DRAW);
 
 	bigVert* temp_vert = nullptr;
 
@@ -452,27 +466,213 @@ void MorphMesh::Draw(Shader* shdr)
 
 void MorphMesh::addPose( std::string filename)
 {
-	poses.push_back(filename);
+	keyFrames.push_back(filename);
 }
 
 void MorphMesh::Update(float dt)
 {
+	if (!looping && !reversed) { //forwards
 
-	if (time >= ANIM_TIME) {
-		time = 0;
-	}
-
-	if (time < ANIM_TIME) {
-		time += dt;
-
-		if (time > ANIM_TIME) {
-			time = ANIM_TIME;
+		if (time >= ANIM_TIME) {
+			time = 0;
+			NextPose();
 		}
 
+		if (time < ANIM_TIME) {
+			time += dt;
+
+			if (time > ANIM_TIME) {
+				time = ANIM_TIME;
+			}
+
+		}
 	}
 
-	
-	
+	else if (!looping && reversed) { //backwards
 
+		if (time <= 0) {
+			time = ANIM_TIME;
+			PrevPose();
+		}
+
+		if (time > 0) {
+			time -= dt;
+
+			if (time < 0.0f) {
+				time = 0.0f;
+			}
+		}
+	}
+
+
+	else if (looping) {
+
+		if (curFrame < num_frames-1 && !reversed) {
+
+			if (time >= ANIM_TIME) {
+				time = ANIM_TIME;
+				NextPose();
+
+				if (curFrame == num_frames - 1) {
+					setReverse();
+				}
+			}
+
+			if (time < ANIM_TIME) {
+				time += dt;
+
+				if (time > ANIM_TIME) {
+					time = ANIM_TIME;
+				}
+
+			}
+
+		}
+		
+		if (curFrame > 0 && reversed) {
+
+			if (time <= 0) {
+				time = 0;
+				PrevPose();
+				if (curFrame == 0) {
+					setReverse();
+				}
+			}
+
+			if (time > 0) {
+				time -= dt;
+
+				if (time < 0.0f) {
+					time = 0.0f;
+				}
+			}
+
+		}
+	}
+	
 	//time = 1.0f;
+}
+
+void MorphMesh::NextPose()
+{
+	curFrame = nextFrame;
+	nextFrame++;
+
+	if (nextFrame > num_frames - 1) {
+		
+		if (!looping) {
+			setPose(0, 0.0f);
+		}
+		else
+			nextFrame = 0;
+	}
+
+	Vertex* vert2 = new Vertex[poses[0].num_vert * 2];
+
+	int id = 0;
+	for (int c = 0; c < poses[0].vert_vec.size(); c++) {
+		vert2[id++] = poses[curFrame].vert_vec[c];
+		vert2[id++] = poses[nextFrame].vert_vec[c];
+	}
+
+	glBindVertexArray(vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * poses[curFrame].num_vert * 2, vert2, GL_DYNAMIC_DRAW);
+
+}
+
+
+void MorphMesh::PrevPose()
+{
+	
+	nextFrame = curFrame;
+	curFrame--;
+
+	if (curFrame < 0) {
+		
+		if (!looping) {
+			setPose(num_frames - 2, ANIM_TIME);
+		}
+		else
+		{
+			curFrame = num_frames - 1;
+		}
+	}
+
+	Vertex* vert2 = new Vertex[poses[nextFrame].num_vert * 2];
+
+	int id = 0;
+	for (int c = 0; c < poses[curFrame].vert_vec.size(); c++) {
+		vert2[id++] = poses[curFrame].vert_vec[c];
+		vert2[id++] = poses[nextFrame].vert_vec[c];
+	}
+
+	glBindVertexArray(vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * poses[curFrame].num_vert * 2, vert2, GL_DYNAMIC_DRAW);
+}
+
+
+void MorphMesh::setLooping()
+{
+	if (!looping) {
+		looping = true;
+	}
+	else
+		looping = false;
+}
+
+void MorphMesh::setReverse()
+{
+	if (!reversed) {
+		reversed = true;
+		time = ANIM_TIME;
+	}
+	else {
+		reversed = false;
+		time = 0;
+	}
+}
+
+void MorphMesh::setPose(int frame, float t)
+{
+	if (frame < 0 || frame > num_frames - 1) {
+		std::cout << "Frames out of bounds!";
+		curFrame = 0;
+		nextFrame = 1;
+		return;
+	}
+
+	curFrame = frame;
+	nextFrame = curFrame + 1;
+
+	if (t < 0 || t > ANIM_TIME) {
+		std::cout << "Anim Time out of bound!";
+		time = 0.0f;
+		return;
+	}
+
+	time = t;
+
+	Vertex* vert2 = new Vertex[poses[nextFrame].num_vert * 2];
+
+	int id = 0;
+	for (int c = 0; c < poses[curFrame].vert_vec.size(); c++) {
+		vert2[id++] = poses[curFrame].vert_vec[c];
+		vert2[id++] = poses[nextFrame].vert_vec[c];
+	}
+
+	glBindVertexArray(vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * poses[curFrame].num_vert * 2, vert2, GL_DYNAMIC_DRAW);
+}
+
+void MorphMesh::play()
+{
+	//for (int i = 0; i < num_frames - 1; i++) {
+	//
+	//}
 }

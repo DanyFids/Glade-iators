@@ -54,10 +54,12 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_RELEASE)
 		f3_pressed = false;
 
+	//this is test shit
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && time <= 0) {
 		players[PLAYER_1]->dmgHP(10.0f);
 		time = MAX_TIME;
 	}
+	//
 
 	if (time > 0) {
 		time -= dt;
@@ -159,6 +161,8 @@ void OnePlayer::LoadScene()
 
 	Material* hpBarMat = new Material("yuck.png");
 	Material* stamBarMat = new Material("blue.png");
+	Material* crowdBarMat = new Material("white.png");
+	Material* blackBarMat = new Material("black.png");
 
 	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator.bvh");
 
@@ -194,10 +198,28 @@ void OnePlayer::LoadScene()
 		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT)) 
 	};
 
+	UI* hpBG = new UI(210, 30, { 5.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* stamBG = new UI(160, 30, { 5.0f, 495.0f, -1.0f }, blackBarMat);
+	UI* crowdBG = new UI(185, 30, { 220.0f, 545.0f, -1.0f }, blackBarMat);
+
+	UI* hpBG2 = new UI(210, 30, { 585.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* stamBG2 = new UI(160, 30, { 635.0f, 495.0f, -1.0f }, blackBarMat);
+	UI* crowdBG2 = new UI(185, 30, { 395.0f, 545.0f, -1.0f }, blackBarMat);
+
+
 	ui = {
-		new HealthBar((Player*)players[PLAYER_1], glm::vec2(50, 550), hpBarMat),
-		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(50, 500), stamBarMat)
+		new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
+		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
+		new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
+
+		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(590, 550), hpBarMat, hpBG2),
+		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(640, 500), stamBarMat, stamBG2),
+		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(395, 550), crowdBarMat, crowdBG2)
 	};
+
+	//ui[2]->scaleX(-1);
+	//ui[3]->scaleX(-1);
+	//ui[4]->scaleX(-1);
 
 	// DEBUG THINGS
 	DebugShader = new Shader("Shaders/debug.vert", "Shaders/debug.frag");
@@ -265,6 +287,11 @@ void TwoPlayer::LoadScene()
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
 	Material* defaultTex = new Material("default-texture.png", "default-texture.png");
 
+	Material* hpBarMat = new Material("yuck.png");
+	Material* stamBarMat = new Material("blue.png");
+	Material* crowdBarMat = new Material("white.png");
+	Material* blackBarMat = new Material("black.png");
+
 	//sun = new DirectionalLight(glm::normalize(glm::vec3(1.5f, 1.0f, 0.5f)), { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f);
 	//lights.push_back(new PointLight({ 0.0f, 30.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 1.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
@@ -287,5 +314,10 @@ void TwoPlayer::LoadScene()
 	Cam = {
 		new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec4(0,0, SCREEN_WIDTH / 2, SCREEN_HEIGHT)), // Cam 1
 		new Camera(glm::vec3(2.0f, 0.0f, -4.0f), glm::vec4(SCREEN_WIDTH / 2,0, SCREEN_WIDTH / 2, SCREEN_HEIGHT)) // Cam 2
+	};
+
+	ui = {
+		//new HealthBar((Player*)players[PLAYER_2], glm::vec2(400, 550), hpBarMat),
+		//new StaminaBar((Player*)players[PLAYER_2], glm::vec2(400, 500), stamBarMat)
 	};
 }

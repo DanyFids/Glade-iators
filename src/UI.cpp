@@ -27,7 +27,7 @@ void UI::INIT()
 	projection = glm::ortho(0.f, (float)SCREEN_WIDTH, 0.f, (float)SCREEN_HEIGHT, -1.f, 1.f);
 }
 
-UI::UI(int width, int height, glm::vec2 pos, Material* ma)
+UI::UI(int width, int height, glm::vec3 pos, Material* ma)
 {
 	material = ma;
 
@@ -37,6 +37,12 @@ UI::UI(int width, int height, glm::vec2 pos, Material* ma)
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(pos.x, pos.y, 0.0f));
 	model = glm::scale(model, glm::vec3(width, height, 1.0f));
+}
+
+int UI::scaleX(int _x)
+{
+	scale.x = _x;
+	return scale.x;
 }
 
 void UI::Draw(glm::vec2 scrn) {
@@ -63,9 +69,10 @@ glm::mat4 UI::projection = glm::mat4(1.0f);
 const int StaminaBar::MAX_WIDTH = 150;
 const int StaminaBar::HEIGHT = 20;
 
-StaminaBar::StaminaBar(Player* p, glm::vec2 pos, Material* ma): UI(MAX_WIDTH, HEIGHT, pos, ma)
+StaminaBar::StaminaBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg): UI(MAX_WIDTH, HEIGHT, glm::vec3(pos, 0), ma)
 {
 	player = p;
+	bg = _bg;
 }
 
 void StaminaBar::Update(float dt)
@@ -75,19 +82,56 @@ void StaminaBar::Update(float dt)
 	dim.x = (float)MAX_WIDTH * perc;
 }
 
+void StaminaBar::Draw(glm::vec2 scrn)
+{
+	bg->Draw(scrn);
+
+	UI::Draw(scrn);
+}
+
 const int HealthBar::MAX_WIDTH = 200;
 const int HealthBar::HEIGHT = 20;
 
-HealthBar::HealthBar(Player* p, glm::vec2 pos, Material* ma) : UI(MAX_WIDTH, HEIGHT, pos, ma)
+HealthBar::HealthBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg) : UI(MAX_WIDTH, HEIGHT, glm::vec3(pos, 0), ma)
 {
 	player = p;
+	bg = _bg;
+
 }
 
 void HealthBar::Update(float dt)
 {
-	float perc = player->GetHP() / Player::MAX_HEALTH;
+	if (cur != (player->GetHP() / Player::MAX_HEALTH)) {
 
-	dim.x = (float)MAX_WIDTH * perc;
+		if (!hpLerp || perc != player->GetHP() / Player::MAX_HEALTH) {
+			hpLerp = true;
+			hpTime = MAX_HPTIME;
+			temp = perc;
+			perc = player->GetHP() / Player::MAX_HEALTH;
+		}
+
+		cur = lerp(perc, temp, hpTime / MAX_HPTIME);
+
+		dim.x = (float)MAX_WIDTH * cur;
+	}
+
+	if (hpTime > 0) {
+		hpTime -= dt;
+	}
+	else {
+		hpLerp = false;
+	}
+
+	//lerp(green, ylw, time / MAX_TIME);
+
+	/*
+	
+	plan:
+	get og value
+	get new value
+	lerp between using time
+	
+	*/
 
 	if (time < MAX_TIME) {
 		time += dt;
@@ -97,6 +141,7 @@ void HealthBar::Update(float dt)
 
 void HealthBar::Draw(glm::vec2 scrn)
 {
+	bg->Draw(scrn);
 	glm::vec3 green(0.0f, 1.0f, 0.0f);
 	glm::vec3 ylw(1.0f, 1.0f, 0.0f);
 	glm::vec3 orange(1.0f, 0.65f, 0.0f);
@@ -197,6 +242,30 @@ void HealthBar::Draw(glm::vec2 scrn)
 			LERPING = false;
 		}
 	}
+
+	UI::Draw(scrn);
+}
+
+const int CrowdBar::MAX_WIDTH = 180;
+const int CrowdBar::HEIGHT = 20;
+CrowdBar::CrowdBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg) : UI(MAX_WIDTH, HEIGHT, glm::vec3(pos, 0), ma)
+{
+	player = p;
+	bg = _bg;
+}
+
+void CrowdBar::Update(float dt)
+{
+	float perc = time / MAX_TIME;
+
+	dim.x = (float)MAX_WIDTH * perc;
+	 
+	//time -= dt;
+}
+
+void CrowdBar::Draw(glm::vec2 scrn)
+{
+	bg->Draw(scrn);
 
 	UI::Draw(scrn);
 }

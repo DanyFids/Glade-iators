@@ -15,18 +15,21 @@ class UI {
 protected:
 	static Mesh* QUAD;
 	static glm::mat4 projection;
-	glm::vec2 pos;
+	glm::vec3 pos;
 	glm::vec2 dim;
+	glm::vec2 scale = {1.0f , 1.0f};
 
 	glm::mat4 model;
 	Material* material;
+	UI* bg = nullptr;
 
 public:
 	static Shader* SHADER;
 
 	static void INIT();
 
-	UI(int width, int height, glm::vec2 pos, Material* ma);
+	UI(int width, int height, glm::vec3 pos, Material* ma);
+	int scaleX(int _x);
 	virtual void Draw(glm::vec2 scrn);
 	virtual void Update(float dt) {};
 };
@@ -38,15 +41,19 @@ class StaminaBar : public UI {
 	Player* player;
 
 public:
-	StaminaBar(Player* p, glm::vec2 pos, Material* ma);
+	StaminaBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg);
 
 	virtual void Update(float dt);
+	virtual void Draw(glm::vec2 scrn);
 };
 
 class HealthBar : public UI {
 	static const int HEIGHT;
 	static const int MAX_WIDTH;
 
+	float hpTime = 0.0f;
+	const float MAX_HPTIME = 0.2f;
+	bool hpLerp = false;
 	float time = 0.0f;
 	const float MAX_TIME = 0.2f;
 	bool GREEN = false;
@@ -57,12 +64,31 @@ class HealthBar : public UI {
 
 	bool LERPING = false;
 
+	float perc = 1.0f;
+	float temp = 1.0f;
+	float cur = 1.0f;;
+
 	Player* player;
 
 public:
-	HealthBar(Player* p, glm::vec2 pos, Material* ma);
+	HealthBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg);
 
 	virtual void Update(float dt);
 	virtual void Draw(glm::vec2 scrn);
 
+};
+
+class CrowdBar : public UI {
+	static const int HEIGHT;
+	static const int MAX_WIDTH;
+	const float MAX_TIME = 300.0f; // 5 minutes
+	float time = MAX_TIME;
+
+	Player* player;
+
+public:
+	CrowdBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg);
+
+	virtual void Update(float dt);
+	virtual void Draw(glm::vec2 scrn);
 };

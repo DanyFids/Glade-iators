@@ -3,6 +3,8 @@
 #include<GLM/gtc/matrix_transform.hpp>
 #include<GLM/gtc/quaternion.hpp>
 #include<vector>
+#include <cmath>
+//#include <chrono>
 
 class Camera;
 class Material;
@@ -126,4 +128,25 @@ public:
 	Shield(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P);
 
 	//void init();
+};
+
+class SplineMan : public Object
+{
+public:
+	virtual void Update(float dt);
+	virtual bool HitDetect(Object* other);
+
+	//float StartT;
+	float CurrT = 0;
+	float MaxT = 0.2f;
+	int current = 0;
+	bool init;
+	int direction = 1;
+	std::vector<glm::vec3> pathPos;
+
+	void CatmullBetweenPoints(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm::vec3 d);
+
+	SplineMan(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<glm::vec3> wasd);
+
+
 };

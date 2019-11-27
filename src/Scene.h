@@ -85,6 +85,8 @@ protected:
 	std::vector<Object*> terrain;
 	std::vector<Shield*> shields;
 	std::vector<Attack*> attacks;
+	std::vector<glm::vec3> beacons;
+
 	bool dodge1 = true;
 	bool dodge2 = true;
 	float dodge1t;
@@ -96,8 +98,7 @@ protected:
 	bool block1 = false;
 	bool block2 = false;
 
-	
-
+	SplineMan* DUUDE;
 
 	Mesh* Amesh = new Mesh("d6.obj");
 	Material* Amat = new Material("missing_tex.png");

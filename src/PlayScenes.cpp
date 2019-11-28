@@ -125,8 +125,8 @@ void OnePlayer::Update(float dt)
 
 	DUUDE->Update(dt);
 
-	for (int u = 0; u < ui1.size(); u++) {
-		ui1[u]->Update(dt);
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Update(dt);
 	}
 
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
@@ -187,8 +187,8 @@ void OnePlayer::Draw()
 	}
 
 	glDisable(GL_DEPTH_TEST);
-	for (int u = 0; u < ui1.size(); u++) {
-		ui1[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 	glEnable(GL_DEPTH_TEST);
 
@@ -286,7 +286,7 @@ void OnePlayer::LoadScene()
 	UI* crowdBG2 = new UI(185, 30, { 395.0f, 545.0f, -1.0f }, blackBarMat);
 
 
-	ui1 = {
+	ui = {
 		new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
 		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
 		new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
@@ -391,8 +391,8 @@ void TwoPlayer::Update(float dt)
 
 	DUUDE->Update(dt);
 
-	for (int u = 0; u < ui1.size(); u++) {
-		ui1[u]->Update(dt);
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Update(dt);
 	}
 
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
@@ -443,11 +443,8 @@ void TwoPlayer::Draw()
 
 	glDisable(GL_DEPTH_TEST);
 
-	for (int u = 0; u < ui1.size(); u++) {
-		ui1[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
-	}
-	for (int u = 0; u < ui2.size(); u++) {
-		ui2[u]->Draw(glm::vec2(SCREEN_WIDTH , SCREEN_HEIGHT));
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 	glEnable(GL_DEPTH_TEST);
 
@@ -536,19 +533,10 @@ void TwoPlayer::LoadScene()
 	UI* crowdBG2 = new UI(185, 30, { 395.0f, 545.0f, -1.0f }, blackBarMat);
 
 
-	ui1 = {
+	ui = {
 		new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
 		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
 		new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
-
-		//new HealthBar((Player*)players[PLAYER_2], glm::vec2(590, 550), hpBarMat, hpBG2),
-		//new StaminaBar((Player*)players[PLAYER_2], glm::vec2(640, 500), stamBarMat, stamBG2),
-		//new CrowdBar((Player*)players[PLAYER_2], glm::vec2(395, 550), crowdBarMat, crowdBG2)
-	};
-	ui2 = {
-		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
-		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
-		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
 
 		new HealthBar((Player*)players[PLAYER_2], glm::vec2(590, 550), hpBarMat, hpBG2),
 		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(640, 500), stamBarMat, stamBG2),

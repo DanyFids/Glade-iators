@@ -112,8 +112,7 @@ protected:
 	std::vector<PointLight*> lights;
 	DirectionalLight * sun;
 
-	std::vector<UI*> ui1;
-	std::vector<UI*> ui2;
+	std::vector<UI*> ui;
 
 public:
 	virtual void KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt) override;

@@ -184,6 +184,7 @@ void OnePlayer::Draw()
 		morphyBoi->Draw(morphShader, Cam);
 		Cam[c]->SetupCam(skelShader);
 		test_player->Draw(skelShader, Cam);
+		
 	}
 
 	glDisable(GL_DEPTH_TEST);
@@ -215,6 +216,8 @@ void OnePlayer::LoadScene()
 	Material* crowdBarMat = new Material("white.png");
 	Material* blackBarMat = new Material("black.png");
 
+	Material* arenaTex = new Material("wood_texture.png");
+
 	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator.bvh");
 	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, GladiatorWM);
 
@@ -228,13 +231,14 @@ void OnePlayer::LoadScene()
 
 
 
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
-	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
+	//lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	Mesh* Square = new Mesh("d6.obj");
 	Mesh* d20 = new Mesh("d20.obj");
 	Mesh* boi = new Mesh("gladiator.obj");
+	Mesh* arena = new Mesh("ColitreeumV2.obj");
 
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f,1.0f,1.0f);
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
@@ -252,10 +256,17 @@ void OnePlayer::LoadScene()
 	players[2]->Scale(glm::vec3(1.2f)); 
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
+	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0,-2,0));
+
+	Colitreeum->Scale(glm::vec3(2.5, 2.5, 2.5));
+
 	floor->Move({ 0.0f, -0.75f, 0.0f });
 	floor->Scale({ 30.0f, 0.5f, 30.0f });
 
-	terrain.push_back(floor);
+	
+
+	//terrain.push_back(floor);
+	terrain.push_back(Colitreeum);
 
 	beacons.push_back(glm::vec3(glm::vec3(1,1,1)));
 	beacons.push_back(glm::vec3(glm::vec3(1,1,3)));
@@ -466,8 +477,8 @@ void TwoPlayer::LoadScene()
 	Material* crowdBarMat = new Material("white.png");
 	Material* blackBarMat = new Material("black.png");
 
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
-	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
+	//lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	beacons.push_back(glm::vec3(glm::vec3(1, 1, 1)));

@@ -365,11 +365,11 @@ void TwoPlayer::Update(float dt)
 		}
 		if (attacks[a]->HitDetect(players[0]) && attacks[a]->player != 0)
 		{
-			std::cout << "Screaming\n";
+			players[0]->dmgHP(10.0f);
 		}
 		if (attacks[a]->HitDetect(players[1]) && attacks[a]->player != 1)
 		{
-			std::cout << "Screaming\n";
+			players[1]->dmgHP(10.0f);
 		}
 	}
 

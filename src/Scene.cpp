@@ -146,6 +146,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			p1.y = players[player]->GetPosition().y;
 			attacks.back()->SetPosition(p1);
 			std::cout << "OOF\n";
+			players[player]->dmgSTAM(15.0f);
 			atk1 = true;
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2 && player == PLAYER_1)
@@ -158,6 +159,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
 			std::cout << "Dodgy boi\n";
 			
+			players[player]->dmgSTAM(20.0f);
 			dodge1 = false;
 			dodge1t = 0.1;
 		}
@@ -206,6 +208,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
 			p1.y = players[player]->GetPosition().y;
 			attacks.back()->SetPosition(p1);
+			players[player]->dmgSTAM(15.0f);
 			std::cout << "OOF\n";
 			atk2 = true;
 		}
@@ -219,6 +222,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
 			std::cout << "Dodgy boi\n";
 
+			players[player]->dmgSTAM(20.0f);
 			dodge2 = false;
 			dodge2t = 0.1;
 		}

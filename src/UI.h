@@ -71,7 +71,7 @@ class HealthBar : public UI {
 	Player* player;
 
 public:
-	HealthBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg);
+	HealthBar(Player* p, glm::vec2 pos, Material* ma, UI*_bg);
 
 	virtual void Update(float dt);
 	virtual void Draw(glm::vec2 scrn);

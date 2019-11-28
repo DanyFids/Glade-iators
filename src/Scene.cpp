@@ -161,15 +161,17 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_1 && atk1 == false)
 		{
-			attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_1));
-			glm::vec3 p1 = players[player]->GetPosition();
-			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-			p1.y = players[player]->GetPosition().y;
-			attacks.back()->SetPosition(p1);
-			std::cout << "OOF\n";
-			players[player]->dmgSTAM(15.0f);
-			atk1 = true;
+			if (players[player]->GetStam() >= 15.0f) {
+				attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_1));
+				glm::vec3 p1 = players[player]->GetPosition();
+				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+				p1.y = players[player]->GetPosition().y;
+				attacks.back()->SetPosition(p1);
+				std::cout << "OOF\n";
+				players[player]->dmgSTAM(15.0f);
+				atk1 = true;
+			}
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2 && player == PLAYER_1)
 		{
@@ -178,12 +180,14 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && player == PLAYER_1 && dodge1 == true && t != glm::vec3(0.0f, 0.0f, 0.0f))
 		{
-			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
-			std::cout << "Dodgy boi\n";
-			
-			players[player]->dmgSTAM(20.0f);
-			dodge1 = false;
-			dodge1t = 0.1;
+			if (players[player]->GetStam() >= 20.0f) {
+				players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
+				std::cout << "Dodgy boi\n";
+
+				players[player]->dmgSTAM(20.0f);
+				dodge1 = false;
+				dodge1t = 0.1;
+			}
 		}
 		
 		if (dodge1t <= -0.4 && dodge1 == false && player == PLAYER_1)
@@ -224,15 +228,17 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_2 && atk2 == false)
 		{
-			attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_2));
-			glm::vec3 p1 = players[player]->GetPosition();
-			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-			p1.y = players[player]->GetPosition().y;
-			attacks.back()->SetPosition(p1);
-			players[player]->dmgSTAM(15.0f);
-			std::cout << "OOF\n";
-			atk2 = true;
+			if (players[player]->GetStam() >= 15.0f) {
+				attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_2));
+				glm::vec3 p1 = players[player]->GetPosition();
+				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+				p1.y = players[player]->GetPosition().y;
+				attacks.back()->SetPosition(p1);
+				players[player]->dmgSTAM(15.0f);
+				std::cout << "OOF\n";
+				atk2 = true;
+			}
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2 && player == PLAYER_2)
 		{
@@ -241,12 +247,13 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && player == PLAYER_2 && dodge2 == true && t != glm::vec3(0.0f, 0.0f, 0.0f))
 		{
-			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
-			std::cout << "Dodgy boi\n";
-
-			players[player]->dmgSTAM(20.0f);
-			dodge2 = false;
-			dodge2t = 0.1;
+			if (players[player]->GetStam() >= 20.0f) {
+				players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
+				std::cout << "Dodgy boi\n";
+				players[player]->dmgSTAM(20.0f);
+				dodge2 = false;
+				dodge2t = 0.1;
+			}
 		}
 
 		if (dodge2t <= -0.4 && dodge2 == false && player == PLAYER_2)

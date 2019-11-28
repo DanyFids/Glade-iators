@@ -63,6 +63,7 @@ public:
 	void Move(glm::vec3 dir);
 	void Scale(glm::vec3 scl);
 	void SetPosition(glm::vec3 pos);
+	void SetRotation(glm::vec3 rot);
 
 	virtual bool HitDetect(Object* other);
 
@@ -108,7 +109,7 @@ private:
 
 public:
 	virtual void Update(float dt);
-	virtual bool HitDetect(Object* other);
+	virtual bool HitDetect(Player* other);
 
 	//static Object* ABox;
 	int player;

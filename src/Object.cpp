@@ -89,6 +89,11 @@ void Object::SetPosition(glm::vec3 pos)
 	transform.position = pos;
 }
 
+void Object::SetRotation(glm::vec3 rot)
+{
+	transform.rotation = rot;
+}
+
 bool Object::HitDetect(Object* other)
 {
 	return false;
@@ -219,7 +224,7 @@ void Attack::Update(float dt)
 {
 }
 
-bool Attack::HitDetect(Object* other)
+bool Attack::HitDetect(Player* other)
 {
 	if (other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, this->GetTransform()) && Hit == false) {
 		this->Hit = true;

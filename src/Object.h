@@ -97,6 +97,7 @@ public:
 
 	float GetHP() { return health; }
 	void dmgHP(float _dmg) { health -= _dmg; }
+	void dmgSTAM(float _dmg) { stamina -= _dmg; }
 	float GetStam() { return stamina; }
 	bool CanRun() { return recov_timer <= 0.0f; }
 
@@ -110,7 +111,7 @@ private:
 
 public:
 	virtual void Update(float dt);
-	virtual bool HitDetect(Object* other);
+	virtual bool HitDetect(Player* other);
 
 	//static Object* ABox;
 	int player;

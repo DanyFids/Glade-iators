@@ -8,6 +8,9 @@
 #include "Constants.h"
 #include"UI.h"
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 void MenuScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt)
 {
 }
@@ -119,16 +122,35 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
 
 		glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 camF = Cam[player]->GetDirection();
 		glm::vec3 camR = Cam[player]->GetRight();
 		if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2)
+		{
 			t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+			//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+		}
+			
 		if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2)
+		{
 			t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+			//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+		}
+			
 		if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
 			players[player]->phys.move = glm::normalize(t) * 10.f * dt;
+			
+			glm::vec3 dir = glm::normalize(t);
 
-			//std::cout << "move\n";
+			float newRot;
+
+			newRot = -(std::atan2f(dir.z, dir.x)) * (180/M_PI);
+
+			std::cout << newRot << std::endl;
+
+			players[player]->SetRotation({ 0.0f, newRot, 0.0f });
+
+			std::cout << "move\n";
 		}
 
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && player == PLAYER_1) {

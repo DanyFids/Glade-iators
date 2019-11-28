@@ -89,6 +89,11 @@ void Object::SetPosition(glm::vec3 pos)
 	transform.position = pos;
 }
 
+void Object::SetRotation(glm::vec3 rot)
+{
+	transform.rotation = rot;
+}
+
 bool Object::HitDetect(Object* other)
 {
 	return false;

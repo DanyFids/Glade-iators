@@ -17,7 +17,7 @@ class OnePlayer: public PlayScene {
 	
 	Player* test_player;
 
-	Player* test_boner;
+	Player* test_bones;
 
 	bool debug = false;
 	bool f3_pressed;
@@ -42,9 +42,13 @@ public:
 class TwoPlayer: public PlayScene {
 	Shader* shaderObj;
 	Shader* depthShader;
+	Shader* morphShader;
+
 
 	Shader* sunShader;
 
+
+	Object* morphyBoi;
 public:
 	TwoPlayer();
 	// Inherited via Scene

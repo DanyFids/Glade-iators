@@ -101,11 +101,13 @@ void OnePlayer::Update(float dt)
 		}
 		if (attacks[a]->HitDetect(players[0]) && attacks[a]->player != 0)
 		{
-			std::cout << "Screaming\n";
+			players[0]->dmgHP(10.0f);
+			attacks[a]->Hit = true;
 		}
 		if (attacks[a]->HitDetect(players[1]) && attacks[a]->player != 1)
 		{
-			std::cout << "Screaming\n";
+			players[1]->dmgHP(10.0f);
+			attacks[a]->Hit = true;
 		}
 	}
 
@@ -260,7 +262,7 @@ void OnePlayer::LoadScene()
 	test_player = new Player(GladiatorMesh, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f });
 	test_player->Scale(glm::vec3(1.2f));
 
-	test_boner = new Player(snekMesh, defaultTex, BlockyBoiHB, { -5.0f,0.0f,5.0f });
+	test_bones = new Player(snekMesh, defaultTex, BlockyBoiHB, { -5.0f,0.0f,5.0f });
 	//test_boner->Scale(glm::vec3(2.0f));
 
 
@@ -393,10 +395,12 @@ void TwoPlayer::Update(float dt)
 		if (attacks[a]->HitDetect(players[0]) && attacks[a]->player != 0)
 		{
 			players[0]->dmgHP(10.0f);
+			attacks[a]->Hit = true;
 		}
 		if (attacks[a]->HitDetect(players[1]) && attacks[a]->player != 1)
 		{
 			players[1]->dmgHP(10.0f);
+			attacks[a]->Hit = true;
 		}
 	}
 
@@ -423,6 +427,8 @@ void TwoPlayer::Update(float dt)
 	}
 
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
+
+	((MorphMesh*)(morphyBoi->GetMesh()))->Update(dt);
 }
 
 void TwoPlayer::Draw()
@@ -433,6 +439,7 @@ void TwoPlayer::Draw()
 	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
 	glClear(GL_DEPTH_BUFFER_BIT);
 	sun->SetupDepthShader(sunShader);
+
 	RenderScene(sunShader);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -455,15 +462,23 @@ void TwoPlayer::Draw()
 	glCullFace(GL_BACK);
 
 	sun->SetupLight(shaderObj);
+	sun->SetupLight(morphShader);
+
 	for (int c = 0; c < lights.size(); c++) {
 		lights[c]->SetupLight(shaderObj, c);
+		lights[c]->SetupLight(morphShader, c);
+
 	}
 	shaderObj->SetI("num_lights", lights.size());
+	morphShader->SetI("num_lights", lights.size());
+
 
 	for (int c = 0; c < Cam.size(); c++) {
 		Cam[c]->SetupCam(shaderObj);
 
 		RenderScene(shaderObj);
+		Cam[c]->SetupCam(morphShader);
+		morphyBoi->Draw(morphShader, Cam);
 	}
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -479,14 +494,19 @@ void TwoPlayer::Draw()
 
 void TwoPlayer::LoadScene()
 {
+	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
+
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
 
-	Material* DiceTex = new Material("d6-normal.png");
+	Material* DiceTex = new Material("dice-texture.png", "d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
-	Material* defaultTex = new Material("default-texture.png", "default-texture.png");
+	Material* defaultTex = new Material("default-texture.png", "default-normal.png");
+
+	Material* arenaTex = new Material("wood_texture.png");
+
 
 	Material* hpBarMat = new Material("yuck.png");
 	Material* stamBarMat = new Material("blue.png");
@@ -521,15 +541,19 @@ void TwoPlayer::LoadScene()
 	Mesh* d20 = new Mesh("d20.obj");
 	Mesh* boi = new Mesh("gladiator.obj");
 
+	Mesh* arena = new Mesh("ColitreeumV2.obj");
+
+
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f, 1.0f, 1.0f);
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
-	players.push_back(new Player(boi, defaultTex, basicCubeHB, { 3.0f, 0.3f, 0.0f }));
-	players.push_back(new Player(boi, defaultTex, basicCubeHB));
+	players.push_back(new Player(boi, defaultTex, basicCubeHB, { 3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
+	//players[PLAYER_1]->Rotate(glm::vec3(0.0f,90.0f,0.0f));
+	players.push_back(new Player(boi, defaultTex, basicCubeHB)); // THIS IS PLAYER TWO
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
-	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
+	players[PLAYER_2]->Move({ 0.0f, -0.6f, 0.0f });
 
 	//terrain.push_back(new Object(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
 	//terrain.b(glm::vec3(1.2f));
@@ -537,18 +561,24 @@ void TwoPlayer::LoadScene()
 	Object* BOI = new Object(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f });
 	//floor->Move({ 0.0f, -1.5f, 0.0f });
 	BOI->Scale(glm::vec3(1.2f));
-	terrain.push_back(BOI);
+	//terrain.push_back(BOI);
 	//players[PLAYER_2]->Scale(glm::vec3(0.75f, 0.75f, 0.75f));
 
 	Object* die = new Object(Square, DiceTex, basicCubeHB);
-	die->Move({ 4.0f, 1.0f, 0.0f });
+	die->Move({ 8.0f, 1.0f, 19.0f });
 	terrain.push_back(die);
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	floor->Move({ 0.0f, -1.5f, 0.0f });
 	floor->Scale({ 30.0f, 0.5f, 30.0f });
 
-	terrain.push_back(floor);
+	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0, -2, 0));
+
+	Colitreeum->Scale(glm::vec3(2.5, 2.5, 2.5));
+
+	terrain.push_back(Colitreeum);
+
+	//terrain.push_back(floor);
 
 	Cam = {
 		new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec4(0,0, SCREEN_WIDTH / 2, SCREEN_HEIGHT)), // Cam 1
@@ -573,4 +603,8 @@ void TwoPlayer::LoadScene()
 		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(640, 500), stamBarMat, stamBG2),
 		new CrowdBar((Player*)players[PLAYER_2], glm::vec2(395, 550), crowdBarMat, crowdBG2)
 	};
+
+	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
+	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(15.0f, 1.0f, 2.0f));
+
 }

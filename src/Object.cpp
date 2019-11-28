@@ -227,7 +227,6 @@ void Attack::Update(float dt)
 bool Attack::HitDetect(Player* other)
 {
 	if (other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, this->GetTransform()) && Hit == false) {
-		this->Hit = true;
 		return true;
 	}
 

@@ -17,6 +17,8 @@ class OnePlayer: public PlayScene {
 	
 	Player* test_player;
 
+	Player* test_boner;
+
 	bool debug = false;
 	bool f3_pressed;
 	int disp_depth = 0;

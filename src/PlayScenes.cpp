@@ -184,6 +184,7 @@ void OnePlayer::Draw()
 		morphyBoi->Draw(morphShader, Cam);
 		Cam[c]->SetupCam(skelShader);
 		test_player->Draw(skelShader, Cam);
+	//	test_boner->Draw(skelShader, Cam);
 		
 	}
 
@@ -211,6 +212,8 @@ void OnePlayer::LoadScene()
 	
 	Material* GladiatorWM = new Material("WeightMap.png");
 
+	Material* SnekWM = new Material("snek/WeightMap.png"); //Bone tester
+
 	Material* hpBarMat = new Material("yuck.png");
 	Material* stamBarMat = new Material("blue.png");
 	Material* crowdBarMat = new Material("white.png");
@@ -221,14 +224,18 @@ void OnePlayer::LoadScene()
 	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator.bvh");
 	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, GladiatorWM);
 
-	gladiatorSkel->WriteTree();
-	gladiatorSkel->Find("l_arm1")->animations[0][0].position += glm::vec3(1.0f, 0.0f, 1.0f);
-	gladiatorSkel->Find("l_arm2")->animations[0][0].position += glm::vec3(2.0f, 0.0f, 2.0f);
-	gladiatorSkel->Find("r_arm1")->animations[0][0].position += glm::vec3(3.0f, 0.0f, 3.0f);
-	gladiatorSkel->Find("r_arm2")->animations[0][0].position += glm::vec3(4.0f, 0.0f, 4.0f);
-	gladiatorSkel->Find("r_leg1")->animations[0][0].position += glm::vec3(5.0f, 0.0f, 5.0f);
+	Skeleton* snekSkel = new Skeleton("Snake_Rig", "snek/3bone.bvh");
+	SkelMesh* snekMesh = new SkelMesh("snek/KillMe.obj", snekSkel, SnekWM);
 
+	//gladiatorSkel->WriteTree();
+	//gladiatorSkel->Find("l_arm1")->animations[0][0].position += glm::vec3(1.0f, 0.0f, 1.0f);
+	//gladiatorSkel->Find("l_arm2")->animations[0][0].position += glm::vec3(2.0f, 0.0f, 2.0f);
+	//gladiatorSkel->Find("r_arm1")->animations[0][0].position += glm::vec3(3.0f, 0.0f, 3.0f);
+	//gladiatorSkel->Find("r_arm2")->animations[0][0].position += glm::vec3(4.0f, 0.0f, 4.0f);
+	//gladiatorSkel->Find("r_leg1")->animations[0][0].position += glm::vec3(5.0f, 0.0f, 5.0f);
 
+	snekSkel->WriteTree();
+	snekSkel->Find("Head")->animations[0][0].scale += glm::vec3(2.0f,2.0f,2.0f);
 
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
@@ -252,6 +259,11 @@ void OnePlayer::LoadScene()
 
 	test_player = new Player(GladiatorMesh, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f });
 	test_player->Scale(glm::vec3(1.2f));
+
+	test_boner = new Player(snekMesh, defaultTex, BlockyBoiHB, { -5.0f,0.0f,5.0f });
+	//test_boner->Scale(glm::vec3(2.0f));
+
+
 	players.push_back(new Player(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
 	players[2]->Scale(glm::vec3(1.2f)); 
 

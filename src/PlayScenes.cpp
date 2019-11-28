@@ -158,7 +158,7 @@ void OnePlayer::LoadScene()
 
 	gladiatorSkel->WriteTree();
 	//gladiatorSkel->Find("l_arm2")->animations[0][0].position += glm::vec3(1.0f, 0.0f, 0.0f);
-	gladiatorSkel->Find("r_leg2")->animations[0][0].rotation += glm::vec3(0.0f, 0.0f, 0.0f);
+	gladiatorSkel->Find("spine1")->animations[0][0].scale = glm::vec3(2.0f, 2.0f, 2.0f);
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));

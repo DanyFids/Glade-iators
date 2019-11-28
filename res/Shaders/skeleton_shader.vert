@@ -31,7 +31,6 @@ uniform mat3 normMat;
 
 void main()
 {
-
 	vec4 newPos = vec4(0.0, 0.0, 0.0, 0.0);
 
 	vec2 wm_size = textureSize(weightMap, 0);

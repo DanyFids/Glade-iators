@@ -243,7 +243,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2 && player == PLAYER_2)
 		{
-			atk2 = false;
+			atk2 = false; 
 		}
 
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && player == PLAYER_2 && dodge2 == true && t != glm::vec3(0.0f, 0.0f, 0.0f))

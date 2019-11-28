@@ -239,7 +239,7 @@ void OnePlayer::LoadScene()
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f,1.0f,1.0f);
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
-	players.push_back(new Player(Square, DiceTex, basicCubeHB, { 3.0f, 0.3f, 0.0f }));
+	players.push_back(new Player(boi, defaultTex, basicCubeHB, { 3.0f, 0.3f, 0.0f }));
 	players.push_back(new Player(d20, D20Tex, basicSphereHB));
 
 	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
@@ -250,6 +250,10 @@ void OnePlayer::LoadScene()
 	test_player->Scale(glm::vec3(1.2f));
 	players.push_back(new Player(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
 	players[2]->Scale(glm::vec3(1.2f)); 
+
+	Object* die = new Object(Square, DiceTex, basicCubeHB);
+	die->Move({ 4.0f, 1.0f, 0.0f });
+	terrain.push_back(die);
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	floor->Move({ 0.0f, -0.75f, 0.0f });
@@ -498,8 +502,8 @@ void TwoPlayer::LoadScene()
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
-	players.push_back(new Player(Square, DiceTex, basicCubeHB, { 3.0f, 0.3f, 0.0f }));
-	players.push_back(new Player(Square, DiceTex, basicCubeHB));
+	players.push_back(new Player(boi, defaultTex, basicCubeHB, { 3.0f, 0.3f, 0.0f }));
+	players.push_back(new Player(boi, defaultTex, basicCubeHB));
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
@@ -512,6 +516,10 @@ void TwoPlayer::LoadScene()
 	BOI->Scale(glm::vec3(1.2f));
 	terrain.push_back(BOI);
 	//players[PLAYER_2]->Scale(glm::vec3(0.75f, 0.75f, 0.75f));
+
+	Object* die = new Object(Square, DiceTex, basicCubeHB);
+	die->Move({ 4.0f, 1.0f, 0.0f });
+	terrain.push_back(die);
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	floor->Move({ 0.0f, -1.5f, 0.0f });

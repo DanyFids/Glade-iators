@@ -112,6 +112,7 @@ protected:
 	std::vector<PointLight*> lights;
 	DirectionalLight * sun;
 
+
 	std::vector<UI*> ui;
 
 public:

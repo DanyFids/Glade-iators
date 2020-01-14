@@ -2,6 +2,7 @@
 
 #include<string>
 #include<vector>
+#include<queue>
 #include<GLM/glm.hpp>
 
 enum ChannelType {
@@ -37,8 +38,10 @@ public:
 	Joint* Find(std::string name);
 
 	void WriteOutput(std::string pref);
+	void WriteTransform(int anim, int frame);
 
-	void FillJointArray(Transform* arr, int& cur, int anim, int frame);
+	void FillJointArray(glm::mat4 * arr, glm::mat4 global, glm::vec3 * binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim, int frame);
+	void LoadAnimFrame(std::queue<float>&, int anim, int frame);
 
 	friend class Skeleton;
 };
@@ -57,7 +60,7 @@ public:
 	int LoadFromFile(std::string file);
 	Joint* Find(std::string name);
 
-	Transform* GetTransformArray(int anim, int frame);
+	void GetTransformArray(glm::mat4* & bones, glm::vec3* & binds, glm::vec3* & bind_t, int anim, int frame);
 	int GetNumBones() { return num_bones; }
 	int GetNumFrames(int a) { return root->animations[a].size(); }
 };

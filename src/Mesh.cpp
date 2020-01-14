@@ -2,8 +2,10 @@
 #include <GLFW/glfw3.h>
 #include <GLM/gtc/matrix_transform.hpp>
 #include <GLM/gtc/type_ptr.hpp>
+#include <stb_image.h>
 #include <fstream>
 #include <sstream>
+#include<iostream>
 #include "Game.h"
 #include "Mesh.h"
 #include "Texture.h"
@@ -23,7 +25,6 @@ Mesh::Mesh(float vert[], int num_vert, unsigned int indi[], int num_indi) {
 	glBindVertexArray(vao);
 
 	// setup array Buffer
-	unsigned int vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * num_vert, vert, GL_STATIC_DRAW);
@@ -61,20 +62,13 @@ Mesh::Mesh(const char* file)
 {
 	unsigned int num_vert, num_indi;
 	
-
-	std::vector<Vertex> vert_vec = std::vector<Vertex>();
 	std::vector<unsigned int> indi_vec = std::vector<unsigned int>();
 
-	LoadMesh(file, vert_vec, num_vert, indi_vec, num_indi);
+	LoadMesh(file, vertices, num_vert, indi_vec, num_indi);
 
 	Vertex* vert;
 	unsigned int* indi;
-	vert = new Vertex[num_vert];
 	indi = new unsigned int[num_indi];
-
-	for (int c = 0; c < vert_vec.size(); c++) {
-		vert[c] = vert_vec[c];
-	}
 
 	for (int c = 0; c < indi_vec.size(); c++) {
 		indi[c] = indi_vec[c];
@@ -84,11 +78,10 @@ Mesh::Mesh(const char* file)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	// setup array Buffer
-	unsigned int vbo;
+	// setup array Buffer;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * num_vert, vert, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * num_vert, vertices.data(), GL_STATIC_DRAW);
 
 	// setup element buffer
 	unsigned int ebo;
@@ -341,26 +334,117 @@ void Mesh::SetPosition(glm::vec3 pos)
 	model = glm::translate(model, pos);
 }
 
-SkelMesh::SkelMesh(std::string f, Skeleton* s, Material* w): Mesh(f.c_str())
+SkelMesh::SkelMesh(std::string f, Skeleton* s, std::string w): Mesh(f.c_str())
 {
 	skeleton = s;
-	weightMap = w;
 	curFrame = 0;
 	nexFrame = 0;
+
+	float** weightMap;
+	int verts;
+	int joints;
+
+	int nrChnls;
+	unsigned char* temp = stbi_load(w.c_str(), &joints, &verts, &nrChnls, 0);
+
+	weightMap = new float*[verts];
+
+	for (int v = 0; v < verts; v++) {
+		weightMap[v] = new float[joints];
+
+		for (int j = 0; j < joints; j++) {
+			weightMap[v][j] = (float)temp[j * nrChnls + v*joints*nrChnls] / 255.0f;
+
+			//std::cout << weightMap[v][j] << " ";
+		}
+		//std::cout << std::endl;
+	}
+
+	std::vector<SkelVert> skel_verts;
+
+	for each (Vertex vert in vertices) {
+		SkelVert temp(vert);
+
+		int bone_i[] = { 0,0,0,0 };
+		float bone_w[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+		for (int j = 0; j < joints; j++) {
+			float w = weightMap[vert.id][j];
+
+			for (int c = 0; c < 4; c++) {
+				if (w > bone_w[c]) {
+					for (int b = 2; b >= c; b--) {
+						bone_i[b + 1] = bone_i[b];
+						bone_w[b + 1] = bone_w[b];
+					}
+
+					bone_i[c] = j;
+					bone_w[c] = w;
+
+					break;
+				}
+			}
+		}
+
+		float weight_total = bone_w[0] + bone_w[1] + bone_w[2] + bone_w[3];
+
+		temp.bone_ids = glm::ivec4(bone_i[0], bone_i[1], bone_i[2], bone_i[3]);
+		temp.weights = glm::vec4(bone_w[0] / weight_total, bone_w[1]/ weight_total, bone_w[2]/ weight_total, bone_w[3] / weight_total);
+
+		skel_verts.push_back(temp);
+	}
+	
+	SkelVert* temp_vert = nullptr;
+
+	glBindVertexArray(vao);
+
+	// Update Attrib Pointer Stride
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(SkelVert), &(temp_vert->position));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(SkelVert), &(temp_vert->normal));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(SkelVert), &(temp_vert->tex_uv));
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(SkelVert), &(temp_vert->tangent));
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(SkelVert), &(temp_vert->biTan));
+	glVertexAttribPointer(5, 1, GL_INT, GL_FALSE, sizeof(SkelVert), &(temp_vert->id));
+
+	// add ids and weights
+	glVertexAttribIPointer(6, 4, GL_INT, sizeof(SkelVert), &(temp_vert->bone_ids));
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(SkelVert), &(temp_vert->weights));
+	glEnableVertexAttribArray(7);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(SkelVert) * skel_verts.size(), skel_verts.data(), GL_STATIC_DRAW);
+	
+	//std::cout << "HOI!!!" << std::endl;
+	for (int v = 0; v < verts; v++) {
+		delete(weightMap[v]);
+	}
+
+	delete(weightMap);
+}
+
+SkelMesh::~SkelMesh()
+{
+	
 }
 
 void SkelMesh::Draw(Shader* shdr)
 {
-	Transform* arr = skeleton->GetTransformArray(anim, curFrame);
+	glm::mat4* arr = nullptr;
+	glm::vec3* binds = nullptr;
+	glm::vec3* bind_t = nullptr;
+	skeleton->GetTransformArray(arr, binds, bind_t, anim, curFrame);
 	int num_b = skeleton->GetNumBones();
 
 	glActiveTexture(GL_TEXTURE20);
-	glBindTexture(GL_TEXTURE_2D, weightMap->DIFF);
-	shdr->SetI("weightMap", 20);
+	//glBindTexture(GL_TEXTURE_2D, weightMap->DIFF);
+	//shdr->SetI("weightMap", 20);
 	
 	shdr->SetI("num_bones", num_b);
 	for (int b = 0; b < num_b; b++) {
-		shdr->SetMat4("bone_t[" + std::to_string(b) + "]", arr[b].GetWorldTransform());
+		shdr->SetMat4("bone_t[" + std::to_string(b) + "]", arr[b]);
+		shdr->SetVec3("bind_p[" + std::to_string(b) + "]", binds[b]);
+		shdr->SetVec3("bind_t[" + std::to_string(b) + "]", bind_t[b]);
 	}
 
 	Mesh::Draw(shdr);

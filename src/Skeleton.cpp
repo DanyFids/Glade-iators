@@ -2,6 +2,7 @@
 #include "Object.h"
 #include<fstream>
 #include<iostream>
+#include<sstream>
 
 ChannelType StringToChnlTp(std::string name)
 {
@@ -87,13 +88,85 @@ void Joint::WriteOutput(std::string pref)
 	}
 }
 
-void Joint::FillJointArray(Transform* arr, int& cur, int anim = 0, int frame = 0)
+void Joint::WriteTransform(int anim, int frame)
 {
-	arr[cur] = animations[anim][frame];
+	std::cout << name << std::endl;
+	std::cout << "Offset:   " + std::to_string(offset.x) + " " + std::to_string(offset.y) + " " + std::to_string(offset.z) << std::endl;
+	std::cout << "Position: " + std::to_string(animations[anim][frame].position.x) + " " + std::to_string(animations[anim][frame].position.y) + " " + std::to_string(animations[anim][frame].position.z) << std::endl;
+	std::cout << "Rotation: " + std::to_string(animations[anim][frame].rotation.x) + " " + std::to_string(animations[anim][frame].rotation.y) + " " + std::to_string(animations[anim][frame].rotation.z) << std::endl << std::endl;
+}
+
+void Joint::FillJointArray(glm::mat4* arr, glm::mat4 global, glm::vec3* binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim = 0, int frame = 0)
+{
+	glm::mat4 trans = global * animations[anim][frame].GetWorldTransform();
+	glm::vec3 bind = last + offset;
+	arr[cur] = trans;
+	binds[cur] = bind;
+	//bind_t[cur] = global;
 	cur++;
 
+	if (name.compare("l_shoulder") == 0 || name.compare("r_shoulder") == 0 || name.compare("neck") == 0 ) {
+		std::cout << name << std::endl;
+		std::cout << "global: " << global[3].x << " " << global[3].y << " " << global[3].z << std::endl;
+		std::cout << "trans:  " << trans[3].x << " " << trans[3].y << " " << trans[3].z << std::endl;
+		std::cout << "bind:   " << bind.x << " " << bind.y << " " << bind.z << std::endl;
+		std::cout << "anim:   " << animations[anim][frame].position.x << " " << animations[anim][frame].position.y << " " << animations[anim][frame].position.z << std::endl;
+		std::cout << std::endl;
+	}
+
 	for (int c = 0; c < children.size(); c++) {
-		children[c]->FillJointArray(arr, cur);
+		glm::vec3 next_bt = last_b + glm::vec3(trans * glm::vec4(children[c]->offset, 0.0f));
+		bind_t[cur] = next_bt;
+		children[c]->FillJointArray(arr, trans, binds, bind, bind_t, next_bt, cur, anim, frame);
+	}
+}
+
+void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
+{
+	if (animations.size() <= anim) {
+		animations.push_back(std::vector<Transform>());
+	}
+
+	if (animations[anim].size() <= frame) {
+		animations[anim].push_back(Transform());
+	}
+
+	for (int c = 0; c < channels.size(); c++) {
+		float val = values.front();
+
+		switch (channels[c]) {
+		case ChannelType::Xposition:
+			animations[anim][frame].position.x = val;
+			break;
+		case ChannelType::Yposition:
+			animations[anim][frame].position.y = -val;
+			break;
+		case ChannelType::Zposition:
+			animations[anim][frame].position.z = val;
+			break;
+		case ChannelType::Xrotation:
+			animations[anim][frame].rotation.x = val;
+			break;
+		case ChannelType::Yrotation:
+			animations[anim][frame].rotation.y = -val;
+			break;
+		case ChannelType::Zrotation:
+			animations[anim][frame].rotation.z = -val;
+			break;
+		default:
+			std::cout << "ERROR::SKELETON:: '" + name + "' ::LOAD_FRAME::INVALID_CHANNEL";
+			break;
+		}
+
+		values.pop();
+	}
+
+	if (name.compare("l_arm1") == 0 || name.compare("r_arm1") == 0) {
+		std::cout << "HOI!!!" << std::endl;
+	}
+
+	for (int c = 0; c < children.size(); c++) {
+		children[c]->LoadAnimFrame(values, anim, frame);
 	}
 }
 
@@ -154,7 +227,7 @@ int Skeleton::LoadFromFile(std::string f)
 				file >> read;
 				cur->offset.x = std::stof(read);
 				file >> read;
-				cur->offset.y = std::stof(read);
+				cur->offset.y = -std::stof(read);
 				file >> read;
 				cur->offset.z = std::stof(read);
 				continue;
@@ -184,6 +257,36 @@ int Skeleton::LoadFromFile(std::string f)
 			file.ignore(512, (int)'\n');
 			continue;
 		}
+		else if (read.compare("MOTION") == 0) {
+			int num_frames = 0;
+			int anim = root->animations.size();
+
+			file >> read;
+			file.ignore(512, (int)'\n');
+			file.ignore(512, (int)'\n');
+
+			while (!file.eof()) {
+				std::queue<float> values;
+
+				std::stringstream line;
+				std::string temp;
+
+				std::getline(file, temp);
+
+				if (temp.compare("") == 0) {
+					break;
+				}
+
+				line.str(temp);
+
+				while (!line.eof()) {
+					line >> read;
+					values.push(std::stof(read));
+				}
+				root->LoadAnimFrame(values, anim, num_frames);
+				num_frames++;
+			}
+		}
 		else {
 			file.ignore(512, (int)'\n');
 			continue;
@@ -203,15 +306,18 @@ Joint* Skeleton::Find(std::string name)
 	return ret;
 }
 
-Transform* Skeleton::GetTransformArray(int anim = 0, int frame = 0)
+void Skeleton::GetTransformArray(glm::mat4* & ret, glm::vec3* & binds, glm::vec3*& bind_t, int anim = 0, int frame = 0)
 {
-	Transform* ret = new Transform[num_bones];
+	ret = new glm::mat4[num_bones];
+	binds = new glm::vec3[num_bones];
+	bind_t = new glm::vec3[num_bones];
 
 	int id = 0;
 
 	for (int c = 0; c < root->children.size(); c++) {
-		root->children[c]->FillJointArray(ret, id, anim, frame);
+		glm::vec3 newPos = root->offset + glm::vec3(root->animations[anim][frame].GetWorldTransform() * glm::vec4(root->children[c]->offset, 0.0f));
+		bind_t[id] = glm::vec3(newPos);
+		root->children[c]->FillJointArray(ret, root->animations[anim][frame].GetWorldTransform(), binds, root->offset, bind_t, newPos, id, anim, frame);
 	}
 
-	return ret;
 }

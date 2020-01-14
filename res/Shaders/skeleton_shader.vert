@@ -5,6 +5,8 @@ layout (location = 2) in vec2 iTexCoord;
 layout (location = 3) in vec3 aTan;
 layout (location = 4) in vec3 bTan;
 layout (location = 5) in int id;
+layout (location = 6) in ivec4 bone_ids;
+layout (location = 7) in vec4 weights;
 
 out vec3 fragPos;
 out vec2 texCoord;
@@ -18,10 +20,12 @@ uniform mat4 project;
 uniform mat4 corr;
 
 const int MAX_BONES = 50;
+const int MAX_VERTS = 6000;
 
 uniform mat4[MAX_BONES] bone_t;
+uniform vec3[MAX_BONES] bind_p;
+uniform vec3[MAX_BONES] bind_t;
 uniform int num_bones;
-uniform sampler2D weightMap;
 
 uniform mat4 sunLSM;
 uniform mat4 lightSpaceMatrix[10];
@@ -33,19 +37,19 @@ void main()
 {
 	vec4 newPos = vec4(0.0, 0.0, 0.0, 0.0);
 
-	vec2 wm_size = textureSize(weightMap, 0);
+	int id1 = 0;
 
-	vec2 texel_s = vec2(1.0/wm_size.x, 1.0/wm_size.y); 
+	if(weights.x + weights.y + weights.z + weights.w > 0){
+		newPos += weights.x * (bone_t[bone_ids.x] * (vec4(aPos - bind_p[bone_ids.x], 1.0)));
+		newPos += weights.y * (bone_t[bone_ids.y] * (vec4(aPos - bind_p[bone_ids.y], 1.0)));
+		newPos += weights.z * (bone_t[bone_ids.z] * (vec4(aPos - bind_p[bone_ids.z], 1.0)));
+		newPos += weights.w * (bone_t[bone_ids.w] * (vec4(aPos - bind_p[bone_ids.w], 1.0)));
 
-	for(int c = 0; c < num_bones - 1; c++){
-		float w = texture(weightMap, vec2(c * texel_s.x, id * texel_s.y)).r;
-
-		if(w > 0.0){
-			newPos += bone_t[c] * vec4(aPos, 1.0) * w;
-		}
+	}else{
+		newPos = vec4(aPos, 1.0);
 	}
 
-	fragPos = vec3(model * vec4(aPos, 1.0)); 
+	fragPos = vec3(model * newPos); 
 	texCoord = iTexCoord;
 
 	vec3 t = normalize(normMat * aTan);
@@ -60,4 +64,5 @@ void main()
 	sunFLP = corr * sunLSM * vec4(fragPos, 1);
 
     gl_Position = corr * project * view * model * newPos;
+	//gl_Position = newPos;
 }

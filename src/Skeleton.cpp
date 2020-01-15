@@ -98,21 +98,21 @@ void Joint::WriteTransform(int anim, int frame)
 
 void Joint::FillJointArray(glm::mat4* arr, glm::mat4 global, glm::vec3* binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim = 0, int frame = 0)
 {
-	glm::mat4 trans = global * animations[anim][frame].GetWorldTransform();
+	glm::mat4 trans = global * animations[anim][frame].GetQuatTransform();
 	glm::vec3 bind = last + offset;
 	arr[cur] = trans;
 	binds[cur] = bind;
 	//bind_t[cur] = global;
 	cur++;
-
-	if (name.compare("l_shoulder") == 0 || name.compare("r_shoulder") == 0 || name.compare("neck") == 0 ) {
+	
+	/*if (name.compare("l_shoulder") == 0 || name.compare("r_shoulder") == 0 || name.compare("neck") == 0 ) {
 		std::cout << name << std::endl;
 		std::cout << "global: " << global[3].x << " " << global[3].y << " " << global[3].z << std::endl;
 		std::cout << "trans:  " << trans[3].x << " " << trans[3].y << " " << trans[3].z << std::endl;
 		std::cout << "bind:   " << bind.x << " " << bind.y << " " << bind.z << std::endl;
 		std::cout << "anim:   " << animations[anim][frame].position.x << " " << animations[anim][frame].position.y << " " << animations[anim][frame].position.z << std::endl;
 		std::cout << std::endl;
-	}
+	}*/
 
 	for (int c = 0; c < children.size(); c++) {
 		glm::vec3 next_bt = last_b + glm::vec3(trans * glm::vec4(children[c]->offset, 0.0f));
@@ -134,6 +134,8 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 	for (int c = 0; c < channels.size(); c++) {
 		float val = values.front();
 
+		float corr = 1.0f;
+
 		switch (channels[c]) {
 		case ChannelType::Xposition:
 			animations[anim][frame].position.x = val;
@@ -145,13 +147,13 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 			animations[anim][frame].position.z = val;
 			break;
 		case ChannelType::Xrotation:
-			animations[anim][frame].rotation.x = val;
+			animations[anim][frame].rotation.x = val * corr;
 			break;
 		case ChannelType::Yrotation:
 			animations[anim][frame].rotation.y = -val;
 			break;
 		case ChannelType::Zrotation:
-			animations[anim][frame].rotation.z = -val;
+			animations[anim][frame].rotation.z = -val * corr;
 			break;
 		default:
 			std::cout << "ERROR::SKELETON:: '" + name + "' ::LOAD_FRAME::INVALID_CHANNEL";

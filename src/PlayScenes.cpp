@@ -34,17 +34,8 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS && !f3_pressed) {
-		if (debug) {
-			if (disp_depth != lights.size() - 1)
-				disp_depth++;
-			else
-				debug = false;
-		}
-		else {
-			if (lights.size() > 0) {
-				debug = true;
-				disp_depth = 0;
-			}
+		if (!f3_pressed) {
+			((SkelMesh*)test_player->GetMesh())->NextFrame();
 		}
 
 		f3_pressed = true;
@@ -183,7 +174,7 @@ void OnePlayer::LoadScene()
 	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
 
 	GladiatorMesh->SetAnim(1);
-	GladiatorMesh->SetFrame(1);
+	GladiatorMesh->SetFrame(0);
 
 	//gladiatorSkel->Find("l_arm1")->WriteTransform(1, 1);
 	//gladiatorSkel->Find("r_arm1")->WriteTransform(1, 1);

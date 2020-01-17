@@ -44,6 +44,7 @@ void main()
 		newPos += weights.y * (bone_t[bone_ids.y] * (vec4(aPos - bind_p[bone_ids.y], 1.0)));
 		newPos += weights.z * (bone_t[bone_ids.z] * (vec4(aPos - bind_p[bone_ids.z], 1.0)));
 		newPos += weights.w * (bone_t[bone_ids.w] * (vec4(aPos - bind_p[bone_ids.w], 1.0)));
+		//newPos += (bone_t[bone_ids.x] * (vec4(aPos - bind_p[bone_ids.x], 1.0)));
 
 	}else{
 		newPos = vec4(aPos, 1.0);

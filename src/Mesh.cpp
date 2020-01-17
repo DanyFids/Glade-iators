@@ -449,3 +449,13 @@ void SkelMesh::Draw(Shader* shdr)
 
 	Mesh::Draw(shdr);
 }
+
+void SkelMesh::NextFrame()
+{
+	curFrame = (curFrame < skeleton->GetNumFrames(anim) -1) ? curFrame + 1 : 0;
+}
+
+void SkelMesh::DrawSkeleton(glm::mat4 global, Shader* shdr)
+{
+	skeleton->DrawSkeleton(global, anim, curFrame, shdr);
+}

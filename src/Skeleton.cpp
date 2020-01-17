@@ -1,5 +1,9 @@
+#include <GLM/gtc/type_ptr.hpp>
 #include "Skeleton.h"
 #include "Object.h"
+#include "Shader.h"
+#include "Mesh.h"
+#include "Texture.h"
 #include<fstream>
 #include<iostream>
 #include<sstream>
@@ -26,6 +30,15 @@ ChannelType StringToChnlTp(std::string name)
 	}
 
 	return ChannelType::INVALID_CHNL_TYPE;
+}
+
+Mesh* Joint::node_mesh = nullptr;
+Material* Joint::node_mat = nullptr;
+
+void Joint::init()
+{
+	if(node_mesh == nullptr) node_mesh = new Mesh("node.obj");
+	if (node_mat == nullptr) node_mat = new Material("default-texture.png", "default-normal.png");
 }
 
 Joint::Joint(std::string n, Joint* p):name(n), parent(p)
@@ -96,6 +109,37 @@ void Joint::WriteTransform(int anim, int frame)
 	std::cout << "Rotation: " + std::to_string(animations[anim][frame].rotation.x) + " " + std::to_string(animations[anim][frame].rotation.y) + " " + std::to_string(animations[anim][frame].rotation.z) << std::endl << std::endl;
 }
 
+void Joint::Draw(glm::mat4 global, int a, int f, Shader* shader)
+{
+	shader->Use();
+	shader->SetI("material.diffuse", 0);
+	shader->SetI("material.normal", 1);
+	shader->SetI("material.specular", 2);
+
+	glm::mat4 model = global * animations[a][f].GetWorldTransform();
+
+	unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	glm::mat3 normMat = glm::mat3(glm::transpose(glm::inverse(model)));
+
+	shader->SetMat3("normMat", normMat);
+
+	shader->SetF("material.shine", node_mat->shine);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, node_mat->DIFF);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, node_mat->NORM);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, node_mat->SPEC);
+
+	node_mesh->Draw(shader);
+
+	for (int c = 0; c < children.size(); c++) {
+		children[c]->Draw(model, a, f, shader);
+	}
+}
+
 void Joint::FillJointArray(glm::mat4* arr, glm::mat4 global, glm::vec3* binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim = 0, int frame = 0)
 {
 	glm::mat4 trans = global * animations[anim][frame].GetQuatTransform();
@@ -105,12 +149,9 @@ void Joint::FillJointArray(glm::mat4* arr, glm::mat4 global, glm::vec3* binds, g
 	//bind_t[cur] = global;
 	cur++;
 	
-	/*if (name.compare("l_shoulder") == 0 || name.compare("r_shoulder") == 0 || name.compare("neck") == 0 ) {
+	/*if ((name.compare("l_shoulder") == 0 || name.compare("r_shoulder") == 0 || name.compare("neck") == 0 ) && frame == 1) {
 		std::cout << name << std::endl;
-		std::cout << "global: " << global[3].x << " " << global[3].y << " " << global[3].z << std::endl;
-		std::cout << "trans:  " << trans[3].x << " " << trans[3].y << " " << trans[3].z << std::endl;
-		std::cout << "bind:   " << bind.x << " " << bind.y << " " << bind.z << std::endl;
-		std::cout << "anim:   " << animations[anim][frame].position.x << " " << animations[anim][frame].position.y << " " << animations[anim][frame].position.z << std::endl;
+		std::cout << "rotation:   " << animations[anim][frame].rotation.x << " " << animations[anim][frame].rotation.y << " " << animations[anim][frame].rotation.z << std::endl;
 		std::cout << std::endl;
 	}*/
 
@@ -141,19 +182,19 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 			animations[anim][frame].position.x = val;
 			break;
 		case ChannelType::Yposition:
-			animations[anim][frame].position.y = -val;
-			break;
-		case ChannelType::Zposition:
 			animations[anim][frame].position.z = val;
 			break;
+		case ChannelType::Zposition:
+			animations[anim][frame].position.y = val;
+			break;
 		case ChannelType::Xrotation:
-			animations[anim][frame].rotation.x = val * corr;
+			animations[anim][frame].rotation.x = -val * corr;
 			break;
 		case ChannelType::Yrotation:
-			animations[anim][frame].rotation.y = -val;
+			animations[anim][frame].rotation.z = val;
 			break;
 		case ChannelType::Zrotation:
-			animations[anim][frame].rotation.z = -val * corr;
+			animations[anim][frame].rotation.y = val * corr;
 			break;
 		default:
 			std::cout << "ERROR::SKELETON:: '" + name + "' ::LOAD_FRAME::INVALID_CHANNEL";
@@ -229,9 +270,9 @@ int Skeleton::LoadFromFile(std::string f)
 				file >> read;
 				cur->offset.x = std::stof(read);
 				file >> read;
-				cur->offset.y = -std::stof(read);
-				file >> read;
 				cur->offset.z = std::stof(read);
+				file >> read;
+				cur->offset.y = std::stof(read);
 				continue;
 			}
 			else return -3;

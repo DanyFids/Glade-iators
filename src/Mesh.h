@@ -78,5 +78,8 @@ public:
 	virtual void Draw(Shader*);
 	void SetAnim(int id) { anim = id; }
 	void SetFrame(int id) { curFrame = id; }
-	void NextFrame() { curFrame = (curFrame == 0) ? 1 : 0; }
+	void NextFrame();
+	void DrawSkeleton(glm::mat4 global, Shader* shdr);
+
+	Skeleton* GetSkeleton() { return skeleton; }
 };

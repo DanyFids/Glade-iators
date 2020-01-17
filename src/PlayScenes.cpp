@@ -117,6 +117,10 @@ void OnePlayer::Draw()
 		Cam[c]->SetupCam(skelShader);
 
 		test_player->Draw(skelShader, Cam);
+
+		/*glDisable(GL_DEPTH_TEST);
+		((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
+		glEnable(GL_DEPTH_TEST);*/
 	}
 
 	glDisable(GL_DEPTH_TEST);
@@ -130,6 +134,8 @@ void OnePlayer::Draw()
 
 void OnePlayer::LoadScene()
 {
+	Joint::init();
+
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
@@ -138,7 +144,7 @@ void OnePlayer::LoadScene()
 	Material* DiceTex = new Material("dice-texture.png", "d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
-	Material* defaultTex = new Material("default-texture.png", "default-texture.png");
+	Material* defaultTex = new Material("default-texture.png", "default-normal.png");
 	
 	Material* GladiatorWM = new Material("WeightMap.png");
 

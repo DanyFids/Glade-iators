@@ -3,17 +3,31 @@
 
 class Light;
 class Mesh;
+class Player;
 
 class OnePlayer: public PlayScene {
 	Shader* shaderObj;
 	Shader* depthShader;
 	Shader* sunShader;
+	Shader* skelShader;
+	Shader* morphShader;
 
 	Shader* DebugShader;
 	Mesh* DebugQuad;
+	
+	Player* test_player;
+
+	Player* test_bones;
+
 	bool debug = false;
 	bool f3_pressed;
 	int disp_depth = 0;
+
+	Object* morphyBoi;
+	Object* staticBoi;
+
+	float time = 0.0f;
+	float MAX_TIME = 0.2f;
 
 public:
 	OnePlayer();
@@ -28,7 +42,13 @@ public:
 class TwoPlayer: public PlayScene {
 	Shader* shaderObj;
 	Shader* depthShader;
+	Shader* morphShader;
 
+
+	Shader* sunShader;
+
+
+	Object* morphyBoi;
 public:
 	TwoPlayer();
 	// Inherited via Scene

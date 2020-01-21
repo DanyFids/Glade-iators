@@ -107,6 +107,9 @@ void Game::Initialize()
 
 	OnePlayerScn = new OnePlayer();
 	TwoPlayerScn = new TwoPlayer();
+	//Attack Init(0);
+	//Init.init();
+
 
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) && 
 		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
@@ -212,8 +215,10 @@ void Game::ImGuiEndFrame()
 
 void Game::InputHandle(float dt)
 {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
 		glfwSetWindowShouldClose(window, true);
+	}
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS && !w_pressed) {
 		if (wireframe) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

@@ -35,6 +35,9 @@ protected:
 	std::vector<ChannelType> channels;
 
 	glm::vec3 offset;
+	glm::vec3 tail;
+
+	glm::mat4 axisRot;
 
 public:
 	static void init();
@@ -50,7 +53,7 @@ public:
 
 	void Draw(glm::mat4 global, int a, int f, Shader* shdr);
 
-	void FillJointArray(glm::mat4 * arr, glm::mat4 global, glm::vec3 * binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim, int frame);
+	void FillJointArray(glm::mat4 * arr, glm::mat3* norms, glm::mat4 global, glm::vec3 * binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim, int frame);
 	void LoadAnimFrame(std::queue<float>&, int anim, int frame);
 
 	friend class Skeleton;
@@ -60,6 +63,9 @@ class Skeleton {
 	std::string name;
 	Joint* root;
 
+	std::vector<std::string> anim_names = { "base" };
+	std::vector<float> anim_ft = { 1.0f };
+	std::vector<unsigned int> anim_frames = { 1 };
 
 	int num_bones;
 public:
@@ -71,7 +77,8 @@ public:
 	Joint* Find(std::string name);
 
 	void DrawSkeleton(glm::mat4 global, int a, int f, Shader* shdr) { root->Draw(global, a, f, shdr); }
-	void GetTransformArray(glm::mat4* & bones, glm::vec3* & binds, glm::vec3* & bind_t, int anim, int frame);
+	void GetTransformArray(glm::mat4* & bones, glm::mat3* & norms, glm::vec3* & binds, glm::vec3* & bind_t, int anim, int frame);
 	int GetNumBones() { return num_bones; }
 	int GetNumFrames(int a) { return root->animations[a].size(); }
+	int GetNumAnims() { return root->animations.size(); }
 };

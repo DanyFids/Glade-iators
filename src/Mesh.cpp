@@ -433,26 +433,45 @@ void SkelMesh::Draw(Shader* shdr)
 	glm::mat4* arr = nullptr;
 	glm::vec3* binds = nullptr;
 	glm::vec3* bind_t = nullptr;
-	skeleton->GetTransformArray(arr, binds, bind_t, anim, curFrame);
+	glm::mat3* norms = nullptr;
+	skeleton->GetTransformArray(arr, norms, binds, bind_t, anim, curFrame);
 	int num_b = skeleton->GetNumBones();
 
-	glActiveTexture(GL_TEXTURE20);
+	//glActiveTexture(GL_TEXTURE20);
 	//glBindTexture(GL_TEXTURE_2D, weightMap->DIFF);
 	//shdr->SetI("weightMap", 20);
 	
 	shdr->SetI("num_bones", num_b);
 	for (int b = 0; b < num_b; b++) {
-		shdr->SetMat4("bone_t[" + std::to_string(b) + "]", arr[b]);
-		shdr->SetVec3("bind_p[" + std::to_string(b) + "]", binds[b]);
-		shdr->SetVec3("bind_t[" + std::to_string(b) + "]", bind_t[b]);
+		std::string b_string = std::to_string(b);
+		shdr->SetMat4("bone_t[" + b_string + "]", arr[b]);
+		shdr->SetVec3("bind_p[" + b_string + "]", binds[b]);
+		shdr->SetVec3("bind_t[" + b_string + "]", bind_t[b]);
+		shdr->SetMat3("norms[" + b_string + "]", norms[b]);
 	}
 
 	Mesh::Draw(shdr);
 }
 
+void SkelMesh::SetAnim(unsigned int id)
+{
+	if (id < skeleton->GetNumAnims())
+		anim = id;
+
+	curFrame = 0;
+	nexFrame = (skeleton->GetNumFrames(anim) > 1) ? 1 : 0;
+}
+
+void SkelMesh::SetFrame(unsigned int id)
+{
+	if(id < skeleton->GetNumFrames(anim))
+	{ curFrame = id; }
+}
+
 void SkelMesh::NextFrame()
 {
-	curFrame = (curFrame < skeleton->GetNumFrames(anim) -1) ? curFrame + 1 : 0;
+	curFrame = nexFrame;
+	nexFrame = (nexFrame < skeleton->GetNumFrames(anim) -1) ? nexFrame + 1 : 0;
 }
 
 void SkelMesh::DrawSkeleton(glm::mat4 global, Shader* shdr)

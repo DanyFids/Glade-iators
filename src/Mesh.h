@@ -76,10 +76,12 @@ public:
 	~SkelMesh();
 
 	virtual void Draw(Shader*);
-	void SetAnim(int id) { anim = id; }
-	void SetFrame(int id) { curFrame = id; }
+	void SetAnim(unsigned int id);
+	void SetFrame(unsigned int id);
 	void NextFrame();
 	void DrawSkeleton(glm::mat4 global, Shader* shdr);
 
 	Skeleton* GetSkeleton() { return skeleton; }
+
+	SkelMesh* Clone() { return new SkelMesh(*this); };
 };

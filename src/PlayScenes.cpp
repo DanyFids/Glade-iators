@@ -118,9 +118,9 @@ void OnePlayer::Draw()
 
 		test_player->Draw(skelShader, Cam);
 
-		/*glDisable(GL_DEPTH_TEST);
+		glDisable(GL_DEPTH_TEST);
 		((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
-		glEnable(GL_DEPTH_TEST);*/
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	glDisable(GL_DEPTH_TEST);

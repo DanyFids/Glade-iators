@@ -23,6 +23,7 @@ const int MAX_BONES = 50;
 const int MAX_VERTS = 6000;
 
 uniform mat4[MAX_BONES] bone_t;
+uniform mat3[MAX_BONES] norms;
 uniform vec3[MAX_BONES] bind_p;
 uniform vec3[MAX_BONES] bind_t;
 uniform int num_bones;
@@ -36,6 +37,7 @@ uniform mat3 normMat;
 void main()
 {
 	vec4 newPos = vec4(0.0, 0.0, 0.0, 0.0);
+	vec3 newNorm = vec3(0.0, 0.0, 0.0);
 
 	int id1 = 0;
 
@@ -46,8 +48,14 @@ void main()
 		newPos += weights.w * (bone_t[bone_ids.w] * (vec4(aPos - bind_p[bone_ids.w], 1.0)));
 		//newPos += (bone_t[bone_ids.x] * (vec4(aPos - bind_p[bone_ids.x], 1.0)));
 
+		newNorm += weights.x * norms[bone_ids.x] * aNorm;
+		newNorm += weights.y * norms[bone_ids.y] * aNorm;
+		newNorm += weights.z * norms[bone_ids.z] * aNorm;
+		newNorm += weights.w * norms[bone_ids.w] * aNorm;
+
 	}else{
 		newPos = vec4(aPos, 1.0);
+		newNorm = aNorm;
 	}
 
 	fragPos = vec3(model * newPos); 
@@ -55,7 +63,7 @@ void main()
 
 	vec3 t = normalize(normMat * aTan);
 	vec3 b = normalize(normMat * bTan);
-	vec3 n = normalize(normMat * aNorm);
+	vec3 n = normalize(normMat * newNorm);
 
 	TBN = mat3(t,b,n);
 

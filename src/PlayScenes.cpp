@@ -177,9 +177,9 @@ void OnePlayer::Draw()
 		Cam[c]->SetupCam(skelShader);
 		test_player->Draw(skelShader, Cam);
 		
-		/*glDisable(GL_DEPTH_TEST);
+		glDisable(GL_DEPTH_TEST);
 		((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
-		glEnable(GL_DEPTH_TEST);*/
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	glDisable(GL_DEPTH_TEST);
@@ -249,8 +249,8 @@ void OnePlayer::LoadScene()
 	//test_boner->Scale(glm::vec3(2.0f));
 
 
-	players.push_back(new Player(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
-	players[2]->Scale(glm::vec3(1.2f)); 
+	//players.push_back(new Player(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
+	//players[2]->Scale(glm::vec3(1.2f)); 
 
 	Object* die = new Object(Square, DiceTex, basicCubeHB);
 	die->Move({ 4.0f, 1.0f, 0.0f });

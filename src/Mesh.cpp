@@ -88,8 +88,7 @@ Mesh::Mesh(const char* file)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
-	// setup array Buffer
-	unsigned int vbo;	
+	// setup array Buffer	
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * num_vert, vert, GL_STATIC_DRAW);

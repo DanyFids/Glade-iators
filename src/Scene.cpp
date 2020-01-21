@@ -167,7 +167,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				glm::vec3 p1 = players[player]->GetPosition();
 				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-				p1.y = players[player]->GetPosition().y + 1.5;
+				p1.y = players[player]->GetPosition().y;
 				attacks.back()->SetPosition(p1);
 				std::cout << "OOF\n";
 				players[player]->dmgSTAM(15.0f);
@@ -204,14 +204,14 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		{
 			dodge1t -= dt;
 		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS && player == PLAYER_1 && block1 == false) {
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS && player == PLAYER_1 && block1 == false) { //dylanote
 			std::cout << "Parry God\n";
 			block1 = true;
 			shields.push_back(new Shield(Amesh, Bmat, basicCubeHB, glm::vec3(0, 0, 0), player));
-			glm::vec3 p1 = players[player]->GetPosition() ;
+			glm::vec3 p1 = players[player]->GetPosition();
 			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-			p1.y = players[player]->GetPosition().y + 1.5;
+			p1.y = players[player]->GetPosition().y;
 			shields.back()->SetPosition(p1);
 		}
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && player == PLAYER_1) {
@@ -234,7 +234,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				glm::vec3 p1 = players[player]->GetPosition();
 				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-				p1.y = players[player]->GetPosition().y + 1.5;
+				p1.y = players[player]->GetPosition().y;
 				attacks.back()->SetPosition(p1);
 				players[player]->dmgSTAM(15.0f);
 				std::cout << "OOF\n";
@@ -277,7 +277,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			glm::vec3 p1 = players[player]->GetPosition();
 			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-			p1.y = players[player]->GetPosition().y + 1.5;
+			p1.y = players[player]->GetPosition().y;
 			shields.back()->SetPosition(p1);
 		}
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && player == PLAYER_2) {

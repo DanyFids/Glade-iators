@@ -288,7 +288,8 @@ void SplineMan::Update(float dt)
 		{
 			if (current <= pathPos.size() - 4)
 			{
-				CatmullBetweenPoints(pathPos[(pathPos.size() - current) - 1], pathPos[(pathPos.size() - current) - 2], pathPos[(pathPos.size() - current) - 3], pathPos[(pathPos.size() - current) - 4]);
+				CatmullBetweenPoints(pathPos[(pathPos.size() - current) - 1], pathPos[(pathPos.size() - current) - 2],
+					pathPos[(pathPos.size() - current) - 3], pathPos[(pathPos.size() - current) - 4]);
 			}
 			else
 			{

@@ -36,6 +36,13 @@ struct Transform {
 			glm::mat4_cast(glm::quat(glm::radians(rotation))) *
 			glm::scale(glm::mat4(1.0f), scale);
 	}
+
+	glm::mat4 GetQuatTransform() const {
+		return
+			glm::translate(glm::mat4(1.0f), position) *
+			glm::mat4_cast(glm::quat(glm::radians(rotation))) *
+			glm::scale(glm::mat4(1.0f), scale);
+	}
 };
 
 struct PhysicsBody {

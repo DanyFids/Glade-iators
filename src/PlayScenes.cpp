@@ -6,7 +6,6 @@
 #include <typeinfo>
 #include <random>
 
-
 #include"Mesh.h"
 #include"Shader.h"
 #include"Texture.h"
@@ -38,17 +37,8 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS && !f3_pressed) {
-		if (debug) {
-			if (disp_depth != lights.size() - 1)
-				disp_depth++;
-			else
-				debug = false;
-		}
-		else {
-			if (lights.size() > 0) {
-				debug = true;
-				disp_depth = 0;
-			}
+		if (!f3_pressed) {
+			((SkelMesh*)test_player->GetMesh())->NextFrame();
 		}
 
 		f3_pressed = true;
@@ -186,8 +176,10 @@ void OnePlayer::Draw()
 		morphyBoi->Draw(morphShader, Cam);
 		Cam[c]->SetupCam(skelShader);
 		test_player->Draw(skelShader, Cam);
-	//	test_boner->Draw(skelShader, Cam);
 		
+		glDisable(GL_DEPTH_TEST);
+		((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	glDisable(GL_DEPTH_TEST);
@@ -201,6 +193,8 @@ void OnePlayer::Draw()
 
 void OnePlayer::LoadScene()
 {
+	Joint::init();
+
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
@@ -210,7 +204,7 @@ void OnePlayer::LoadScene()
 	Material* DiceTex = new Material("dice-texture.png", "d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
-	Material* defaultTex = new Material("default-texture.png", "default-texture.png");
+	Material* defaultTex = new Material("default-texture.png");
 	
 	Material* GladiatorWM = new Material("WeightMap.png");
 
@@ -224,24 +218,13 @@ void OnePlayer::LoadScene()
 	Material* arenaTex = new Material("wood_texture.png");
 
 	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator.bvh");
-	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, GladiatorWM);
+	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
 
-	Skeleton* snekSkel = new Skeleton("Snake_Rig", "snek/3bone.bvh");
-	SkelMesh* snekMesh = new SkelMesh("snek/KillMe.obj", snekSkel, SnekWM);
-
-	//gladiatorSkel->WriteTree();
-	//gladiatorSkel->Find("l_arm1")->animations[0][0].position += glm::vec3(1.0f, 0.0f, 1.0f);
-	//gladiatorSkel->Find("l_arm2")->animations[0][0].position += glm::vec3(2.0f, 0.0f, 2.0f);
-	//gladiatorSkel->Find("r_arm1")->animations[0][0].position += glm::vec3(3.0f, 0.0f, 3.0f);
-	//gladiatorSkel->Find("r_arm2")->animations[0][0].position += glm::vec3(4.0f, 0.0f, 4.0f);
-	//gladiatorSkel->Find("r_leg1")->animations[0][0].position += glm::vec3(5.0f, 0.0f, 5.0f);
-
-	snekSkel->WriteTree();
-	snekSkel->Find("Head")->animations[0][0].scale += glm::vec3(2.0f,2.0f,2.0f);
-
+	GladiatorMesh->SetAnim(1);
+	GladiatorMesh->SetFrame(0);
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
-	//lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	Mesh* Square = new Mesh("d6.obj");
@@ -262,12 +245,12 @@ void OnePlayer::LoadScene()
 	test_player = new Player(GladiatorMesh, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f });
 	test_player->Scale(glm::vec3(1.2f));
 
-	test_bones = new Player(snekMesh, defaultTex, BlockyBoiHB, { -5.0f,0.0f,5.0f });
+	//test_bones = new Player(snekMesh, defaultTex, BlockyBoiHB, { -5.0f,0.0f,5.0f });
 	//test_boner->Scale(glm::vec3(2.0f));
 
 
-	players.push_back(new Player(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
-	players[2]->Scale(glm::vec3(1.2f)); 
+	//players.push_back(new Player(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
+	//players[2]->Scale(glm::vec3(1.2f)); 
 
 	Object* die = new Object(Square, DiceTex, basicCubeHB);
 	die->Move({ 4.0f, 1.0f, 0.0f });

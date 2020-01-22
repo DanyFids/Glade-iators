@@ -51,6 +51,17 @@ bool CubeHitbox::HitDetect(Transform t, CapsuleHitbox* other, Transform oT)
 	return false;
 }
 
+bool CubeHitbox::HitDetectSAT(Transform t, CubeHitbox* other, Transform oT)
+{
+	this->setVerts(t);
+	this->setNorms();
+
+	other->setVerts(oT);
+	other->setNorms();
+
+	return testIntersection(t,other,oT);
+}
+
 //////////////// 
 //			For SAT Hit detection
 /////////////
@@ -119,6 +130,8 @@ bool CubeHitbox::testIntersection(Transform t, CubeHitbox* object2, Transform oT
 			return false;
 		}
 	}
+
+	//Get EdgeDirs?
 
 	return true;
 }

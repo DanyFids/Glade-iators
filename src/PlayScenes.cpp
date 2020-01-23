@@ -86,6 +86,7 @@ void OnePlayer::Update(float dt)
 		attacks[a]->time -= dt;
 		if (attacks[a]->time <= 0)
 		{
+			players[attacks[a]->getPlayer()]->DestroyChild(0);
 			attacks.erase(attacks.begin() + a);
 			break;
 		}

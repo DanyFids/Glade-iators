@@ -29,6 +29,20 @@ struct Transform {
 			;
 	}
 
+	glm::mat4 GetRotEul() const {
+		glm::quat qPitch = glm::angleAxis(glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::quat qYaw = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::quat qRoll = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+		glm::quat rot = qYaw * qPitch * qRoll;
+
+		return glm::mat4_cast(rot);
+	}
+
+	glm::mat4 GetRotQuat() const {
+		return glm::mat4_cast(glm::quat(glm::radians(rotation)));
+	}
+
 	glm::mat4 GetRotScale() const {
 		return
 			glm::mat4_cast(glm::quat(glm::radians(rotation))) *

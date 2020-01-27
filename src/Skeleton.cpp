@@ -8,6 +8,7 @@
 #include<iostream>
 #include<sstream>
 #include <math.h>
+#include <stack>
 
 ChannelType StringToChnlTp(std::string name)
 {
@@ -34,20 +35,20 @@ ChannelType StringToChnlTp(std::string name)
 }
 
 glm::mat4 FindAxisRot(glm::vec3 tail) {
-	glm::vec3 base(0.0f, 1.0f, 0.0f);
+	glm::vec3 base(0.0f, 0.0f, 1.0f);
 	glm::vec3 ntail = glm::normalize(tail);
 
 	glm::vec3 rot = glm::vec3();
 
-	rot.x = std::atan2f(ntail.z, ntail.y);
-	//rot.y = std::atan2f(ntail.z, ntail.x);
-	rot.z = std::atan2f(ntail.x, ntail.y);
+	rot.x = std::atan2f(ntail.y, ntail.z);
+	rot.y = std::atan2f(ntail.x, ntail.z);
+	//rot.z = std::atan2f(ntail.x, ntail.y);
 
 	glm::mat4 axisRot = glm::mat4(glm::angleAxis(rot.x, glm::vec3(1.0f, 0.0f, 0.0f)) * glm::angleAxis(rot.y, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::angleAxis(rot.z, glm::vec3(0.0f, 0.0f, 1.0f)));
 
-	glm::vec4 test = glm::vec4(base, 1.0f) * axisRot * glm::length(tail);;
+	glm::vec3 test = glm::vec3(glm::vec4(base * glm::length(tail), 1.0f) * axisRot);
 
-	return axisRot;
+ 	return axisRot;
 }
 
 Mesh* Joint::node_mesh = nullptr;
@@ -55,7 +56,9 @@ Material* Joint::node_mat = nullptr;
 
 void Joint::init()
 {
-	if(node_mesh == nullptr) node_mesh = new Mesh("node.obj");
+	if (node_mesh == nullptr) {
+		node_mesh = new Mesh("node.obj");
+	}
 	if (node_mat == nullptr) node_mat = new Material("default-texture.png", "default-normal.png");
 }
 
@@ -160,7 +163,37 @@ void Joint::Draw(glm::mat4 global, int a, int f, Shader* shader)
 
 void Joint::FillJointArray(glm::mat4* arr, glm::mat3* norms, glm::mat4 global, glm::vec3* binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim = 0, int frame = 0)
 {
-	glm::mat4 trans = global * animations[anim][frame].GetQuatTransform();
+	glm::mat4 local_trans;
+
+	if (parent != nullptr) {
+		std::stack<glm::mat4> parentStack;
+		Joint* cur = parent;
+		while (cur != nullptr) {
+			parentStack.push(cur->axisRot);
+			cur = cur->parent;
+		}
+
+		glm::mat4 local_rot = animations[anim][frame].GetRotEul();
+
+		while (parentStack.size() > 0) {
+			auto par = parentStack.top();
+			local_rot = glm::inverse(par) * local_rot * par;
+			parentStack.pop();
+		}
+
+		local_rot = local_rot * axisRot;
+
+		local_trans = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f) * glm::length(offset)) * // Offset
+			glm::translate(glm::mat4(1.0f), animations[anim][frame].position - offset) * // Translations
+			local_rot * // Rotation
+			glm::scale(glm::mat4(1.0f), animations[anim][frame].scale); // scale
+	}
+	else {
+		local_trans = glm::translate(glm::mat4(1.0f), animations[anim][frame].position) * axisRot * animations[anim][frame].GetRotEul() * glm::scale(glm::mat4(1.0f), animations[anim][frame].scale);
+	}
+
+	//glm::mat4 trans = global * local_trans;
+	glm::mat4 trans = global * animations[anim][frame].GetWorldTransform();
 	glm::vec3 bind = last + offset;
 	glm::mat3 norm = glm::mat3(glm::transpose(glm::inverse(trans)));
 	arr[cur] = trans;
@@ -199,7 +232,7 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 
 		switch (channels[c]) {
 		case ChannelType::Xposition:
-			animations[anim][frame].position.x = val;
+			animations[anim][frame].position.x = -val;
 			break;
 		case ChannelType::Yposition:
 			animations[anim][frame].position.z = val;
@@ -227,6 +260,8 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 	if (channels.size() <= 3 && (int)channels[0] > 3) {
 		animations[anim][frame].position = offset;
 	}
+
+	//animations[anim][frame].position = glm::vec3(0.0f, 0.0f, glm::length(offset));
 
 	if (name.compare("l_arm1") == 0 || name.compare("r_arm1") == 0) {
 		std::cout << "HOI!!!" << std::endl;
@@ -292,7 +327,7 @@ int Skeleton::LoadFromFile(std::string f)
 		else if (read.compare("OFFSET") == 0) {
 			if (cur != nullptr) {
 				file >> read;
-				cur->offset.x = std::stof(read);
+				cur->offset.x = -std::stof(read);
 				file >> read;
 				cur->offset.z = std::stof(read);
 				file >> read;
@@ -341,10 +376,10 @@ int Skeleton::LoadFromFile(std::string f)
 			temp.x = std::stof(read);
 			
 			file >> read; // y offset
-			temp.y = std::stof(read);
+			temp.z = std::stof(read);
 
 			file >> read; // z offset
-			temp.z = std::stof(read);
+			temp.y = std::stof(read);
 
 
 			file.ignore(512, (int)'\n');

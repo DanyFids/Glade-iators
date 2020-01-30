@@ -20,7 +20,6 @@
 #include"Skeleton.h"
 #include"Lerp.h"
 
-
 OnePlayer::OnePlayer()
 {
 	LoadScene();
@@ -60,6 +59,7 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void OnePlayer::Update(float dt)
 {
+	audioEngine.Update();
 	for (int c = 0; c < players.size(); c++) {
 		players[c]->Update(dt);
 
@@ -194,6 +194,19 @@ void OnePlayer::Draw()
 void OnePlayer::LoadScene()
 {
 	Joint::init();
+	//{91f62782-35bd-42df-85a1-8f359308dd0c}
+
+	//// Init AudioEngine (Don't forget to shut down and update)
+	audioEngine.Init();
+
+	//// Load a bank (Use the flag FMOD_STUDIO_LOAD_BANK_NORMAL)
+	audioEngine.LoadBank("Master", FMOD_STUDIO_LOAD_BANK_NORMAL);
+
+	//// Load an event
+	audioEngine.LoadEvent("MenuPlaceholder", "{91f62782-35bd-42df-85a1-8f359308dd0c}");
+
+	//// Play the event
+	audioEngine.PlayEvent("MenuPlaceholder");
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");

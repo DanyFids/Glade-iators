@@ -66,10 +66,13 @@ void OnePlayer::Update(float dt)
 		for (int p = 0; p < players.size(); p++) {
 			if (players[c] != players[p]) {
 				if (players[c]->HitDetect(players[p])) {
-					//std::cout << "Welp\n";
+					std::cout << "Welp\n";
 				}
 			}
 		}
+
+
+
 
 		if (glfwJoystickPresent(c) && glfwJoystickIsGamepad(c)) {
 			Cam[c]->Move(players[c]->phys.move, dt);
@@ -232,21 +235,32 @@ void OnePlayer::LoadScene()
 	Mesh* boi = new Mesh("gladiator.obj");
 	Mesh* arena = new Mesh("ColitreeumV2.obj");
 
-	Hitbox* basicCubeHB = new CubeHitbox(1.0f,1.0f,1.0f);
+	Hitbox* basicCubeHB = new CubeHitbox(1.2f,3.0f,1.2f);
+	Hitbox* basicCubeHB2 = new CubeHitbox(1.0, 1.0f, 1.0f);
+
+	//Capsule testing
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(2.0f,1.0f); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(2.0f,1.0f);
+	//Capsule Testing
+
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
-	players.push_back(new Player(boi, defaultTex, basicCubeHB, { 3.0f, 0.3f, 0.0f }));
-	players.push_back(new Player(d20, D20Tex, basicSphereHB));
 
-	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
-	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
+	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
+	players.push_back(new Player(d20, D20Tex, basicCapsuleHB2)); //P2
+
+	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
+
+	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
+	players[PLAYER_2]->Move({ 0.0f, 0.0f, 0.0f });
+	//players[PLAYER_2]->Rotate(glm::vec3(0,0,25));
 	
 
-	test_player = new Player(GladiatorMesh, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f });
+	test_player = new Player(GladiatorMesh, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 0.0f });
 	test_player->Scale(glm::vec3(1.2f));
 
 	//test_bones = new Player(snekMesh, defaultTex, BlockyBoiHB, { -5.0f,0.0f,5.0f });
-	//test_boner->Scale(glm::vec3(2.0f));
+	//test_bones->Scale(glm::vec3(2.0f));
 
 
 	//players.push_back(new Player(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
@@ -255,6 +269,11 @@ void OnePlayer::LoadScene()
 	Object* die = new Object(Square, DiceTex, basicCubeHB);
 	die->Move({ 4.0f, 1.0f, 0.0f });
 	terrain.push_back(die);
+
+	////SAT Testing Stuff
+	//Object* SATtest1 = new Object(Square, DiceTex, basicCubeHB);
+	//die->Move({2.0f,1.0f,10.0f});
+	//terrain.push_back(SATtest1);
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0,-2,0));

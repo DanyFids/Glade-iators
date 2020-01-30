@@ -18,9 +18,11 @@ public:
 
 class CubeHitbox : public Hitbox {
 	glm::vec3 dim;
+	
 
-	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec4> vertices;
 	std::vector<glm::vec3> normals;
+	std::vector<glm::vec3> edgeDirs;
 
 	//Temporary min-max ranges for SAT collision detection
 	float min;
@@ -38,10 +40,12 @@ public:
 
 	virtual void setVerts(Transform t);
 	virtual void setNorms();
+	virtual void setEdgeDirs();
+	virtual glm::vec3 convertVec4(glm::vec4 _vec4);
 	
-	virtual void GetInterval(Transform t, glm::vec3 axis, float& min, float& max);
+	virtual void GetInterval(CubeHitbox* o, glm::vec3 axis, float& min, float& max);
 
-	virtual bool testIntersection(Transform t, CubeHitbox* object2, Transform oT);
+	virtual bool testIntersection(Transform t, CubeHitbox* object2, Transform oT, glm::vec3 offset);
 };
 
 class SphereHitbox : public Hitbox {
@@ -54,4 +58,24 @@ public:
 	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
 	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);
 	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT);
+};
+
+class CapsuleHitbox : public Hitbox {
+
+	float radius;
+	float height;
+	glm::vec4 upperBound, lowerBound;
+public:
+	CapsuleHitbox(float r, float h) :radius(r), height(h) {
+	
+	
+	};
+	
+	float GetRadius() { return radius; }
+
+	virtual glm::vec3 convertVec4(glm::vec4 _vec4);
+
+	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT);//Capsule to capsule
+	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
+	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);
 };

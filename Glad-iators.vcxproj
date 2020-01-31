@@ -59,7 +59,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\..\dependencies\glfw3\include;..\..\dependencies\glad\include;..\..\dependencies\imgui;..\..\dependencies\GLM\include;..\..\dependencies\stbs;..\..\dependencies\fmod;..\..\dependencies\spdlog\include;..\..\dependencies\entt;..\..\dependencies\cereal;..\..\dependencies\gzip;..\..\modules\FMODStudio\include;..\..\modules\sampleModule\include;..\..\modules\toolkit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;..\..\dependencies\glfw3\include;..\..\dependencies\glad\include;..\..\dependencies\imgui;..\..\dependencies\GLM\include;..\..\dependencies\stbs;..\..\dependencies\fmod;..\..\dependencies\spdlog\include;..\..\dependencies\entt;..\..\dependencies\cereal;..\..\dependencies\gzip;..\..\modules\florp\include;..\..\modules\FMODStudio\include;..\..\modules\sampleModule\include;..\..\modules\toolkit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -81,7 +81,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLFW_INCLUDE_NONE;WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\..\dependencies\glfw3\include;..\..\dependencies\glad\include;..\..\dependencies\imgui;..\..\dependencies\GLM\include;..\..\dependencies\stbs;..\..\dependencies\fmod;..\..\dependencies\spdlog\include;..\..\dependencies\entt;..\..\dependencies\cereal;..\..\dependencies\gzip;..\..\modules\FMODStudio\include;..\..\modules\sampleModule\include;..\..\modules\toolkit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;..\..\dependencies\glfw3\include;..\..\dependencies\glad\include;..\..\dependencies\imgui;..\..\dependencies\GLM\include;..\..\dependencies\stbs;..\..\dependencies\fmod;..\..\dependencies\spdlog\include;..\..\dependencies\entt;..\..\dependencies\cereal;..\..\dependencies\gzip;..\..\modules\florp\include;..\..\modules\FMODStudio\include;..\..\modules\sampleModule\include;..\..\modules\toolkit\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -152,6 +152,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\dependencies\imgui\ImGui.vcxproj">
       <Project>{C0FF640D-2C14-8DBE-F595-301E616989EF}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\modules\florp\FLORP.vcxproj">
+      <Project>{28BB1C0D-94CF-44BE-5D51-E81DC92441EF}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\modules\FMODStudio\FMODStudio.vcxproj">
       <Project>{A386D97E-8F3E-1BCC-F845-F427E41CB6BC}</Project>

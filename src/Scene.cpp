@@ -7,6 +7,7 @@
 #include"Light.h"
 #include "Constants.h"
 #include"UI.h"
+#include "Skeleton.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -167,6 +168,8 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				glm::vec3 p1 = glm::vec3();
 				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+
+				//((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1");
 
 				players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, player));
 				

@@ -221,6 +221,8 @@ void OnePlayer::LoadScene()
 	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator.bvh");
 	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
 
+	gladiatorSkel->WriteTree();
+
 	GladiatorMesh->SetAnim(1);
 	GladiatorMesh->SetFrame(0);
 

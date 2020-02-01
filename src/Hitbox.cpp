@@ -1,6 +1,9 @@
 #include "Hitbox.h"
-#include "Object.h"
+
 #include <iostream>
+
+#include "Shader.h"
+#include <GLM\gtc\type_ptr.hpp>
 
 CubeHitbox::CubeHitbox(float w, float h, float d):dim(glm::vec3(w,h,d))
 {
@@ -297,11 +300,19 @@ bool CubeHitbox::testIntersection(Transform t, CubeHitbox* object2, Transform oT
 
 	return true;
 }
+void CubeHitbox::Draw(Shader* shdr, Transform p)
+{
+
+}
 #pragma endregion
 
 /********************************************************************
 *						SPHERE COLLISION
 ********************************************************************/
+
+void SphereHitbox::Draw(Shader* shdr, Transform p)
+{
+}
 
 bool SphereHitbox::HitDetect(Transform t, CubeHitbox* other, Transform oT)
 {
@@ -339,11 +350,55 @@ bool SphereHitbox::HitDetect(Transform t, CapsuleHitbox* other, Transform oT)
 }
 
 #pragma region Capsule Collisions
+Mesh* CapsuleHitbox::node_me = nullptr;
+Material* CapsuleHitbox::node_ma = nullptr;
+
+void CapsuleHitbox::init()
+{
+	node_me = new Mesh("node.obj");
+	node_ma = new Material("default-texture.png", "default-normal.png");
+}
+
 glm::vec3 CapsuleHitbox::convertVec4(glm::vec4 _vec4)
 {
 	glm::vec3 pass{ _vec4.x,_vec4.y,_vec4.z };
 
 	return pass;
+}
+
+void CapsuleHitbox::Draw(Shader* shdr, Transform p)
+{
+	shdr->Use();
+	shdr->SetI("material.diffuse", 0);
+	shdr->SetI("material.normal", 1);
+	shdr->SetI("material.specular", 2);
+
+	glm::mat4 model = parent.GetWorldTransform() * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),lowerBound);
+	
+	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));
+
+
+	unsigned int modelLoc = glGetUniformLocation(shdr->ID, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	glm::mat3 normMat = glm::mat3(glm::transpose(glm::inverse(model)));
+
+	shdr->SetMat3("normMat", normMat);
+
+	shdr->SetF("material.shine", node_ma->shine);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, node_ma->DIFF);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, node_ma->NORM);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, node_ma->SPEC);
+
+	node_me->Draw(shdr);
+
+	model = p.GetWorldTransform() * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),upperBound);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	node_me->Draw(shdr);
 }
 
 bool CapsuleHitbox::HitDetect(Transform t, CapsuleHitbox* other, Transform oT)
@@ -359,28 +414,25 @@ bool CapsuleHitbox::HitDetect(Transform t, CapsuleHitbox* other, Transform oT)
 		other->height += 0.000001f;
 	}
 
+	glm::vec3 tub = convertVec4(t.GetWorldTransform() * transform.GetWorldTransform() * glm::vec4(upperBound.x, upperBound.y, upperBound.z, 1.0f));
+	glm::vec3 tlb = convertVec4(t.GetWorldTransform() * transform.GetWorldTransform() * glm::vec4(lowerBound.x, lowerBound.y, lowerBound.z, 1.0f));
 
-	this->lowerBound = glm::vec4(t.position, 1) * t.GetRot();
-	//this->lowerBound = glm::vec4(t.position.x, t.position.y - (height/2), t.position.z, 1) * t.GetRot();
-	this->upperBound = glm::vec4(t.position.x, t.position.y + height, t.position.z, 1) * t.GetRot();
-
-	other->lowerBound = glm::vec4(oT.position, 1) * oT.GetRot();
-	//other->lowerBound = glm::vec4(oT.position.x, oT.position.y - (height/2), oT.position.z, 1) * oT.GetRot();
-	other->upperBound = glm::vec4(oT.position.x, oT.position.y + height, oT.position.z, 1) * oT.GetRot();
+	glm::vec3 oub = convertVec4(oT.GetWorldTransform() * other->transform.GetWorldTransform() * glm::vec4(other->upperBound.x, other->upperBound.y, other->upperBound.z, 1.0f));
+	glm::vec3 olb = convertVec4(oT.GetWorldTransform() * other->transform.GetWorldTransform() * glm::vec4(other->lowerBound.x, other->lowerBound.y, other->lowerBound.z, 1.0f));
 
 	glm::vec3 closestPointA;
 	glm::vec3 closestPointB;
 
 	//Find closest point on both lines
 	{
-		glm::vec3 LineA = convertVec4( this->upperBound) - convertVec4( this->lowerBound);
-		glm::vec3 LineB = convertVec4( other->upperBound) - convertVec4( other->lowerBound);
+		glm::vec3 LineA = tub - tlb;
+		glm::vec3 LineB = oub - olb;
 
-		glm::vec3 PA1 = convertVec4(this->lowerBound);
-		glm::vec3 PA2 = convertVec4(this->upperBound);
+		glm::vec3 PA1 = tlb;
+		glm::vec3 PA2 = tub;
 
-		glm::vec3 PB1 = convertVec4(other->lowerBound);
-		glm::vec3 PB2 = convertVec4(other->upperBound);
+		glm::vec3 PB1 = olb;
+		glm::vec3 PB2 = oub;
 
 		glm::vec3 DirA = glm::normalize(LineA);
 		glm::vec3 DirB = glm::normalize(LineB);
@@ -397,8 +449,8 @@ bool CapsuleHitbox::HitDetect(Transform t, CapsuleHitbox* other, Transform oT)
 		closestPointA = PA1 + ((PA2-PA1) * scalarA);
 		closestPointB = PB1 + ((PB2-PB1) * scalarB);
 
-		//closestPointA = PA1 + ((DirA) * s);
-		//closestPointB = PB1 + ((DirB) * t);
+		//closestPointA = PA1 + ((DirA) * scalarA);
+		//closestPointB = PB1 + ((DirB) * scalarB);
 
 
 	}
@@ -406,7 +458,7 @@ bool CapsuleHitbox::HitDetect(Transform t, CapsuleHitbox* other, Transform oT)
 	float totalDist = glm::distance(closestPointA, closestPointB);
 	float totalRadius = this->radius + other->GetRadius();
 
-	if (totalDist < totalRadius) {
+	if (totalDist <= totalRadius) {
 		return true;
 	}
 
@@ -423,4 +475,10 @@ bool CapsuleHitbox::HitDetect(Transform t, SphereHitbox* other, Transform oT)
 	return false;
 }
 
+
 #pragma endregion
+
+void Hitbox::parentTransform(Transform t)
+{
+	parent = t;
+}

@@ -185,6 +185,8 @@ void OnePlayer::Draw()
 		glEnable(GL_DEPTH_TEST);
 	}
 
+
+
 	glDisable(GL_DEPTH_TEST);
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -197,6 +199,7 @@ void OnePlayer::Draw()
 void OnePlayer::LoadScene()
 {
 	Joint::init();
+	CapsuleHitbox::init();
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
@@ -239,8 +242,8 @@ void OnePlayer::LoadScene()
 	Hitbox* basicCubeHB2 = new CubeHitbox(1.0, 1.0f, 1.0f);
 
 	//Capsule testing
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(2.0f,1.0f); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(2.0f,1.0f);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(1.5f,1.0f); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(1.5f,1.0f);
 	//Capsule Testing
 
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
@@ -481,6 +484,12 @@ void TwoPlayer::Draw()
 		RenderScene(shaderObj);
 		Cam[c]->SetupCam(morphShader);
 		morphyBoi->Draw(morphShader, Cam);
+
+		glDisable(GL_DEPTH_TEST);
+		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform());
+		//	players[1]->hitbox->Draw(shaderObj);
+
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -492,6 +501,8 @@ void TwoPlayer::Draw()
 	}
 	glEnable(GL_DEPTH_TEST);
 
+
+	
 }
 
 void TwoPlayer::LoadScene()
@@ -550,9 +561,15 @@ void TwoPlayer::LoadScene()
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
-	players.push_back(new Player(boi, defaultTex, basicCubeHB, { 3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
+	//Capsule testing
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f, 2.0f); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.4f, 2.0f);
+
+	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
+	players[PLAYER_1]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
 	//players[PLAYER_1]->Rotate(glm::vec3(0.0f,90.0f,0.0f));
-	players.push_back(new Player(boi, defaultTex, basicCubeHB)); // THIS IS PLAYER TWO
+	players.push_back(new Player(boi, defaultTex, basicCapsuleHB2)); // THIS IS PLAYER TWO
+	players[PLAYER_2]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, -0.6f, 0.0f });

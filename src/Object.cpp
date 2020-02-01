@@ -94,6 +94,7 @@ void Object::SetRotation(glm::vec3 rot)
 	transform.rotation = rot;
 }
 
+
 bool Object::HitDetect(Object* other)
 {
 	return false;

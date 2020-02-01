@@ -146,11 +146,11 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 			newRot = -(std::atan2f(dir.z, dir.x)) * (180/M_PI);
 
-			std::cout << newRot << std::endl;
+			//std::cout << newRot << std::endl;
 
 			players[player]->SetRotation({ 0.0f, newRot, 0.0f });
 
-			std::cout << "move\n";
+			//std::cout << "move\n";
 		}
 
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && player == PLAYER_1) {

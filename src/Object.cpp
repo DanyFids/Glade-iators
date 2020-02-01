@@ -150,6 +150,7 @@ void Object::SetRotation(glm::vec3 rot)
 	transform.rotation = rot;
 }
 
+
 void Object::addChild(Object* child)
 {
 	children.push_back(child);
@@ -232,6 +233,8 @@ void Player::Update(float dt)
 		}
 	}
 
+	
+
 	Object::Update(dt);
 }
 
@@ -240,7 +243,7 @@ bool Player::HitDetect(Object* other)
 	Transform predict = transform;
 	predict.position += phys.move;
 
-	if (other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, predict)) { 
+	if (other->hitbox->HitDetect(other->GetTransform(), (CapsuleHitbox*)this->hitbox, predict)) { 
 		for (float t = 1.0f; t >= -0.1f; t -= 0.1f) {
 			t = glm::max(t, 0.0f);
 			glm::vec3 fixSpd = lerp(glm::vec3(0.0f, 0.0f, 0.0f), phys.move, t);
@@ -248,7 +251,7 @@ bool Player::HitDetect(Object* other)
 			predict = transform;
 			predict.position += fixSpd;
 
-			if (!other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, predict)) {
+			if (!other->hitbox->HitDetect(other->GetTransform(), (CapsuleHitbox*)this->hitbox, predict) || t == 0.0f) {
 				phys.move = fixSpd;
 				break;
 			}

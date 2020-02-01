@@ -48,22 +48,12 @@ void main()
     gl_Position = corr * project * view * model * vec4(lerpPos.x, lerpPos.y, lerpPos.z, 1.0);
 	vert_out.fragPos = vec3(model * vec4(lerpPos, 1.0)); 
 
-	//just pose1
-	//gl_Position = corr * project * view * model * vec4(aPos.x, aPos.y, aPos.z, 1.0);
-	//vert_out.fragPos = vec3(model * vec4(aPos, 1.0));
-
-
 	vert_out.texCoord = iTexCoord;
 
 	//lerped Normals
 	vec3 t = normalize(vec3(model * vec4(lerpATAN, 0.0)));
 	vec3 b = normalize(vec3(model * vec4(lerpBTAN, 0.0)));
 	vec3 n = normalize(vec3(model * vec4(lerpNorm, 0.0)));
-
-	//just pose1
-	//vec3 t = normalize(vec3(model * vec4(aTan, 0.0)));
-	//vec3 b = normalize(vec3(model * vec4(bTan, 0.0)));
-	//vec3 n = normalize(vec3(model * vec4(aNorm, 0.0)));
 
 	vert_out.TBN = mat3(t,b,n);
 }

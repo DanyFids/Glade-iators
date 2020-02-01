@@ -39,6 +39,10 @@ struct Transform {
 			glm::scale(glm::mat4(1.0f), scale);
 	}
 
+	glm::mat4 GetRot() const {
+		return glm::mat4_cast(glm::quat(glm::radians(rotation)));
+	}
+
 	glm::mat4 GetQuatTransform() const {
 		return
 			glm::translate(glm::mat4(1.0f), position) *

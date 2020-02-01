@@ -19,6 +19,7 @@
 #include"UI.h"
 #include"Skeleton.h"
 #include"Lerp.h"
+#include "Sound.h"
 
 OnePlayer::OnePlayer()
 {
@@ -66,10 +67,13 @@ void OnePlayer::Update(float dt)
 		for (int p = 0; p < players.size(); p++) {
 			if (players[c] != players[p]) {
 				if (players[c]->HitDetect(players[p])) {
-					//std::cout << "Welp\n";
+					std::cout << "Welp\n";
 				}
 			}
 		}
+
+
+
 
 		if (glfwJoystickPresent(c) && glfwJoystickIsGamepad(c)) {
 			Cam[c]->Move(players[c]->phys.move, dt);
@@ -179,9 +183,11 @@ void OnePlayer::Draw()
 		test_player->Draw(skelShader, Cam, shaderObj);
 		
 		glDisable(GL_DEPTH_TEST);
-		((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
+		//((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
 		glEnable(GL_DEPTH_TEST);
 	}
+
+
 
 	glDisable(GL_DEPTH_TEST);
 	for (int u = 0; u < ui.size(); u++) {
@@ -208,6 +214,7 @@ void OnePlayer::LoadScene()
 
 	//// Play the event
 	audioEngine.PlayEvent("MenuPlaceholder");
+	CapsuleHitbox::init();
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
@@ -231,7 +238,7 @@ void OnePlayer::LoadScene()
 
 	Material* arenaTex = new Material("wood_texture.png");
 
-	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator.bvh");
+	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "Animations/attack.bvh");
 	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
 
 	gladiatorSkel->WriteTree();
@@ -251,14 +258,27 @@ void OnePlayer::LoadScene()
 	Mesh* sword_mesh = new Mesh("Weapons/Sword.obj");
 	Mesh* shield_mesh = new Mesh("Weapons/Circle_Shield.obj");
 
-	Hitbox* basicCubeHB = new CubeHitbox(1.0f,1.0f,1.0f);
+	Hitbox* basicCubeHB = new CubeHitbox(1.2f,3.0f,1.2f);
+	Hitbox* basicCubeHB2 = new CubeHitbox(1.0, 1.0f, 1.0f);
+
+	//Capsule testing
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(1.5f,1.0f); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(1.5f,1.0f);
+	//Capsule Testing
+
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
-	players.push_back(new Player(boi, defaultTex, basicCubeHB, { 3.0f, 0.3f, 0.0f }));
-	players.push_back(new Player(d20, D20Tex, basicSphereHB));
 
+	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
+	players.push_back(new Player(d20, D20Tex, basicCapsuleHB2)); //P2
+
+	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
+
+	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
+	players[PLAYER_2]->Move({ 0.0f, 0.0f, 0.0f });
+	//players[PLAYER_2]->Rotate(glm::vec3(0,0,25));
+	
 	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
-	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
 
 
 	test_player = new Player(GladiatorMesh, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f });
@@ -279,7 +299,7 @@ void OnePlayer::LoadScene()
 	test_player->addChild(shield);
 
 	//test_bones = new Player(snekMesh, defaultTex, BlockyBoiHB, { -5.0f,0.0f,5.0f });
-	//test_boner->Scale(glm::vec3(2.0f));
+	//test_bones->Scale(glm::vec3(2.0f));
 
 
 	//players.push_back(new Player(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
@@ -288,6 +308,11 @@ void OnePlayer::LoadScene()
 	Object* die = new Object(Square, DiceTex, basicCubeHB);
 	die->Move({ 4.0f, 1.0f, 0.0f });
 	terrain.push_back(die);
+
+	////SAT Testing Stuff
+	//Object* SATtest1 = new Object(Square, DiceTex, basicCubeHB);
+	//die->Move({2.0f,1.0f,10.0f});
+	//terrain.push_back(SATtest1);
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
 	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0,-2,0));
@@ -495,6 +520,12 @@ void TwoPlayer::Draw()
 		RenderScene(shaderObj);
 		Cam[c]->SetupCam(morphShader);
 		morphyBoi->Draw(morphShader, Cam);
+
+		glDisable(GL_DEPTH_TEST);
+		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform());
+		//	players[1]->hitbox->Draw(shaderObj);
+
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -506,6 +537,8 @@ void TwoPlayer::Draw()
 	}
 	glEnable(GL_DEPTH_TEST);
 
+
+	
 }
 
 void TwoPlayer::LoadScene()
@@ -564,9 +597,15 @@ void TwoPlayer::LoadScene()
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
-	players.push_back(new Player(boi, defaultTex, basicCubeHB, { 3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
+	//Capsule testing
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f, 2.0f); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.4f, 2.0f);
+
+	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
+	players[PLAYER_1]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
 	//players[PLAYER_1]->Rotate(glm::vec3(0.0f,90.0f,0.0f));
-	players.push_back(new Player(boi, defaultTex, basicCubeHB)); // THIS IS PLAYER TWO
+	players.push_back(new Player(boi, defaultTex, basicCapsuleHB2)); // THIS IS PLAYER TWO
+	players[PLAYER_2]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, -0.6f, 0.0f });

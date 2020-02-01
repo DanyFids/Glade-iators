@@ -3,7 +3,6 @@
 #include<vector>
 #include "Mesh.h"
 #include "Texture.h"
-#include "Object.h"
 
 struct Transform;
 
@@ -12,15 +11,11 @@ class SphereHitbox;
 class CapsuleHitbox;
 
 class Hitbox {
-	
+
 public:
 	virtual bool HitDetect(Transform t, CubeHitbox * other, Transform oT) = 0;
 	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT) = 0;
 	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT) = 0;
-	virtual void parentTransform(Transform t);
-	virtual void Draw(Shader* shdr, Transform p) = 0;
-protected:
-	Transform parent;
 };
 
 class CubeHitbox : public Hitbox {
@@ -39,7 +34,6 @@ public:
 
 	glm::vec3 GetDim() {return dim;}
 
-	virtual void Draw(Shader* shdr, Transform p) override;
 
 	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
 	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);
@@ -61,7 +55,6 @@ class SphereHitbox : public Hitbox {
 public:
 	SphereHitbox(float r) :radius(r) {};
 
-	virtual void Draw(Shader* shdr, Transform p) override;
 	float GetRadius() { return radius; }
 
 	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
@@ -70,27 +63,22 @@ public:
 };
 
 class CapsuleHitbox : public Hitbox {
-	static Mesh* node_me;
-	static Material* node_ma;
-	
+
+	Transform 
 	float radius;
 	float height;
-	glm::vec3 upperBound, lowerBound;
-	Transform transform;
+	glm::vec4 upperBound, lowerBound;
 public:
-	static void init();
-
 	CapsuleHitbox(float r, float h) :radius(r), height(h) {
-		lowerBound = glm::vec3(0.0f, 0.0f, 0.0f);
-		upperBound = glm::vec3(0.0f, h, 0.0f);
+	
+	
 	};
 	
 	float GetRadius() { return radius; }
 
 	virtual glm::vec3 convertVec4(glm::vec4 _vec4);
-	virtual void Draw( Shader* shdr, Transform p) override;
+	void Draw(glm::mat4 Pos1, glm::mat4 Pos2, Shader* shdr);
 	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT);//Capsule to capsule
 	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
 	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);
-	
 };

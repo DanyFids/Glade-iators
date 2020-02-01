@@ -133,7 +133,9 @@ public:
 
 	virtual void Draw(Shader*);
 	void SetAnim(int id) { anim = id; }
+	int GetAnim() { return anim; }
 	void SetFrame(int id) { curFrame = id; }
+	int GetFrame() { return curFrame; }
 	void NextFrame();
 	void DrawSkeleton(glm::mat4 global, Shader* shdr);
 

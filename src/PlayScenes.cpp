@@ -179,7 +179,7 @@ void OnePlayer::Draw()
 		test_player->Draw(skelShader, Cam, shaderObj);
 		
 		glDisable(GL_DEPTH_TEST);
-		((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
+		//((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
 		glEnable(GL_DEPTH_TEST);
 	}
 
@@ -218,7 +218,7 @@ void OnePlayer::LoadScene()
 
 	Material* arenaTex = new Material("wood_texture.png");
 
-	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator.bvh");
+	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "Animations/attack.bvh");
 	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
 
 	gladiatorSkel->WriteTree();

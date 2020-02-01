@@ -7,6 +7,7 @@
 #include"Hitbox.h"
 #include "UI.h"
 #include"Lerp.h"
+#include "Skeleton.h"
 
 
 Object::Object()
@@ -29,7 +30,7 @@ Object::Object(Mesh* me, Material* ma, Hitbox* hb)
 	transform.rotation = glm::vec3();
 }
 
-Object::Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos)
+Object::Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, Joint* p, SkelMesh* m)
 {
 	mesh = me;
 	material = ma;
@@ -37,13 +38,16 @@ Object::Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos)
 	transform.position = pos;
 	transform.scale = glm::vec3(1.0f);
 	transform.rotation = glm::vec3();
+	parent_joint = p;
+	parent_Mesh = m;
 }
 
 void Object::Update(float dt)
 {
+	
 }
 
-void Object::Draw(Shader* shader, std::vector<Camera*> cams)
+void Object::Draw(Shader* shader, std::vector<Camera*> cams, Shader* childShader)
 {
 	shader->Use();
 	shader->SetI("material.diffuse", 0);
@@ -51,6 +55,10 @@ void Object::Draw(Shader* shader, std::vector<Camera*> cams)
 	shader->SetI("material.specular", 2);
 	
 	glm::mat4 model = transform.GetWorldTransform();
+
+	if (parent_joint != nullptr && parent_Mesh != nullptr) {
+		model *= parent_joint->TransformTo(parent_Mesh->GetAnim(), parent_Mesh->GetFrame());
+	}
 
 	unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -68,6 +76,54 @@ void Object::Draw(Shader* shader, std::vector<Camera*> cams)
 	glBindTexture(GL_TEXTURE_2D, material->SPEC);
 
 	mesh->Draw(shader);
+
+	for (int c = 0; c < children.size(); c++) 
+		children[c]->DrawChild((childShader == nullptr) ? shader : childShader, model);
+	
+}
+
+void Object::DrawChild(Shader* shader, glm::mat4 parent)
+{
+	shader->Use();
+	shader->SetI("material.diffuse", 0);
+	shader->SetI("material.normal", 1);
+	shader->SetI("material.specular", 2);
+
+	glm::mat4 par_j = glm::mat4(1.0f);
+
+	if (parent_joint != nullptr && parent_Mesh != nullptr) {
+		par_j = parent_joint->TransformTo(parent_Mesh->GetAnim(), parent_Mesh->GetFrame());
+	}
+
+	glm::mat4 model = parent * par_j * transform.GetWorldTransform();
+
+	unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	glm::mat3 normMat = glm::mat3(glm::transpose(glm::inverse(model)));
+
+	shader->SetMat3("normMat", normMat);
+
+	shader->SetF("material.shine", material->shine);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, material->DIFF);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, material->NORM);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, material->SPEC);
+
+	mesh->Draw(shader);
+
+	for (int c = 0; c < children.size(); c++)
+		children[c]->DrawChild(shader, model);
+}
+
+void Object::DestroyChild(int c)
+{
+	if (c < children.size()) {
+		delete(children[c]);
+		children.erase(children.begin() + c);
+	}
 }
 
 void Object::Rotate(glm::vec3 rot) {
@@ -94,6 +150,11 @@ void Object::SetRotation(glm::vec3 rot)
 	transform.rotation = rot;
 }
 
+
+void Object::addChild(Object* child)
+{
+	children.push_back(child);
+}
 
 bool Object::HitDetect(Object* other)
 {

@@ -53,6 +53,8 @@ public:
 	void FillJointArray(glm::mat4 * arr, glm::mat4 global, glm::vec3 * binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim, int frame);
 	void LoadAnimFrame(std::queue<float>&, int anim, int frame);
 
+	glm::mat4 TransformTo(int anim, int frame);
+
 	friend class Skeleton;
 };
 

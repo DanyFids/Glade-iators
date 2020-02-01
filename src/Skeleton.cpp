@@ -213,6 +213,14 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 	}
 }
 
+glm::mat4 Joint::TransformTo(int anim, int frame)
+{
+	if (parent != nullptr) 
+		return parent->TransformTo(anim, frame) * animations[anim][frame].GetWorldTransform();
+	else
+		return animations[anim][frame].GetWorldTransform();
+}
+
 Skeleton::Skeleton(std::string name, std::string file)
 {
 	this->name = name;

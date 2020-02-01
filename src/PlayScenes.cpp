@@ -86,6 +86,7 @@ void OnePlayer::Update(float dt)
 		attacks[a]->time -= dt;
 		if (attacks[a]->time <= 0)
 		{
+			players[attacks[a]->getPlayer()]->DestroyChild(0);
 			attacks.erase(attacks.begin() + a);
 			break;
 		}
@@ -175,7 +176,7 @@ void OnePlayer::Draw()
 		Cam[c]->SetupCam(morphShader);
 		morphyBoi->Draw(morphShader, Cam);
 		Cam[c]->SetupCam(skelShader);
-		test_player->Draw(skelShader, Cam);
+		test_player->Draw(skelShader, Cam, shaderObj);
 		
 		glDisable(GL_DEPTH_TEST);
 		((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
@@ -233,8 +234,11 @@ void OnePlayer::LoadScene()
 	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator.bvh");
 	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
 
+	gladiatorSkel->WriteTree();
+
 	GladiatorMesh->SetAnim(1);
 	GladiatorMesh->SetFrame(0);
+
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
@@ -244,6 +248,8 @@ void OnePlayer::LoadScene()
 	Mesh* d20 = new Mesh("d20.obj");
 	Mesh* boi = new Mesh("gladiator.obj");
 	Mesh* arena = new Mesh("ColitreeumV2.obj");
+	Mesh* sword_mesh = new Mesh("Weapons/Sword.obj");
+	Mesh* shield_mesh = new Mesh("Weapons/Circle_Shield.obj");
 
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f,1.0f,1.0f);
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
@@ -253,10 +259,24 @@ void OnePlayer::LoadScene()
 
 	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
-	
+
 
 	test_player = new Player(GladiatorMesh, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f });
 	test_player->Scale(glm::vec3(1.2f));
+
+	Object* sword = new Object(sword_mesh, defaultTex, BlockyBoiHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_arm2.001"),GladiatorMesh);
+	Object* shield = new Object(shield_mesh, defaultTex, BlockyBoiHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("l_arm2.001"), GladiatorMesh);
+
+	sword->SetPosition({0.15f, 0.0f, -0.125f});
+	sword->Scale({0.8f, 0.8f, 0.8f});
+	sword->SetRotation({0.0f, 0.0f, 90.0f});
+
+	shield->SetPosition({ -0.35f, 0.05f, 0.0f });
+	shield->Scale({ 0.7f, 0.5f, 0.5f });
+	shield->SetRotation({ 0.0f, 0.0f, 270.0f });
+
+	test_player->addChild(sword);
+	test_player->addChild(shield);
 
 	//test_bones = new Player(snekMesh, defaultTex, BlockyBoiHB, { -5.0f,0.0f,5.0f });
 	//test_boner->Scale(glm::vec3(2.0f));

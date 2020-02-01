@@ -11,6 +11,8 @@ class Material;
 class Mesh;
 class Shader;
 class Hitbox;
+class Joint;
+class SkelMesh;
 
 struct Transform {
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -54,6 +56,9 @@ protected:
 	Mesh* mesh;
 	Material* material;
 	Transform transform;
+	std::vector <Object*>children;
+	Joint* parent_joint = nullptr;
+	SkelMesh* parent_Mesh = nullptr;
 
 public:
 	Hitbox* hitbox;
@@ -61,16 +66,19 @@ public:
 
 	Object();
 	Object(Mesh* me, Material* ma, Hitbox* hb);
-	Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos);
+	Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, Joint* p = nullptr, SkelMesh* m = nullptr);
 
 	virtual void Update(float dt);
-	virtual void Draw(Shader* shader, std::vector<Camera*> cam);
+	virtual void Draw(Shader* shader, std::vector<Camera*> cam, Shader* childShader = nullptr);
+	virtual void DrawChild(Shader* shader, glm::mat4 parent);
+	virtual void DestroyChild(int c);
 	void Rotate(glm::vec3 rot);
 	void Rotate(float tht, glm::vec3 dir);
 	void Move(glm::vec3 dir);
 	void Scale(glm::vec3 scl);
 	void SetPosition(glm::vec3 pos);
 	void SetRotation(glm::vec3 rot);
+	void addChild(Object* child);
 
 	virtual bool HitDetect(Object* other);
 
@@ -128,6 +136,7 @@ public:
 
 	Attack(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P);
 
+	int getPlayer() { return player; }
 	//void init();
 };
 

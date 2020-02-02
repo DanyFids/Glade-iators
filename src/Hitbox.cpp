@@ -335,6 +335,75 @@ void SphereHitbox::init()
 	node_ma = new Material("default-texture.png", "default-normal.png");
 }
 
+void SphereHitbox::Draw(Shader* shdr, glm::mat4 p)
+{
+	shdr->Use();
+	shdr->SetI("material.diffuse", 0);
+	shdr->SetI("material.normal", 1);
+	shdr->SetI("material.specular", 2);
+
+	glm::mat4 model = p * transform.GetWorldTransform();// *glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z));
+
+	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));
+
+	unsigned int modelLoc = glGetUniformLocation(shdr->ID, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	glm::mat3 normMat = glm::mat3(glm::transpose(glm::inverse(model)));
+
+	shdr->SetMat3("normMat", normMat);
+
+	shdr->SetF("material.shine", node_ma->shine);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, node_ma->DIFF);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, node_ma->NORM);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, node_ma->SPEC);
+
+	node_me->Draw(shdr);
+
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y + radius, transform.position.z));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	node_me->Draw(shdr);
+
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y - radius, transform.position.z));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	node_me->Draw(shdr);
+
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x + radius, transform.position.y, transform.position.z));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	node_me->Draw(shdr);
+
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x - radius, transform.position.y, transform.position.z));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	node_me->Draw(shdr);
+
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z + radius));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	node_me->Draw(shdr);
+
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z - radius));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	node_me->Draw(shdr);
+}
+
+void SphereHitbox::SetTransform(Transform t)
+{
+	transform = t;
+}
+
+Transform SphereHitbox::GetTransform()
+{
+	return transform;
+}
+
 bool SphereHitbox::HitDetect(Object* th, CubeHitbox* other, Object* oth)
 {
 	Transform t = th->GetTransform();
@@ -415,7 +484,7 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 	shdr->SetI("material.normal", 1);
 	shdr->SetI("material.specular", 2);
 
-	glm::mat4 model = p.GetWorldTransform() * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),lowerBound);
+	glm::mat4 model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),lowerBound);
 	
 	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));
 
@@ -437,7 +506,7 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 
 	node_me->Draw(shdr);
 
-	model = p.GetWorldTransform() * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),upperBound);
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),upperBound);
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	node_me->Draw(shdr);

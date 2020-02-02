@@ -66,6 +66,7 @@ public:
 };
 
 class CapsuleHitbox;
+
 class SphereHitbox : public Hitbox {
 	float radius;
 	static Mesh* node_me;
@@ -74,6 +75,7 @@ public:
 	SphereHitbox(float r) :radius(r) {};
 	static void init();
 	virtual Transform GetTransform() override;
+	virtual void SetTransform(Transform t) override;
 
 	virtual void Draw(Shader* shdr, glm::mat4 p) override;
 	float GetRadius() { return radius; }
@@ -105,7 +107,7 @@ public:
 	virtual Transform GetTransform() override;
 
 	virtual glm::vec3 convertVec4(glm::vec4 _vec4);
-	virtual void Draw( Shader* shdr, Transform p) override;
+	virtual void Draw( Shader* shdr, glm::mat4 p) override;
 	virtual bool HitDetect(Object* th, CubeHitbox* other, Object* oth);
 	virtual bool HitDetect(Object* th, SphereHitbox* other, Object* oth);
 	virtual bool HitDetect(Object* th, CapsuleHitbox* other, Object* oth);

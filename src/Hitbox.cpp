@@ -485,6 +485,7 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 	shdr->SetI("material.specular", 2);
 
 	glm::mat4 model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),lowerBound);
+	glm::vec3 test = model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	
 	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));
 
@@ -534,10 +535,10 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 
 bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
  {
-	Transform t = th->GetTransform();
-	Transform oT = oth->GetTransform();
-	oT.position += oth->phys.move;
-	t.position += th->phys.move;
+	glm::mat4 t = th->getParentTransform();
+	glm::mat4 oT = oth->getParentTransform();
+	//oT = oT * glm::translate(glm::mat4(1.0f), oth->phys.move);
+	t = t * glm::translate(glm::mat4(1.0f), th->phys.move);
 	//Adding an indiscriminant value to 1 so we don't get destroyed by dividing by zero.
 
 	if (this->height == 1.0f) {
@@ -548,11 +549,11 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 		other->height += 0.000001f;
 	}
 
-	glm::vec3 tub = convertVec4(t.GetWorldTransform() * transform.GetWorldTransform() * glm::vec4(upperBound.x, upperBound.y, upperBound.z, 1.0f));
-	glm::vec3 tlb = convertVec4(t.GetWorldTransform() * transform.GetWorldTransform() * glm::vec4(lowerBound.x, lowerBound.y, lowerBound.z, 1.0f));
+	glm::vec3 tub = convertVec4(t * transform.GetWorldTransform() * glm::vec4(upperBound.x, upperBound.y, upperBound.z, 1.0f));
+	glm::vec3 tlb = convertVec4(t * transform.GetWorldTransform() * glm::vec4(lowerBound.x, lowerBound.y, lowerBound.z, 1.0f));
 
-	glm::vec3 oub = convertVec4(oT.GetWorldTransform() * other->transform.GetWorldTransform() * glm::vec4(other->upperBound.x, other->upperBound.y, other->upperBound.z, 1.0f));
-	glm::vec3 olb = convertVec4(oT.GetWorldTransform() * other->transform.GetWorldTransform() * glm::vec4(other->lowerBound.x, other->lowerBound.y, other->lowerBound.z, 1.0f));
+	glm::vec3 oub = convertVec4(oT * other->transform.GetWorldTransform() * glm::vec4(other->upperBound.x, other->upperBound.y, other->upperBound.z, 1.0f));
+	glm::vec3 olb = convertVec4(oT * other->transform.GetWorldTransform() * glm::vec4(other->lowerBound.x, other->lowerBound.y, other->lowerBound.z, 1.0f));
 
 	glm::vec3 closestPointA;
 	glm::vec3 closestPointB;
@@ -574,8 +575,12 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 		//Getting a scalar value for length along line B
 		float scalarB = (((glm::dot(LineA,(PB1 - PA1)) * glm::dot(LineA, LineB) / glm::dot(LineA, LineA)) - (glm::dot(LineB, (PB1 - PA1)))	) / (glm::dot(LineB, LineB) - 1));
 
+		scalarB = glm::clamp(scalarB, -1.0f, 1.0f);
+
 		//Getting a scalar value for length along line A subbing in t.
 		float scalarA = (glm::dot(LineB, (PB1 - PA1)) + glm::dot(LineB, LineB) * scalarB) / glm::dot(LineA, LineB);
+
+		scalarA = glm::clamp(scalarA, -1.0f, 1.0f);
 
 		//std::cout << scalarB << std::endl;
 		//std::cout << scalarA << std::endl;

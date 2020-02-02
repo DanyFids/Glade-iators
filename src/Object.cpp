@@ -42,6 +42,12 @@ Object::Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, Joint* p, Skel
 	parent_Mesh = m;
 }
 
+glm::mat4 Object::GetTrueTransform()
+{
+
+	return glm::mat4();
+}
+
 void Object::Update(float dt)
 {
 	
@@ -160,9 +166,9 @@ void Object::addChild(Object* child)
 glm::mat4 Object::getParentTransform()
 {
 	if (parent != nullptr)
-		return parent->getParentTransform() * transform.GetWorldTransform();
+		return parent->getParentTransform() * TransformTo() * transform.GetWorldTransform();
 	else
-		return transform.GetWorldTransform();
+		return TransformTo() * transform.GetWorldTransform();
 	
 }
 
@@ -178,7 +184,10 @@ void Object::ApplyMove() {
 
 glm::mat4 Object::TransformTo()
 {
-	return parent_joint->TransformTo(parent_Mesh->GetAnim(), parent_Mesh->GetFrame());
+	if (parent_joint != nullptr)
+		return parent_joint->TransformTo(parent_Mesh->GetAnim(), parent_Mesh->GetFrame());
+	else
+		return glm::mat4(1.0f);
 }
 
 const float Player::MAX_HEALTH = 100.0f;

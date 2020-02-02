@@ -317,11 +317,11 @@ void PlayScene::RenderScene(Shader* shader)
 	//
 	//}
 
-	for (int s = 0; s < shields.size(); s++)
-	{
-		shields[s]->Draw(shader, Cam);
+	//for (int s = 0; s < shields.size(); s++)
+	//{
+	//	shields[s]->Draw(shader, Cam);
+	//
+	//}
 
-	}
-
-	DUUDE->Draw(shader, Cam);
+	//DUUDE->Draw(shader, Cam);
 }

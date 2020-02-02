@@ -166,6 +166,11 @@ void Object::ApplyMove() {
 	phys.move = glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
+glm::mat4 Object::TransformTo()
+{
+	return parent_joint->TransformTo(parent_Mesh->GetAnim(), parent_Mesh->GetFrame());
+}
+
 const float Player::MAX_HEALTH = 100.0f;
 const float Player::MAX_STAMINA = 100.0f;
 const float Player::STAM_DECAY = 30.0f;

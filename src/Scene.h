@@ -84,8 +84,9 @@ class PlayScene : public Scene {
 protected:
 	std::vector<Player*> players;
 	std::vector<Object*> terrain;
-	std::vector<Shield*> shields;
+	std::vector<Object*> shields;
 	std::vector<Attack*> attacks;
+	std::vector<Object*> weapons;
 	std::vector<glm::vec3> beacons;
 
 	bool dodge1 = true;

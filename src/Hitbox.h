@@ -18,7 +18,9 @@ public:
 	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT) = 0;
 	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT) = 0;
 	virtual void parentTransform(Transform t);
-	virtual void Draw(Shader* shdr, Transform p) = 0;
+	virtual void Draw(Shader* shdr, glm::mat4 p) = 0;
+	virtual Transform GetTransform() = 0;
+	virtual void SetTransform(Transform t) = 0;
 protected:
 	Transform parent;
 };
@@ -38,8 +40,10 @@ public:
 	CubeHitbox(float w, float h, float d);
 
 	glm::vec3 GetDim() {return dim;}
+	virtual void SetTransform(Transform t) override;
+	virtual void Draw(Shader* shdr, glm::mat4 p) override;
 
-	virtual void Draw(Shader* shdr, Transform p) override;
+	virtual Transform GetTransform() override;
 
 	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
 	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);
@@ -58,11 +62,18 @@ public:
 
 class SphereHitbox : public Hitbox {
 	float radius;
+	Transform transform;
+	static Mesh* node_me;
+	static Material* node_ma;
 public:
 	SphereHitbox(float r) :radius(r) {};
+	static void init();
+	virtual Transform GetTransform() override;
 
-	virtual void Draw(Shader* shdr, Transform p) override;
+	virtual void Draw(Shader* shdr, glm::mat4 p) override;
 	float GetRadius() { return radius; }
+
+	virtual void SetTransform(Transform t) override;
 
 	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
 	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);
@@ -86,9 +97,11 @@ public:
 	};
 	
 	float GetRadius() { return radius; }
+	virtual void SetTransform(Transform t) override;
+	virtual Transform GetTransform() override;
 
 	virtual glm::vec3 convertVec4(glm::vec4 _vec4);
-	virtual void Draw( Shader* shdr, Transform p) override;
+	virtual void Draw( Shader* shdr, glm::mat4 p);
 	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT);//Capsule to capsule
 	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
 	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);

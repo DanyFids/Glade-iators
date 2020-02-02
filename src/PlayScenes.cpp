@@ -112,11 +112,11 @@ void OnePlayer::Update(float dt)
 	for (int a = 0; a < shields.size(); a++)
 	{
 		
-		if (shields[a]->player == 0 && block1 == false)
-		{
-			shields.erase(shields.begin() + a);
-			break;
-		}
+		//if (shields[a]->player == 0 && block1 == false)
+		//{
+		//	shields.erase(shields.begin() + a);
+		//	break;
+		//}
 		
 	}
 
@@ -185,6 +185,16 @@ void OnePlayer::Draw()
 		glDisable(GL_DEPTH_TEST);
 		//((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
 		glEnable(GL_DEPTH_TEST);
+
+		glDisable(GL_DEPTH_TEST);
+		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+
+		weapons[0]->hitbox->Draw(shaderObj, test_player->GetTransform().GetWorldTransform() * weapons[0]->TransformTo() * weapons[0]->GetTransform().GetWorldTransform());
+		shields[0]->hitbox->Draw(shaderObj, test_player->GetTransform().GetWorldTransform() * shields[0]->TransformTo() * shields[0]->GetTransform().GetWorldTransform());
+		//players[0]->GetTransform().GetWorldTransform() * weapons[0]->GetTransform().GetWorldTransform();
+		//	players[1]->hitbox->Draw(shaderObj);
+
+		glEnable(GL_DEPTH_TEST);
 	}
 
 
@@ -215,6 +225,7 @@ void OnePlayer::LoadScene()
 	//// Play the event
 	audioEngine.PlayEvent("MenuPlaceholder");
 	CapsuleHitbox::init();
+	SphereHitbox::init();
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
@@ -264,9 +275,11 @@ void OnePlayer::LoadScene()
 	//Capsule testing
 	Hitbox* basicCapsuleHB = new CapsuleHitbox(1.5f,1.0f); //radius + height
 	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(1.5f,1.0f);
+	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.08f, 1.2f);
 	//Capsule Testing
 
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
+	Hitbox* shieldSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
 	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
@@ -284,19 +297,22 @@ void OnePlayer::LoadScene()
 	test_player = new Player(GladiatorMesh, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f });
 	test_player->Scale(glm::vec3(1.2f));
 
-	Object* sword = new Object(sword_mesh, defaultTex, BlockyBoiHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_arm2.001"),GladiatorMesh);
-	Object* shield = new Object(shield_mesh, defaultTex, BlockyBoiHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("l_arm2.001"), GladiatorMesh);
+	weapons.push_back(new Object(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_arm2.001"),GladiatorMesh));
+	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("l_arm2.001"), GladiatorMesh));
 
-	sword->SetPosition({0.15f, 0.0f, -0.125f});
-	sword->Scale({0.8f, 0.8f, 0.8f});
-	sword->SetRotation({0.0f, 0.0f, 90.0f});
+	weapons[0]->SetPosition({0.15f, 0.0f, -0.125f});
+	weapons[0]->Scale({0.8f, 0.8f, 0.8f});
+	weapons[0]->SetRotation({0.0f, 0.0f, 90.0f});
 
-	shield->SetPosition({ -0.35f, 0.05f, 0.0f });
-	shield->Scale({ 0.7f, 0.5f, 0.5f });
-	shield->SetRotation({ 0.0f, 0.0f, 270.0f });
-
-	test_player->addChild(sword);
-	test_player->addChild(shield);
+	shields[0]->SetPosition({ -0.35f, 0.05f, 0.0f });
+	shields[0]->Scale({ 0.7f, 0.5f, 0.5f });
+	shields[0]->SetRotation({ 0.0f, 0.0f, 270.0f });
+	glm::vec3 test2 = shields[0]->hitbox->GetTransform().position;
+	shields[0]->hitbox->GetTransform().position = glm::vec3(100.0f, 0.0f, 0.0f);
+	glm::vec3 test = shields[0]->hitbox->GetTransform().position;
+	test_player->addChild(weapons[0]);
+	test_player->addChild(shields[0]);
+	//sword->addChild(swordCapsuleHB);
 
 	//test_bones = new Player(snekMesh, defaultTex, BlockyBoiHB, { -5.0f,0.0f,5.0f });
 	//test_bones->Scale(glm::vec3(2.0f));
@@ -448,16 +464,16 @@ void TwoPlayer::Update(float dt)
 	for (int a = 0; a < shields.size(); a++)
 	{
 
-		if (shields[a]->player == 0 && block1 == false)
-		{
-			shields.erase(shields.begin() + a);
-			break;
-		}
-		if (shields[a]->player == 1 && block2 == false)
-		{
-			shields.erase(shields.begin() + a);
-			break;
-		}
+		//if (shields[a]->player == 0 && block1 == false)
+		//{
+		//	shields.erase(shields.begin() + a);
+		//	break;
+		//}
+		//if (shields[a]->player == 1 && block2 == false)
+		//{
+		//	shields.erase(shields.begin() + a);
+		//	break;
+		//}
 
 	}
 
@@ -522,7 +538,8 @@ void TwoPlayer::Draw()
 		morphyBoi->Draw(morphShader, Cam);
 
 		glDisable(GL_DEPTH_TEST);
-		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform());
+		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
 		//	players[1]->hitbox->Draw(shaderObj);
 
 		glEnable(GL_DEPTH_TEST);
@@ -563,7 +580,7 @@ void TwoPlayer::LoadScene()
 	Material* blackBarMat = new Material("black.png");
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
-	//lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	beacons.push_back(glm::vec3(glm::vec3(1, 1, 1)));
@@ -598,8 +615,8 @@ void TwoPlayer::LoadScene()
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
 	//Capsule testing
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f, 2.0f); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.4f, 2.0f);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.3f, 2.0f); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.3f, 2.0f);
 
 	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
 	players[PLAYER_1]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());

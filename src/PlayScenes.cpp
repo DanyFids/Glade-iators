@@ -64,6 +64,10 @@ void OnePlayer::Update(float dt)
 		std::cout << "WEAPON HIT\n";
 	}
 
+	if (players[PLAYER_1]->HitDetect(shields[0])) {
+
+	}
+
 	audioEngine.Update();
 	for (int c = 0; c < players.size(); c++) {
 		players[c]->Update(dt);
@@ -193,7 +197,7 @@ void OnePlayer::Draw()
 
 		glDisable(GL_DEPTH_TEST);
 		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-
+		players[PLAYER_2]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
 		weapons[0]->hitbox->Draw(shaderObj, test_player->GetTransform().GetWorldTransform() * weapons[0]->TransformTo() * weapons[0]->GetTransform().GetWorldTransform());
 		shields[0]->hitbox->Draw(shaderObj, test_player->GetTransform().GetWorldTransform() * shields[0]->TransformTo() * shields[0]->GetTransform().GetWorldTransform());
 		//players[0]->GetTransform().GetWorldTransform() * weapons[0]->GetTransform().GetWorldTransform();
@@ -229,6 +233,7 @@ void OnePlayer::LoadScene()
 
 	//// Play the event
 	audioEngine.PlayEvent("MenuPlaceholder");
+
 	CapsuleHitbox::init();
 	SphereHitbox::init();
 
@@ -283,17 +288,18 @@ void OnePlayer::LoadScene()
 	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.08f, 1.2f);
 	//Capsule Testing
 
-	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
+	Hitbox* basicSphereHB = new SphereHitbox(1.0f);
 	Hitbox* shieldSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
 	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
-	//players.push_back(new Player(d20, D20Tex, basicCapsuleHB2)); //P2
+	players.push_back(new Player(d20, D20Tex, basicSphereHB)); //P2
 
 	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
+	basicSphereHB->SetScale({0.5f, 1.0f, 1.0f});
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
-	//players[PLAYER_2]->Move({ 0.0f, 0.0f, 0.0f });
+	players[PLAYER_2]->Move({ -6.0f, 0.0f, 0.0f });
 	//players[PLAYER_2]->Rotate(glm::vec3(0,0,25));
 	
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });

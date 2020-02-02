@@ -24,7 +24,7 @@ public:
 
 	void SetPosition(glm::vec3 pos) { transform.position = pos; }
 	void SetRotation(glm::vec3 rot) { transform.rotation = rot; }
-	void SetScale(glm::vec3 scl) { transform.position = scl; }
+	void SetScale(glm::vec3 scl) { transform.scale = scl; }
 protected:
 	Transform parent;
 	Transform transform;

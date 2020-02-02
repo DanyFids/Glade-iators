@@ -363,32 +363,32 @@ void SphereHitbox::Draw(Shader* shdr, glm::mat4 p)
 
 	node_me->Draw(shdr);
 
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y + radius, transform.position.z));
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	node_me->Draw(shdr);
 
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y - radius, transform.position.z));
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	node_me->Draw(shdr);
 
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x + radius, transform.position.y, transform.position.z));
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	node_me->Draw(shdr);
 
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x - radius, transform.position.y, transform.position.z));
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	node_me->Draw(shdr);
 
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z + radius));
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	node_me->Draw(shdr);
 
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z - radius));
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	node_me->Draw(shdr);
@@ -446,10 +446,13 @@ bool SphereHitbox::HitDetect(Object* th, SphereHitbox* other, Object* oth)
 
 bool SphereHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 {
-	return false;
+	return other->HitDetect(oth, this, th);
 }
 
 #pragma endregion
+
+
+
 
 #pragma region Capsule Collisions
 Mesh* CapsuleHitbox::node_me = nullptr;
@@ -641,7 +644,10 @@ bool CapsuleHitbox::HitDetect(Object* th, SphereHitbox* other, Object* oth)
 
 	float max_dist = or + radius;
 
-	return false;
+	if (glm::distance(cpa, op) < max_dist)
+		return true;
+	else
+		return false;
 }
 
 

@@ -59,7 +59,7 @@ public:
 
 	virtual void Draw(Shader*);
 	void SetTexture(Material* t);
-	void Update(float dt);
+	virtual void Update(float dt);
 
 	void LoadMesh(const char* f, std::vector<Vertex> &vertices, unsigned int& num_verts, std::vector<unsigned int> &indices, unsigned int& num_indi);
 
@@ -88,7 +88,7 @@ public:
 
 	virtual void Draw(Shader*);
 	void addPose( std::string filename);
-	void Update(float dt);
+	virtual void Update(float dt);
 	void NextPose();
 	void PrevPose();
 	

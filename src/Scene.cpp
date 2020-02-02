@@ -145,7 +145,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 			float newRot;
 
-			newRot = -(std::atan2f(dir.z, dir.x)) * (180/M_PI);
+			newRot = -(std::atan2f(dir.z, dir.x)) * (180/M_PI) + 180;
 
 			//std::cout << newRot << std::endl;
 
@@ -317,11 +317,11 @@ void PlayScene::RenderScene(Shader* shader)
 	//
 	//}
 
-	for (int s = 0; s < shields.size(); s++)
+	/*for (int s = 0; s < shields.size(); s++)
 	{
 		shields[s]->Draw(shader, Cam);
 
-	}
+	}*/
 
 	DUUDE->Draw(shader, Cam);
 }

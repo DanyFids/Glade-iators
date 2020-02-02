@@ -118,6 +118,7 @@
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Skeleton.h" />
+    <ClInclude Include="src\Sound.h" />
     <ClInclude Include="src\Test_Primitives.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\UI.h" />
@@ -137,6 +138,7 @@
     <ClCompile Include="src\SceneManager.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Skeleton.cpp" />
+    <ClCompile Include="src\Sound.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\UI.cpp" />
   </ItemGroup>

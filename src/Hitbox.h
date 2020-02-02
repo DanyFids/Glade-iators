@@ -14,13 +14,14 @@ class CapsuleHitbox;
 class Hitbox {
 	
 public:
-	virtual bool HitDetect(Transform t, CubeHitbox * other, Transform oT) = 0;
-	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT) = 0;
-	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT) = 0;
+	virtual bool HitDetect(Object* th, CubeHitbox * other, Object* oth) = 0;
+	virtual bool HitDetect(Object* th, SphereHitbox* other, Object* oth) = 0;
+	virtual bool HitDetect(Object* th, CapsuleHitbox* other, Object* oth) = 0;
 	virtual void parentTransform(Transform t);
 	virtual void Draw(Shader* shdr, Transform p) = 0;
 protected:
 	Transform parent;
+	Transform transform;
 };
 
 class CubeHitbox : public Hitbox {
@@ -41,9 +42,9 @@ public:
 
 	virtual void Draw(Shader* shdr, Transform p) override;
 
-	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
-	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);
-	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT);
+	virtual bool HitDetect(Object* th, CubeHitbox* other, Object* oth);
+	virtual bool HitDetect(Object* th, SphereHitbox* other, Object* oth);
+	virtual bool HitDetect(Object* th, CapsuleHitbox* other, Object* oth);
 	virtual bool HitDetectSAT(Transform t, CubeHitbox* other, Transform oT);
 
 	virtual void setVerts(Transform t);
@@ -56,6 +57,7 @@ public:
 	virtual bool testIntersection(Transform t, CubeHitbox* object2, Transform oT, glm::vec3 offset);
 };
 
+class CapsuleHitbox;
 class SphereHitbox : public Hitbox {
 	float radius;
 public:
@@ -64,9 +66,11 @@ public:
 	virtual void Draw(Shader* shdr, Transform p) override;
 	float GetRadius() { return radius; }
 
-	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
-	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);
-	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT);
+	virtual bool HitDetect(Object* th, CubeHitbox* other, Object* oth);
+	virtual bool HitDetect(Object* th, SphereHitbox* other, Object* oth);
+	virtual bool HitDetect(Object* th, CapsuleHitbox* other, Object* oth);
+
+	friend class CapsuleHitbox;
 };
 
 class CapsuleHitbox : public Hitbox {
@@ -76,7 +80,6 @@ class CapsuleHitbox : public Hitbox {
 	float radius;
 	float height;
 	glm::vec3 upperBound, lowerBound;
-	Transform transform;
 public:
 	static void init();
 
@@ -89,8 +92,8 @@ public:
 
 	virtual glm::vec3 convertVec4(glm::vec4 _vec4);
 	virtual void Draw( Shader* shdr, Transform p) override;
-	virtual bool HitDetect(Transform t, CapsuleHitbox* other, Transform oT);//Capsule to capsule
-	virtual bool HitDetect(Transform t, CubeHitbox* other, Transform oT);
-	virtual bool HitDetect(Transform t, SphereHitbox* other, Transform oT);
+	virtual bool HitDetect(Object* th, CubeHitbox* other, Object* oth);
+	virtual bool HitDetect(Object* th, SphereHitbox* other, Object* oth);
+	virtual bool HitDetect(Object* th, CapsuleHitbox* other, Object* oth);
 	
 };

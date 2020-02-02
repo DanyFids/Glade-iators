@@ -66,7 +66,7 @@ protected:
 
 public:
 	Hitbox* hitbox;
-	Object* parentObject;
+	Object* parent;
 	PhysicsBody phys;
 
 	Object();
@@ -95,6 +95,8 @@ public:
 	Transform GetTransform() { return transform; }
 
 	Mesh* GetMesh() { return mesh; }
+
+	friend class Hitbox;
 };
 
 class Player : public Object {

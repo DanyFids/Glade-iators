@@ -91,6 +91,9 @@ public:
 
 	virtual void ApplyMove();
 
+	Joint* GetParentJoint() { return parent_joint; }
+	glm::mat4 TransformTo();
+
 	glm::vec3 GetPosition() { return transform.position; };
 	Transform GetTransform() { return transform; }
 

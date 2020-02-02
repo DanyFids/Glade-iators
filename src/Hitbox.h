@@ -18,7 +18,13 @@ public:
 	virtual bool HitDetect(Object* th, SphereHitbox* other, Object* oth) = 0;
 	virtual bool HitDetect(Object* th, CapsuleHitbox* other, Object* oth) = 0;
 	virtual void parentTransform(Transform t);
-	virtual void Draw(Shader* shdr, Transform p) = 0;
+	virtual void Draw(Shader* shdr, glm::mat4 p) = 0;
+	virtual Transform GetTransform() = 0;
+	virtual void SetTransform(Transform t) = 0;
+
+	void SetPosition(glm::vec3 pos) { transform.position = pos; }
+	void SetRotation(glm::vec3 rot) { transform.rotation = rot; }
+	void SetScale(glm::vec3 scl) { transform.position = scl; }
 protected:
 	Transform parent;
 	Transform transform;
@@ -39,8 +45,10 @@ public:
 	CubeHitbox(float w, float h, float d);
 
 	glm::vec3 GetDim() {return dim;}
+	virtual void SetTransform(Transform t) override;
+	virtual void Draw(Shader* shdr, glm::mat4 p) override;
 
-	virtual void Draw(Shader* shdr, Transform p) override;
+	virtual Transform GetTransform() override;
 
 	virtual bool HitDetect(Object* th, CubeHitbox* other, Object* oth);
 	virtual bool HitDetect(Object* th, SphereHitbox* other, Object* oth);
@@ -60,10 +68,14 @@ public:
 class CapsuleHitbox;
 class SphereHitbox : public Hitbox {
 	float radius;
+	static Mesh* node_me;
+	static Material* node_ma;
 public:
 	SphereHitbox(float r) :radius(r) {};
+	static void init();
+	virtual Transform GetTransform() override;
 
-	virtual void Draw(Shader* shdr, Transform p) override;
+	virtual void Draw(Shader* shdr, glm::mat4 p) override;
 	float GetRadius() { return radius; }
 
 	virtual bool HitDetect(Object* th, CubeHitbox* other, Object* oth);
@@ -89,6 +101,8 @@ public:
 	};
 	
 	float GetRadius() { return radius; }
+	virtual void SetTransform(Transform t) override;
+	virtual Transform GetTransform() override;
 
 	virtual glm::vec3 convertVec4(glm::vec4 _vec4);
 	virtual void Draw( Shader* shdr, Transform p) override;

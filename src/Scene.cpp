@@ -65,12 +65,12 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 	{
-		attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));
-		glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
-		p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
-		p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));
-		p1.y = players[0]->GetPosition().y;
-		attacks.back()->SetPosition(p1);
+		//attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));
+		//glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
+		//p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
+		//p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));
+		//p1.y = players[0]->GetPosition().y;
+		//attacks.back()->SetPosition(p1);
 		//attacks.back()->ABox->SetPosition(glm::vec3(0,2,4));
 	}
 	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && dodge1 == false)
@@ -233,17 +233,17 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_2 && atk2 == false)
 		{
-			if (players[player]->GetStam() >= 15.0f) {
-				attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_2));
-				glm::vec3 p1 = players[player]->GetPosition();
-				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-				p1.y = players[player]->GetPosition().y;
-				attacks.back()->SetPosition(p1);
-				players[player]->dmgSTAM(15.0f);
-				std::cout << "OOF\n";
-				atk2 = true;
-			}
+			//if (players[player]->GetStam() >= 15.0f) {
+			//	attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_2));
+			//	glm::vec3 p1 = players[player]->GetPosition();
+			//	p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+			//	p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+			//	p1.y = players[player]->GetPosition().y;
+			//	attacks.back()->SetPosition(p1);
+			//	players[player]->dmgSTAM(15.0f);
+			//	std::cout << "OOF\n";
+			//	atk2 = true;
+			//}
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2 && player == PLAYER_2)
 		{
@@ -311,11 +311,11 @@ void PlayScene::RenderScene(Shader* shader)
 		terrain[t]->Draw(shader, Cam);
 	}
 
-	for (int a = 0; a < attacks.size(); a++)
-	{
-		attacks[a]->Draw(shader, Cam);
-
-	}
+	//for (int a = 0; a < attacks.size(); a++)
+	//{
+	//	attacks[a]->Draw(shader, Cam);
+	//
+	//}
 
 	for (int s = 0; s < shields.size(); s++)
 	{

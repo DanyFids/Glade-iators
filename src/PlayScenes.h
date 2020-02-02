@@ -1,6 +1,8 @@
 #pragma once
 #include "Scene.h"
 
+#include "Sound.h"
+
 class Light;
 class Mesh;
 class Player;
@@ -25,6 +27,7 @@ class OnePlayer: public PlayScene {
 
 	Object* morphyBoi;
 	Object* staticBoi;
+	Sound audioEngine;
 
 	float time = 0.0f;
 	float MAX_TIME = 0.2f;

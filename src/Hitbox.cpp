@@ -309,18 +309,30 @@ bool CubeHitbox::testIntersection(Transform t, CubeHitbox* object2, Transform oT
 
 	return true;
 }
-void CubeHitbox::Draw(Shader* shdr, Transform p)
+void CubeHitbox::SetTransform(Transform t)
+{
+}
+void CubeHitbox::Draw(Shader* shdr, glm::mat4 p)
 {
 
 }
+Transform CubeHitbox::GetTransform()
+{
+	return Transform();
+}
 #pragma endregion
 
+#pragma region Shpere Collisions
+Mesh* SphereHitbox::node_me = nullptr;
+Material* SphereHitbox::node_ma = nullptr;
 /********************************************************************
 *						SPHERE COLLISION
 ********************************************************************/
 
-void SphereHitbox::Draw(Shader* shdr, Transform p)
+void SphereHitbox::init()
 {
+	node_me = new Mesh("node.obj");
+	node_ma = new Material("default-texture.png", "default-normal.png");
 }
 
 bool SphereHitbox::HitDetect(Object* th, CubeHitbox* other, Object* oth)
@@ -368,6 +380,8 @@ bool SphereHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 	return false;
 }
 
+#pragma endregion
+
 #pragma region Capsule Collisions
 Mesh* CapsuleHitbox::node_me = nullptr;
 Material* CapsuleHitbox::node_ma = nullptr;
@@ -378,6 +392,15 @@ void CapsuleHitbox::init()
 	node_ma = new Material("default-texture.png", "default-normal.png");
 }
 
+void CapsuleHitbox::SetTransform(Transform t)
+{
+}
+
+Transform CapsuleHitbox::GetTransform()
+{
+	return Transform();
+}
+
 glm::vec3 CapsuleHitbox::convertVec4(glm::vec4 _vec4)
 {
 	glm::vec3 pass{ _vec4.x,_vec4.y,_vec4.z };
@@ -385,7 +408,7 @@ glm::vec3 CapsuleHitbox::convertVec4(glm::vec4 _vec4)
 	return pass;
 }
 
-void CapsuleHitbox::Draw(Shader* shdr, Transform p)
+void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 {
 	shdr->Use();
 	shdr->SetI("material.diffuse", 0);
@@ -415,6 +438,26 @@ void CapsuleHitbox::Draw(Shader* shdr, Transform p)
 	node_me->Draw(shdr);
 
 	model = p.GetWorldTransform() * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),upperBound);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	node_me->Draw(shdr);
+
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x + radius, upperBound.y, upperBound.z));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	node_me->Draw(shdr);
+
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x - radius, upperBound.y, upperBound.z));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	node_me->Draw(shdr);
+
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x, upperBound.y, upperBound.z + radius));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	node_me->Draw(shdr);
+
+	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x, upperBound.y, upperBound.z - radius));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	node_me->Draw(shdr);

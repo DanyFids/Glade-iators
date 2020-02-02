@@ -21,8 +21,13 @@ public:
 	virtual void Draw(Shader* shdr, glm::mat4 p) = 0;
 	virtual Transform GetTransform() = 0;
 	virtual void SetTransform(Transform t) = 0;
+
+	void SetPosition(glm::vec3 pos) { transform.position = pos; }
+	void SetRotation(glm::vec3 rot) { transform.rotation = rot; }
+	void SetScale(glm::vec3 scl) { transform.position = scl; }
 protected:
 	Transform parent;
+	Transform transform;
 };
 
 class CubeHitbox : public Hitbox {
@@ -62,7 +67,6 @@ public:
 
 class SphereHitbox : public Hitbox {
 	float radius;
-	Transform transform;
 	static Mesh* node_me;
 	static Material* node_ma;
 public:
@@ -87,7 +91,6 @@ class CapsuleHitbox : public Hitbox {
 	float radius;
 	float height;
 	glm::vec3 upperBound, lowerBound;
-	Transform transform;
 public:
 	static void init();
 

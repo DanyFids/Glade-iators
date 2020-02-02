@@ -85,7 +85,7 @@ protected:
 	std::vector<Player*> players;
 	std::vector<Object*> terrain;
 	std::vector<Object*> shields;
-	std::vector<Attack*> attacks;
+	//std::vector<Attack*> attacks;
 	std::vector<Object*> weapons;
 	std::vector<glm::vec3> beacons;
 

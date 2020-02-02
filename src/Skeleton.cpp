@@ -205,7 +205,7 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 	}
 
 	if (name.compare("l_arm1") == 0 || name.compare("r_arm1") == 0) {
-		std::cout << "HOI!!!" << std::endl;
+		//std::cout << "HOI!!!" << std::endl;
 	}
 
 	for (int c = 0; c < children.size(); c++) {
@@ -312,13 +312,32 @@ int Skeleton::LoadFromFile(std::string f)
 			int num_frames = 0;
 			int anim = root->animations.size();
 
+			AnimStates.push_back(std::vector<FrameStates>());
+
 			file >> read;
 			file.ignore(512, (int)'\n');
 			file.ignore(512, (int)'\n');
-
+			int yeetval = 1;
+			int yootval = 1;
 			while (!file.eof()) {
+				file >> read;
+				if (read.compare("N") == 0)
+				{
+					std::cout << yeetval << "yeet \n";
+					yeetval++;
+					AnimStates[AnimStates.size() - 1].push_back(Neutral);
+					//file >> read;
+					//file.ignore(2);
+				}
+				if (read.compare("A") == 0)
+				{
+					std::cout << yootval  << "yoot \n";
+					yootval++;
+					AnimStates[AnimStates.size() - 1].push_back(Attack);
+					file >> read;
+					//file.ignore(2);
+				}
 				std::queue<float> values;
-
 				std::stringstream line;
 				std::string temp;
 

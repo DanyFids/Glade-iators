@@ -60,9 +60,14 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void OnePlayer::Update(float dt)
 {
+	if (players[0]->HitDetect(weapons[0])) {
+		std::cout << "WEAPON HIT\n";
+	}
+
 	audioEngine.Update();
 	for (int c = 0; c < players.size(); c++) {
 		players[c]->Update(dt);
+	
 
 		for (int p = 0; p < players.size(); p++) {
 			if (players[c] != players[p]) {
@@ -85,26 +90,26 @@ void OnePlayer::Update(float dt)
 		}
 	}
 
-	for (int a = 0; a < attacks.size(); a++)
-	{
-		attacks[a]->time -= dt;
-		if (attacks[a]->time <= 0)
-		{
-			players[attacks[a]->getPlayer()]->DestroyChild(0);
-			attacks.erase(attacks.begin() + a);
-			break;
-		}
-		if (attacks[a]->HitDetect(players[0]) && attacks[a]->player != 0)
-		{
-			players[0]->dmgHP(10.0f);
-			attacks[a]->Hit = true;
-		}
-		if (attacks[a]->HitDetect(players[1]) && attacks[a]->player != 1)
-		{
-			players[1]->dmgHP(10.0f);
-			attacks[a]->Hit = true;
-		}
-	}
+	//for (int a = 0; a < attacks.size(); a++)
+	//{
+	//	attacks[a]->time -= dt;
+	//	if (attacks[a]->time <= 0)
+	//	{
+	//		players[attacks[a]->getPlayer()]->DestroyChild(0);
+	//		attacks.erase(attacks.begin() + a);
+	//		break;
+	//	}
+	//	if (attacks[a]->HitDetect(players[0]) && attacks[a]->player != 0)
+	//	{
+	//		players[0]->dmgHP(10.0f);
+	//		attacks[a]->Hit = true;
+	//	}
+	//	if (attacks[a]->HitDetect(players[1]) && attacks[a]->player != 1)
+	//	{
+	//		players[1]->dmgHP(10.0f);
+	//		attacks[a]->Hit = true;
+	//	}
+	//}
 
 	((MorphMesh*)(morphyBoi->GetMesh()))->Update(dt);
 	// m morphyBoi->Update(dt);
@@ -273,8 +278,8 @@ void OnePlayer::LoadScene()
 	Hitbox* basicCubeHB2 = new CubeHitbox(1.0, 1.0f, 1.0f);
 
 	//Capsule testing
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(1.5f,1.0f); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(1.5f,1.0f);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f,2.0f); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,2.0f);
 	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.08f, 1.2f);
 	//Capsule Testing
 
@@ -283,15 +288,15 @@ void OnePlayer::LoadScene()
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
 	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
-	players.push_back(new Player(d20, D20Tex, basicCapsuleHB2)); //P2
+	//players.push_back(new Player(d20, D20Tex, basicCapsuleHB2)); //P2
 
 	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
-	players[PLAYER_2]->Move({ 0.0f, 0.0f, 0.0f });
+	//players[PLAYER_2]->Move({ 0.0f, 0.0f, 0.0f });
 	//players[PLAYER_2]->Rotate(glm::vec3(0,0,25));
 	
-	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
+	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 
 
 	test_player = new Player(GladiatorMesh, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f });
@@ -303,12 +308,13 @@ void OnePlayer::LoadScene()
 	weapons[0]->SetPosition({0.15f, 0.0f, -0.125f});
 	weapons[0]->Scale({0.8f, 0.8f, 0.8f});
 	weapons[0]->SetRotation({0.0f, 0.0f, 90.0f});
+	
 
 	shields[0]->SetPosition({ -0.35f, 0.05f, 0.0f });
 	shields[0]->Scale({ 0.7f, 0.5f, 0.5f });
 	shields[0]->SetRotation({ 0.0f, 0.0f, 270.0f });
-	glm::vec3 test2 = shields[0]->hitbox->GetTransform().position;
-	shields[0]->hitbox->GetTransform().position = glm::vec3(100.0f, 0.0f, 0.0f);
+
+	shields[0]->hitbox->SetPosition(glm::vec3(0.0f, 0.3f, 0.0f));
 	glm::vec3 test = shields[0]->hitbox->GetTransform().position;
 	test_player->addChild(weapons[0]);
 	test_player->addChild(shields[0]);
@@ -441,25 +447,25 @@ void TwoPlayer::Update(float dt)
 		}
 	}
 
-	for (int a = 0; a < attacks.size(); a++)
-	{
-		attacks[a]->time -= dt;
-		if (attacks[a]->time <= 0)
-		{
-			attacks.erase(attacks.begin() + a);
-			break;
-		}
-		if (attacks[a]->HitDetect(players[0]) && attacks[a]->player != 0)
-		{
-			players[0]->dmgHP(10.0f);
-			attacks[a]->Hit = true;
-		}
-		if (attacks[a]->HitDetect(players[1]) && attacks[a]->player != 1)
-		{
-			players[1]->dmgHP(10.0f);
-			attacks[a]->Hit = true;
-		}
-	}
+	//for (int a = 0; a < attacks.size(); a++)
+	//{
+	//	attacks[a]->time -= dt;
+	//	if (attacks[a]->time <= 0)
+	//	{
+	//		attacks.erase(attacks.begin() + a);
+	//		break;
+	//	}
+	//	if (attacks[a]->HitDetect(players[0]) && attacks[a]->player != 0)
+	//	{
+	//		players[0]->dmgHP(10.0f);
+	//		attacks[a]->Hit = true;
+	//	}
+	//	if (attacks[a]->HitDetect(players[1]) && attacks[a]->player != 1)
+	//	{
+	//		players[1]->dmgHP(10.0f);
+	//		attacks[a]->Hit = true;
+	//	}
+	//}
 
 	for (int a = 0; a < shields.size(); a++)
 	{

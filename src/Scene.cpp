@@ -322,6 +322,5 @@ void PlayScene::RenderScene(Shader* shader)
 		shields[s]->Draw(shader, Cam);
 
 	}*/
-
-	DUUDE->Draw(shader, Cam);
+	//DUUDE->Draw(shader, Cam);
 }

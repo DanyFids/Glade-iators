@@ -66,13 +66,14 @@ protected:
 
 public:
 	Hitbox* hitbox;
-	Object* parent;
+	Object* parent = nullptr;
 	PhysicsBody phys;
 
 	Object();
 	Object(Mesh* me, Material* ma, Hitbox* hb);
 	Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, Joint* p = nullptr, SkelMesh* m = nullptr);
 
+	glm::mat4 GetTrueTransform();
 	virtual void Update(float dt);
 	virtual void Draw(Shader* shader, std::vector<Camera*> cam, Shader* childShader = nullptr);
 	virtual void DrawChild(Shader* shader, glm::mat4 parent);

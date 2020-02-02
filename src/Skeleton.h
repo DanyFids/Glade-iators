@@ -80,7 +80,6 @@ public:
 
 	int LoadFromFile(std::string file);
 	Joint* Find(std::string name);
-
 	void DrawSkeleton(glm::mat4 global, int a, int f, Shader* shdr) { root->Draw(global, a, f, shdr); }
 	void GetTransformArray(glm::mat4* & bones, glm::vec3* & binds, glm::vec3* & bind_t, int anim, int frame);
 	int GetNumBones() { return num_bones; }

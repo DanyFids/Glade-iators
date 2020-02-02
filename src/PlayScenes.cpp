@@ -61,7 +61,12 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 void OnePlayer::Update(float dt)
 {
 	if (players[0]->HitDetect(weapons[0])) {
-		std::cout << "WEAPON HIT\n";
+		/*if ((players[1]->GetMesh()).AnimStates[0][0] == Attack) {
+			std::cout << "WEAPON HIT\n";
+		}*/
+		/*else {
+			std::cout << "WEAPON NEUTRAL\n";
+		}*/
 	}
 
 	if (players[PLAYER_1]->HitDetect(shields[0])) {
@@ -118,18 +123,18 @@ void OnePlayer::Update(float dt)
 	((MorphMesh*)(morphyBoi->GetMesh()))->Update(dt);
 	// m morphyBoi->Update(dt);
 
-	for (int a = 0; a < shields.size(); a++)
-	{
-		
-		//if (shields[a]->player == 0 && block1 == false)
-		//{
-		//	shields.erase(shields.begin() + a);
-		//	break;
-		//}
-		
-	}
+	//for (int a = 0; a < shields.size(); a++)
+	//{
+	//	
+	//	//if (shields[a]->player == 0 && block1 == false)
+	//	//{
+	//	//	shields.erase(shields.begin() + a);
+	//	//	break;
+	//	//}
+	//	
+	//}
 
-	DUUDE->Update(dt);
+	//DUUDE->Update(dt);
 
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
@@ -196,10 +201,13 @@ void OnePlayer::Draw()
 		glEnable(GL_DEPTH_TEST);
 
 		glDisable(GL_DEPTH_TEST);
+		
 		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		players[PLAYER_2]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
-		weapons[0]->hitbox->Draw(shaderObj, test_player->GetTransform().GetWorldTransform() * weapons[0]->TransformTo() * weapons[0]->GetTransform().GetWorldTransform());
-		shields[0]->hitbox->Draw(shaderObj, test_player->GetTransform().GetWorldTransform() * shields[0]->TransformTo() * shields[0]->GetTransform().GetWorldTransform());
+		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+
+
+		weapons[0]->hitbox->Draw(shaderObj, weapons[0]->getParentTransform());
+		shields[0]->hitbox->Draw(shaderObj, shields[0]->getParentTransform());
 		//players[0]->GetTransform().GetWorldTransform() * weapons[0]->GetTransform().GetWorldTransform();
 		//	players[1]->hitbox->Draw(shaderObj);
 
@@ -284,8 +292,9 @@ void OnePlayer::LoadScene()
 
 	//Capsule testing
 	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f,2.0f); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,2.0f);
-	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.08f, 1.2f);
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,3.0f);
+	Hitbox* basicCapsuleHB3 = new CapsuleHitbox(0.6,2.0);
+	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.1f, 1.2f);
 	//Capsule Testing
 
 	Hitbox* basicSphereHB = new SphereHitbox(1.0f);
@@ -305,7 +314,7 @@ void OnePlayer::LoadScene()
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 
 
-	test_player = new Player(GladiatorMesh, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f });
+	test_player = new Player(GladiatorMesh, defaultTex, basicCapsuleHB3, { 0.0f, 0.0f, 0.0f });
 	test_player->Scale(glm::vec3(1.2f));
 
 	weapons.push_back(new Object(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_arm2.001"),GladiatorMesh));
@@ -321,7 +330,7 @@ void OnePlayer::LoadScene()
 	shields[0]->SetRotation({ 0.0f, 0.0f, 270.0f });
 
 	shields[0]->hitbox->SetPosition(glm::vec3(0.0f, 0.3f, 0.0f));
-	glm::vec3 test = shields[0]->hitbox->GetTransform().position;
+	//glm::vec3 test = shields[0]->hitbox->GetTransform().position;
 	test_player->addChild(weapons[0]);
 	test_player->addChild(shields[0]);
 	//sword->addChild(swordCapsuleHB);
@@ -335,7 +344,7 @@ void OnePlayer::LoadScene()
 
 	Object* die = new Object(Square, DiceTex, basicCubeHB);
 	die->Move({ 4.0f, 1.0f, 0.0f });
-	terrain.push_back(die);
+	//terrain.push_back(die);
 
 	////SAT Testing Stuff
 	//Object* SATtest1 = new Object(Square, DiceTex, basicCubeHB);
@@ -369,7 +378,7 @@ void OnePlayer::LoadScene()
 	Mesh* BsMesh = new Mesh("d6.obj");
 	Material* BsMat = new Material("missing_tex.png");
 
-	DUUDE = new SplineMan(BsMesh, BsMat, basicCubeHB, glm::vec3(1, 1, 1), beacons);
+	//DUUDE = new SplineMan(BsMesh, BsMat, basicCubeHB, glm::vec3(1, 1, 1), beacons);
 
 	Cam = {
 		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT)) 
@@ -397,8 +406,8 @@ void OnePlayer::LoadScene()
 
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 
-	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(2.0f,1.0f,2.0f));
-	staticBoi = new Object(new Mesh("wobble/wobble2.obj"), defaultTex, basicCubeHB, glm::vec3(2.0f, 4.0f, 2.0f));
+	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(5.0f,1.0f,5.0f));
+	//staticBoi = new Object(new Mesh("wobble/wobble2.obj"), defaultTex, basicCubeHB, glm::vec3(2.0f, 4.0f, 2.0f));
 
 	// DEBUG THINGS
 	DebugShader = new Shader("Shaders/debug.vert", "Shaders/debug.frag");

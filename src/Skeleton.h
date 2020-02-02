@@ -15,6 +15,14 @@ enum ChannelType {
 	Zrotation
 };
 
+enum FrameStates {
+	Neutral,
+	Block,
+	Roll,
+	Attack,
+	Deflect
+};
+
 ChannelType StringToChnlTp(std::string name);
 
 class Skeleton;
@@ -65,6 +73,7 @@ class Skeleton {
 
 	int num_bones;
 public:
+	std::vector<std::vector<FrameStates>> AnimStates;
 	Skeleton(std::string name, std::string file);
 
 	void WriteTree();

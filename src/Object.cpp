@@ -154,6 +154,16 @@ void Object::SetRotation(glm::vec3 rot)
 void Object::addChild(Object* child)
 {
 	children.push_back(child);
+	child->parent = this;
+}
+
+glm::mat4 Object::getParentTransform()
+{
+	if (parent != nullptr)
+		return parent->getParentTransform() * transform.GetWorldTransform();
+	else
+		return transform.GetWorldTransform();
+	
 }
 
 bool Object::HitDetect(Object* other)
@@ -164,6 +174,11 @@ bool Object::HitDetect(Object* other)
 void Object::ApplyMove() {
 	transform.position += phys.move;
 	phys.move = glm::vec3(0.0f, 0.0f, 0.0f);
+}
+
+glm::mat4 Object::TransformTo()
+{
+	return parent_joint->TransformTo(parent_Mesh->GetAnim(), parent_Mesh->GetFrame());
 }
 
 const float Player::MAX_HEALTH = 100.0f;
@@ -243,7 +258,7 @@ bool Player::HitDetect(Object* other)
 	Transform predict = transform;
 	predict.position += phys.move;
 
-	if (other->hitbox->HitDetect(other->GetTransform(), (CapsuleHitbox*)this->hitbox, predict)) { 
+	if (other->hitbox->HitDetect(other, (CapsuleHitbox*)this->hitbox, this)) { 
 		for (float t = 1.0f; t >= -0.1f; t -= 0.1f) {
 			t = glm::max(t, 0.0f);
 			glm::vec3 fixSpd = lerp(glm::vec3(0.0f, 0.0f, 0.0f), phys.move, t);
@@ -251,7 +266,7 @@ bool Player::HitDetect(Object* other)
 			predict = transform;
 			predict.position += fixSpd;
 
-			if (!other->hitbox->HitDetect(other->GetTransform(), (CapsuleHitbox*)this->hitbox, predict) || t == 0.0f) {
+			if (!other->hitbox->HitDetect(other, (CapsuleHitbox*)this->hitbox, this) || t == 0.0f) {
 				phys.move = fixSpd;
 				break;
 			}
@@ -290,7 +305,7 @@ void Attack::Update(float dt)
 
 bool Attack::HitDetect(Player* other)
 {
-	if (other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, this->GetTransform()) && Hit == false) {
+	if (other->hitbox->HitDetect(other, (CubeHitbox*)this->hitbox, this) && Hit == false) {
 		return true;
 	}
 

@@ -66,6 +66,7 @@ protected:
 
 public:
 	Hitbox* hitbox;
+	Object* parent;
 	PhysicsBody phys;
 
 	Object();
@@ -84,14 +85,21 @@ public:
 	void SetRotation(glm::vec3 rot);
 	void addChild(Object* child);
 
+	glm::mat4 getParentTransform();
+
 	virtual bool HitDetect(Object* other);
 
 	virtual void ApplyMove();
+
+	Joint* GetParentJoint() { return parent_joint; }
+	glm::mat4 TransformTo();
 
 	glm::vec3 GetPosition() { return transform.position; };
 	Transform GetTransform() { return transform; }
 
 	Mesh* GetMesh() { return mesh; }
+
+	friend class Hitbox;
 };
 
 class Player : public Object {

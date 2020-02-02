@@ -156,6 +156,15 @@ void Object::addChild(Object* child)
 	children.push_back(child);
 }
 
+glm::mat4 Object::getParentTransform()
+{
+		if (parentObject != nullptr)
+			return parentObject->getParentTransform() * transform.GetWorldTransform();
+		else
+			return transform.GetWorldTransform();
+	
+}
+
 bool Object::HitDetect(Object* other)
 {
 	return false;

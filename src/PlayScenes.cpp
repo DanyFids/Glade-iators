@@ -343,8 +343,8 @@ void OnePlayer::LoadScene()
 	//players[2]->Scale(glm::vec3(1.2f)); 
 
 	Object* die = new Object(Square, DiceTex, basicCubeHB);
-	die->Move({ 4.0f, 1.0f, 0.0f });
-	//terrain.push_back(die);
+	die->Move({ 8.0f, 1.0f, -3.0f });
+	terrain.push_back(die);
 
 	////SAT Testing Stuff
 	//Object* SATtest1 = new Object(Square, DiceTex, basicCubeHB);

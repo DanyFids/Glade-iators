@@ -13,3 +13,8 @@ glm::vec3 lerp(glm::vec3 p1, glm::vec3 p2, float t){
 
 	return ret;
 }
+
+glm::mat4 lerp(glm::mat4 p1, glm::mat4 p2, float t)
+{
+	return (1.0f - t) * p1 + t * p2;
+}

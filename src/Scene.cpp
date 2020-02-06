@@ -6,6 +6,7 @@
 #include"Light.h"
 #include "Constants.h"
 #include"UI.h"
+#include "Game.h"
 
 void MenuScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt)
 {
@@ -118,5 +119,12 @@ void PlayScene::RenderScene(Shader* shader)
 
 	for (int t = 0; t < terrain.size(); t++) {
 		terrain[t]->Draw(shader, Cam);
+	}
+}
+
+void Scene::ResizeCams()
+{
+	for (int c = 0; c < Cam.size(); c++) {
+		Cam[c]->UpdateScreen({ Game::SCREEN.x / Cam.size() * c,0, Game::SCREEN.x / Cam.size(),Game::SCREEN.y});
 	}
 }

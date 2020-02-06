@@ -40,13 +40,21 @@ glm::mat4 FindAxisRot(glm::vec3 tail) {
 
 	glm::vec3 rot = glm::vec3();
 
-	rot.x = std::atan2f(ntail.y, ntail.z);
-	rot.y = std::atan2f(ntail.x, ntail.z);
+	rot.x = std::atan2f(-tail.y, tail.z);
+	rot.y = std::atan2f(tail.x, tail.z);
 	//rot.z = std::atan2f(ntail.x, ntail.y);
 
 	glm::mat4 axisRot = glm::mat4(glm::angleAxis(rot.x, glm::vec3(1.0f, 0.0f, 0.0f)) * glm::angleAxis(rot.y, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::angleAxis(rot.z, glm::vec3(0.0f, 0.0f, 1.0f)));
 
-	glm::vec3 test = glm::vec3(glm::vec4(base * glm::length(tail), 1.0f) * axisRot);
+	glm::vec4 test = glm::inverse(axisRot) * (glm::vec4(tail / glm::length(tail), 1.0f));
+	glm::vec4 test2 = glm::vec4(glm::vec3(test.x, test.y, test.z) * glm::length(tail), 1.0) * axisRot;
+	glm::vec4 test3 = axisRot * glm::vec4(glm::vec3(test.x, test.y, test.z) * glm::length(tail), 1.0);
+	glm::vec4 test4 = glm::inverse(axisRot) * glm::rotate(glm::mat4(1.0f), 0.5f, {0.0f, 1.0f, 0.0f}) * axisRot * glm::vec4(tail, 1.0f);
+	glm::vec4 test5 = glm::rotate(glm::mat4(1.0f), 0.5f, { 0.0f, 1.0f, 0.0f }) * glm::vec4(tail, 1.0f);
+
+	if (tail.x != 0 && tail.y != 0 && tail.z != 0) {
+		std::cout << "HOI!!!" << std::endl;
+	}
 
  	return axisRot;
 }
@@ -161,7 +169,7 @@ void Joint::Draw(glm::mat4 global, int a, int f, Shader* shader)
 	}
 }
 
-void Joint::FillJointArray(glm::mat4* arr, glm::mat3* norms, glm::mat4 global, glm::vec3* binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim = 0, int frame = 0)
+void Joint::FillJointArray(glm::mat4* arr, glm::mat4*& axis, glm::mat4*& axis_i, glm::mat3* norms, glm::mat4 global, glm::vec3* binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim = 0, int frame = 0)
 {
 	glm::mat4 local_trans;
 
@@ -198,6 +206,8 @@ void Joint::FillJointArray(glm::mat4* arr, glm::mat3* norms, glm::mat4 global, g
 	glm::mat3 norm = glm::mat3(glm::transpose(glm::inverse(trans)));
 	arr[cur] = trans;
 	binds[cur] = bind;
+	axis[cur] = axisRot;
+	axis_i[cur] = glm::inverse(axisRot);
 	//bind_t[cur] = global;
 	norms[cur] = norm;
 	cur++;
@@ -211,7 +221,7 @@ void Joint::FillJointArray(glm::mat4* arr, glm::mat3* norms, glm::mat4 global, g
 	for (int c = 0; c < children.size(); c++) {
 		glm::vec3 next_bt = last_b + glm::vec3(trans * glm::vec4(children[c]->offset, 0.0f));
 		bind_t[cur] = next_bt;
-		children[c]->FillJointArray(arr, norms, trans, binds, bind, bind_t, next_bt, cur, anim, frame);
+		children[c]->FillJointArray(arr, axis, axis_i, norms, trans, binds, bind, bind_t, next_bt, cur, anim, frame);
 	}
 }
 
@@ -225,6 +235,10 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 		animations[anim].push_back(Transform());
 	}
 
+	if (this->name.compare("l_leg2") == 0) {
+		std::cout << "HOI!!" << std::endl;
+	}
+
 	for (int c = 0; c < channels.size(); c++) {
 		float val = values.front();
 
@@ -232,7 +246,7 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 
 		switch (channels[c]) {
 		case ChannelType::Xposition:
-			animations[anim][frame].position.x = -val;
+			animations[anim][frame].position.x = val;
 			break;
 		case ChannelType::Yposition:
 			animations[anim][frame].position.z = val;
@@ -241,13 +255,13 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 			animations[anim][frame].position.y = val;
 			break;
 		case ChannelType::Xrotation:
-			animations[anim][frame].rotation.x = -val * corr;
+			animations[anim][frame].rotation.x = -val;
 			break;
 		case ChannelType::Yrotation:
-			animations[anim][frame].rotation.z = val;
+			animations[anim][frame].rotation.z = -val;
 			break;
 		case ChannelType::Zrotation:
-			animations[anim][frame].rotation.y = val * corr;
+			animations[anim][frame].rotation.y = val;
 			break;
 		default:
 			std::cout << "ERROR::SKELETON:: '" + name + "' ::LOAD_FRAME::INVALID_CHANNEL";
@@ -332,6 +346,8 @@ int Skeleton::LoadFromFile(std::string f)
 				cur->offset.z = std::stof(read);
 				file >> read;
 				cur->offset.y = std::stof(read);
+
+				cur->animations[0][0].position = cur->offset;
 				continue;
 			}
 			else return -3;
@@ -381,7 +397,6 @@ int Skeleton::LoadFromFile(std::string f)
 			file >> read; // z offset
 			temp.y = std::stof(read);
 
-
 			file.ignore(512, (int)'\n');
 			file.ignore(512, (int)'\n');
 
@@ -390,7 +405,9 @@ int Skeleton::LoadFromFile(std::string f)
 			continue;
 		}
 		else if (read.compare("MOTION") == 0) {
-			anim_names.push_back("debug");
+			file >> read;
+			
+			anim_names.push_back(read);
 
 			int num_frames = 0;
 			int anim = root->animations.size();
@@ -413,6 +430,7 @@ int Skeleton::LoadFromFile(std::string f)
 
 				std::stringstream line;
 				std::string temp;
+
 
 				std::getline(file, temp);
 
@@ -449,19 +467,36 @@ Joint* Skeleton::Find(std::string name)
 	return ret;
 }
 
-void Skeleton::GetTransformArray(glm::mat4* & ret, glm::mat3* & norms, glm::vec3* & binds, glm::vec3*& bind_t, int anim = 0, int frame = 0)
+void Skeleton::GetTransformArray(glm::mat4* & ret, glm::mat4* & axis, glm::mat4* & axis_i, glm::mat3* & norms, glm::vec3* & binds, glm::vec3*& bind_t, int anim = 0, int frame = 0)
 {
 	ret = new glm::mat4[num_bones];
 	binds = new glm::vec3[num_bones];
 	bind_t = new glm::vec3[num_bones];
 	norms = new glm::mat3[num_bones];
+	axis = new glm::mat4[num_bones];
+	axis_i = new glm::mat4[num_bones];
 
 	int id = 0;
 
 	for (int c = 0; c < root->children.size(); c++) {
 		glm::vec3 newPos = root->offset + glm::vec3(root->animations[anim][frame].GetWorldTransform() * glm::vec4(root->children[c]->offset, 0.0f));
 		bind_t[id] = glm::vec3(newPos);
-		root->children[c]->FillJointArray(ret, norms, root->animations[anim][frame].GetWorldTransform(), binds, root->offset, bind_t, newPos, id, anim, frame);
+		root->children[c]->FillJointArray(ret, axis, axis_i, norms, root->animations[anim][frame].GetWorldTransform(), binds, root->offset, bind_t, newPos, id, anim, frame);
 	}
 
+}
+
+int Skeleton::GetAnimByName(std::string n)
+{
+	int ret;
+
+	for (ret = 0; ret < anim_names.size(); ret++) {
+		if (anim_names[ret].compare(n) == 0)
+			break;
+	}
+
+	if (ret < anim_names.size())
+		return ret;
+	else
+		return -1;
 }

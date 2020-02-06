@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include <thread>
 
 class Light;
 class Mesh;
@@ -19,7 +20,15 @@ class OnePlayer: public PlayScene {
 	bool debug = false;
 	bool f3_pressed;
 	int disp_depth = 0;
+	
+	std::thread threadObj;
 
+	//CG ASSIGNMENT STUFF
+	bool cg_asg_input = false;
+	bool enable_ambient = true;
+	bool enable_diffuse = true;
+	bool enable_spec = true;
+	bool enable_rim = true;
 public:
 	OnePlayer();
 
@@ -28,6 +37,12 @@ public:
 	virtual void Update(float dt) override;
 	virtual void Draw() override;
 	virtual void LoadScene() override;
+
+	Player* GetPlayer(int i) { return (Player*) players[i]; }
+	Player* GetTestPlayer() { return test_player; }
+
+	// CG ASSINGMENT FUNCS
+
 };
 
 class TwoPlayer: public PlayScene {

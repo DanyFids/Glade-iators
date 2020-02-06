@@ -23,6 +23,8 @@ const int MAX_BONES = 50;
 const int MAX_VERTS = 6000;
 
 uniform mat4[MAX_BONES] bone_t;
+uniform mat4[MAX_BONES] b_axis;
+uniform mat4[MAX_BONES] b_axis_i;
 uniform mat3[MAX_BONES] norms;
 uniform vec3[MAX_BONES] bind_p;
 uniform vec3[MAX_BONES] bind_t;
@@ -46,6 +48,9 @@ void main()
 		newPos += weights.y * (bone_t[bone_ids.y] * (vec4(aPos - bind_p[bone_ids.y], 1.0)));
 		newPos += weights.z * (bone_t[bone_ids.z] * (vec4(aPos - bind_p[bone_ids.z], 1.0)));
 		newPos += weights.w * (bone_t[bone_ids.w] * (vec4(aPos - bind_p[bone_ids.w], 1.0)));
+
+		//newPos += b_axis[bone_ids.x] * ( bone_t[bone_ids.x] * (b_axis_i[bone_ids.x] * vec4(aPos - bind_p[bone_ids.x], 1.0)));
+		
 		//newPos += (bone_t[bone_ids.x] * (vec4(aPos - bind_p[bone_ids.x], 1.0)));
 
 		newNorm += weights.x * norms[bone_ids.x] * aNorm;

@@ -68,12 +68,16 @@ class SkelMesh : public Mesh {
 	int nexFrame;
 	int anim = 0;
 
+	float anim_time = 0.0f;
+
 	Skeleton* skeleton;
 	//Material* weightMap;
 
 public:
 	SkelMesh(std::string f, Skeleton* s, std::string weightMap);
 	~SkelMesh();
+
+	virtual void Update(float dt);
 
 	virtual void Draw(Shader*);
 	void SetAnim(unsigned int id);

@@ -558,47 +558,142 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 	glm::vec3 oub = convertVec4(oT * other->transform.GetWorldTransform() * glm::vec4(other->upperBound.x, other->upperBound.y, other->upperBound.z, 1.0f));
 	glm::vec3 olb = convertVec4(oT * other->transform.GetWorldTransform() * glm::vec4(other->lowerBound.x, other->lowerBound.y, other->lowerBound.z, 1.0f));
 
-	glm::vec3 closestPointA;
-	glm::vec3 closestPointB;
+	//glm::vec3 closestPointA;
+	//glm::vec3 closestPointB;
 
-	//Find closest point on both lines
+	float totalDist; //Calculated later
+	float totalRadius = this->radius + other->GetRadius();
+
+	//Find closest point on both lines -- Broken as of 2/1/2020
 	{
-		glm::vec3 LineA = tub - tlb;
-		glm::vec3 LineB = oub - olb;
+		//glm::vec3 LineA = tub - tlb;
+		//glm::vec3 LineB = oub - olb;
 
-		glm::vec3 PA1 = tlb;
-		glm::vec3 PA2 = tub;
+		//glm::vec3 PA1 = tlb;
+		//glm::vec3 PA2 = tub;
 
-		glm::vec3 PB1 = olb;
-		glm::vec3 PB2 = oub;
+		//glm::vec3 PB1 = olb;
+		//glm::vec3 PB2 = oub;
 
-		glm::vec3 DirA = glm::normalize(LineA);
-		glm::vec3 DirB = glm::normalize(LineB);
+		//glm::vec3 DirA = glm::normalize(LineA);
+		//glm::vec3 DirB = glm::normalize(LineB);
 
-		//Getting a scalar value for length along line B
-		float scalarB = (((glm::dot(LineA,(PB1 - PA1)) * glm::dot(LineA, LineB) / glm::dot(LineA, LineA)) - (glm::dot(LineB, (PB1 - PA1)))	) / (glm::dot(LineB, LineB) - 1));
+		////Getting a scalar value for length along line B
+		//float scalarB = (((glm::dot(LineA,(PB1 - PA1)) * glm::dot(LineA, LineB) / glm::dot(LineA, LineA)) - (glm::dot(LineB, (PB1 - PA1)))	) / (glm::dot(LineB, LineB) - 1));
 
-		scalarB = glm::clamp(scalarB, -1.0f, 1.0f);
+		//scalarB = glm::clamp(scalarB, -1.0f, 1.0f);
 
-		//Getting a scalar value for length along line A subbing in t.
-		float scalarA = (glm::dot(LineB, (PB1 - PA1)) + glm::dot(LineB, LineB) * scalarB) / glm::dot(LineA, LineB);
+		////Getting a scalar value for length along line A subbing in t.
+		//float scalarA = (glm::dot(LineB, (PB1 - PA1)) + glm::dot(LineB, LineB) * scalarB) / glm::dot(LineA, LineB);
 
-		scalarA = glm::clamp(scalarA, -1.0f, 1.0f);
+		//scalarA = glm::clamp(scalarA, -1.0f, 1.0f);
 
-		//std::cout << scalarB << std::endl;
-		//std::cout << scalarA << std::endl;
+		////std::cout << scalarB << std::endl;
+		////std::cout << scalarA << std::endl;
 
-		closestPointA = PA1 + ((PA2-PA1) * scalarA);
-		closestPointB = PB1 + ((PB2-PB1) * scalarB);
+		//closestPointA = PA1 + ((PA2-PA1) * scalarA);
+		//closestPointB = PB1 + ((PB2-PB1) * scalarB);
 
-		//closestPointA = PA1 + ((DirA) * scalarA);
-		//closestPointB = PB1 + ((DirB) * scalarB);
+		////closestPointA = PA1 + ((DirA) * scalarA);
+		////closestPointB = PB1 + ((DirB) * scalarB);
 
 
 	}
 
-	float totalDist = glm::distance(closestPointA, closestPointB);
-	float totalRadius = this->radius + other->GetRadius();
+	//Calculate Line Segment distance
+	{
+		constexpr auto SMALL_VALUE = 0.00000001;;
+
+		glm::vec3 LineA = tub - tlb; //u
+		glm::vec3 LineB = oub - olb; //v
+		glm::vec3 LineC = tlb - olb; //w
+
+		float a = glm::dot(LineA, LineA); //Always >= 0
+		float b = glm::dot(LineA,LineB); 
+		float c = glm::dot(LineB, LineB); //Always >= 0
+
+		float d = glm::dot(LineA,LineC);
+		float e = glm::dot(LineB, LineC);
+
+		float f = (a * c) - (b * b); //Always >= 0	 // D
+
+		float sc, sN, sD = f; // sc = sN / sD, by default sD = D >= 0
+		float tc, tN, tD = f; // tc = tN / tD, by default tD = D >= 0
+
+
+		//The following section is to calculate against certain cases where values may go out of real ranges.
+		//Due to the nature of Dot Product in 3D space and in certain orientations.
+		
+		//Now compute the line parameters of the two closest Points.
+		if (f < SMALL_VALUE) { //This means the line is almost parallel
+			sN = 0.0f;		   // force using lower bound for line 1
+			sD = 1.0f;		   //To prevent a future division by 0.
+			tN = e;
+			tD = c;
+		}
+		else//				Get the closest points on the infinite lines.
+		{
+			sN = (b*e - c*d);
+			tN = (a*e - b*d);
+			if (sN < 0.0f) {	//sc < 0 , the s=0  edge is visible
+				sN = 0.0f;
+				tN = e;
+				tD = c;
+			}
+			else if (sN > sD) // sc > 1 , the s=1 edge is visible.
+			{
+				sN = sD;
+				tN = e + b;
+				tD = c;
+			}
+		}
+
+
+
+		if (tN < 0.0f) { //tc < 0 , the t = 0 edge is visible.
+			tN = 0.0f;
+
+			//recompute sc for this edge
+			if (-d < 0.0f) {
+				sN = 0.0f;
+			}
+			else if (-d > a) {
+				sN = sD;
+			}
+			else {
+				sN = -d;
+				sD = a;
+			}	
+		}
+		else if (tN > tD) { //tc > 1 , the t = 1 edge is visible.
+			tN = tD;
+
+			//recompute sc for this edge.
+			if ((-d + b) < 0.0f) {
+				sN = 0;
+			}
+			else if ((-d + b) > a)
+			{
+				sN = sD;
+			}
+			else
+			{
+				sN = (-d + b);
+				sD = a;
+			}
+		}
+
+		//do division to calculate sc and tc
+		sc = (glm::abs(sN) < SMALL_VALUE ? 0.0 : (sN / sD));
+		tc = (glm::abs(tN) < SMALL_VALUE ? 0.0 : (tN / tD));
+					
+		//We get the closest vector that is between both lines so we need it's length
+		//sc and tc are the parameters for vector lines A and B (multiplier to be a point along them)
+
+		totalDist = glm::length(LineC + (sc * LineA) - (tc * LineB));
+	}
+
+	
 
 	if (totalDist <= totalRadius) {
 		return true;

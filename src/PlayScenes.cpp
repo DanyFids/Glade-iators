@@ -302,14 +302,14 @@ void OnePlayer::LoadScene()
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
 	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
-	players.push_back(new Player(d20, D20Tex, basicSphereHB)); //P2
+	players.push_back(new Player(d20, D20Tex, basicCapsuleHB2)); //P2
 
 	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
 	basicSphereHB->SetScale({0.5f, 1.0f, 1.0f});
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ -6.0f, 0.0f, 0.0f });
-	//players[PLAYER_2]->Rotate(glm::vec3(0,0,25));
+	players[PLAYER_2]->Rotate(glm::vec3(45,0,45));
 	
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 

@@ -7,6 +7,7 @@
 #include"Light.h"
 #include "Constants.h"
 #include"UI.h"
+#include "Game.h"
 #include "Skeleton.h"
 
 #define _USE_MATH_DEFINES
@@ -323,4 +324,11 @@ void PlayScene::RenderScene(Shader* shader)
 
 	}*/
 	//DUUDE->Draw(shader, Cam);
+}
+
+void Scene::ResizeCams()
+{
+	for (int c = 0; c < Cam.size(); c++) {
+		Cam[c]->UpdateScreen({ Game::SCREEN.x / Cam.size() * c,0, Game::SCREEN.x / Cam.size(),Game::SCREEN.y});
+	}
 }

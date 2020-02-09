@@ -3,8 +3,11 @@
 #include<GLFW/glfw3.h>
 #include<GLM/glm.hpp>
 #include <iostream>
+#include <sstream>
 #include <typeinfo>
 #include <random>
+#include <thread>
+#include <queue>
 
 #include"Mesh.h"
 #include"Shader.h"
@@ -144,6 +147,8 @@ void OnePlayer::Update(float dt)
 
 
 	
+
+	test_player->Update(dt);
 }
 
 void OnePlayer::Draw()
@@ -167,6 +172,7 @@ void OnePlayer::Draw()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		lights[l]->SetupDepthShader(depthShader);
 		RenderScene(depthShader);
+		test_player->Draw(depthShader, Cam);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -186,6 +192,16 @@ void OnePlayer::Draw()
 	shaderObj->SetI("num_lights", lights.size());
 	morphShader->SetI("num_lights", lights.size());
 	skelShader->SetI("num_lights", lights.size());
+
+	shaderObj->SetB("enable_a", enable_ambient);
+	shaderObj->SetB("enable_d", enable_diffuse);
+	shaderObj->SetB("enable_s", enable_spec);
+	shaderObj->SetB("enable_r", enable_rim);
+
+	skelShader->SetB("enable_a", enable_ambient);
+	skelShader->SetB("enable_d", enable_diffuse);
+	skelShader->SetB("enable_s", enable_spec);
+	skelShader->SetB("enable_r", enable_rim);
 
 	for (int c = 0; c < Cam.size(); c++) {
 		Cam[c]->SetupCam(shaderObj);
@@ -267,7 +283,7 @@ void OnePlayer::LoadScene()
 
 	Material* arenaTex = new Material("wood_texture.png");
 
-	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "Animations/attack.bvh");
+	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "bone_t.bvh");
 	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
 
 	gladiatorSkel->WriteTree();
@@ -411,7 +427,93 @@ void OnePlayer::LoadScene()
 
 	// DEBUG THINGS
 	DebugShader = new Shader("Shaders/debug.vert", "Shaders/debug.frag");
-	DebugQuad = new Mesh(square, 4, square_index, 6); 
+	DebugQuad = new Mesh(square, 4, square_index, 6);
+
+	// Console?
+	auto console = [this]() {
+		std::string line = "";
+		std::string read;
+
+		std::queue<std::string> input;
+
+		while (true) {
+			while (input.size() > 0) {
+				input.pop();
+			}
+
+			std::cout << "> ";
+			std::getline(std::cin, line);
+
+			auto pos = line.find(" ");
+
+			while (pos != std::string::npos) {
+				read = line.substr(0, pos);
+				line.erase(0, pos+1);
+
+				input.push(read);
+
+				pos = line.find(" ");
+			}
+
+			input.push(line);
+
+			if (input.size() > 0) {
+				std::string command = input.front();
+				input.pop();
+
+				if (command.compare("play") == 0) {
+					if (input.size() >= 2) {
+						std::string target_n = input.front();
+						input.pop();
+
+						Player* target;
+
+						if (target_n.compare("test_player") == 0) {
+							target = this->GetTestPlayer();
+						}
+						else if(target_n.compare("player_1")) {
+							target = this->GetPlayer(PLAYER_1);
+						}
+						else if (target_n.compare("player_2")) {
+							target = this->GetPlayer(PLAYER_2);
+						}
+						else {
+							std::cout << "Error: Invalid Target!" << std::endl;
+							continue;
+						}
+
+						std::string anim = input.front();
+						input.pop();
+
+						int a = ((SkelMesh*)target->GetMesh())->GetSkeleton()->GetAnimByName(anim);
+						if (a > -1) {
+							((SkelMesh*)target->GetMesh())->SetAnim(a);
+							std::cout << target_n + " playing: " + anim << std::endl;
+							continue;
+						}
+						else {
+							std::cout << "Error: Animation not found." << std::endl;
+							continue;
+						}
+					}
+					else {
+						std::cout << "Error: play requires 2 arguments: [target] [anim_name]" << std::endl;
+						continue;
+					}
+				}
+				else if (command.compare("exit") == 0) {
+					break;
+				}
+				else {
+					std::cout << "Error: Invalid Command." << std::endl;
+					continue;
+				}
+
+			}
+		}
+	};
+
+	threadObj = std::thread(console);
 }
 
 

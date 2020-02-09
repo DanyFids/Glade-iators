@@ -8,10 +8,15 @@ class Scene;
 
 class Game {
 public:
+	static glm::ivec2 SCREEN;
+	static Game* CURRENT;
+
 	Game();
 	~Game();
 
 	void Run();
+
+	friend void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height);
 protected:
 	void Initialize();
 	void Shutdown();

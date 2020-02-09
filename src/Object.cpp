@@ -257,7 +257,7 @@ void Player::Update(float dt)
 		}
 	}
 
-	
+	((SkelMesh*)mesh)->Update(dt);
 
 	Object::Update(dt);
 }

@@ -314,7 +314,7 @@ void OnePlayer::LoadScene()
 	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f,4.0f); //radius + height
 	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,4.0f);
 	Hitbox* basicCapsuleHB3 = new CapsuleHitbox(0.2,4.0);
-	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.1f, 2.0f);
+	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.2f, 2.0f);
 	//Capsule Testing
 
 	Hitbox* basicSphereHB = new SphereHitbox(1.0f);
@@ -325,7 +325,7 @@ void OnePlayer::LoadScene()
 	players.push_back(new Player(d20, D20Tex, basicCapsuleHB2)); //P2
 
 	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
-	shieldSphereHB->SetScale({0.2f, 1.0f, 0.1f});
+	//shieldSphereHB->SetScale({0.2f, 1.0f, 0.1f});
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ -6.0f, 0.0f, 0.0f });
@@ -340,13 +340,13 @@ void OnePlayer::LoadScene()
 	weapons.push_back(new Object(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_hand"),GladiatorMesh));
 	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("l_hand"), GladiatorMesh));
 
-	weapons[0]->SetPosition({0.15f, 0.0f, -0.125f});
+	weapons[0]->SetPosition({-0.12f, 0.0f, -0.12f});
 	weapons[0]->Scale({0.8f, 0.8f, 0.8f});
-	weapons[0]->SetRotation({0.0f, 0.0f, 90.0f});
+	weapons[0]->SetRotation({90.0f, 0.0f, 0.0f});
 	
 
-	shields[0]->SetPosition({ -0.35f, 0.05f, 0.0f });
-	shields[0]->Scale({ 0.7f, 0.5f, 0.5f });
+	shields[0]->SetPosition({ -0.15f, 0.05f, 0.0f });
+	shields[0]->Scale({ 0.05f, 0.4f, 0.4f });
 	shields[0]->SetRotation({ 0.0f, 0.0f, 270.0f });
 
 	//shields[0]->hitbox->SetPosition(glm::vec3(0.0f, 0.3f, 0.0f));

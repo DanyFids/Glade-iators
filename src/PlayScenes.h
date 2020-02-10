@@ -1,5 +1,8 @@
 #pragma once
 #include "Scene.h"
+#include <thread>
+
+#include "Sound.h"
 
 class Light;
 class Mesh;
@@ -22,9 +25,12 @@ class OnePlayer: public PlayScene {
 	bool debug = false;
 	bool f3_pressed;
 	int disp_depth = 0;
+	
+	std::thread threadObj;
 
 	Object* morphyBoi;
 	Object* staticBoi;
+	Sound audioEngine;
 
 	float time = 0.0f;
 	float MAX_TIME = 0.2f;
@@ -37,6 +43,12 @@ public:
 	virtual void Update(float dt) override;
 	virtual void Draw() override;
 	virtual void LoadScene() override;
+
+	Player* GetPlayer(int i) { return (Player*) players[i]; }
+	Player* GetTestPlayer() { return test_player; }
+
+	// CG ASSINGMENT FUNCS
+
 };
 
 class TwoPlayer: public PlayScene {

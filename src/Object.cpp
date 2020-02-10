@@ -7,6 +7,7 @@
 #include"Hitbox.h"
 #include "UI.h"
 #include"Lerp.h"
+#include "Skeleton.h"
 
 
 Object::Object()
@@ -29,7 +30,7 @@ Object::Object(Mesh* me, Material* ma, Hitbox* hb)
 	transform.rotation = glm::vec3();
 }
 
-Object::Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos)
+Object::Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, Joint* p, SkelMesh* m)
 {
 	mesh = me;
 	material = ma;
@@ -37,13 +38,22 @@ Object::Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos)
 	transform.position = pos;
 	transform.scale = glm::vec3(1.0f);
 	transform.rotation = glm::vec3();
+	parent_joint = p;
+	parent_Mesh = m;
+}
+
+glm::mat4 Object::GetTrueTransform()
+{
+
+	return glm::mat4();
 }
 
 void Object::Update(float dt)
 {
+	
 }
 
-void Object::Draw(Shader* shader, std::vector<Camera*> cams)
+void Object::Draw(Shader* shader, std::vector<Camera*> cams, Shader* childShader)
 {
 	shader->Use();
 	shader->SetI("material.diffuse", 0);
@@ -51,6 +61,10 @@ void Object::Draw(Shader* shader, std::vector<Camera*> cams)
 	shader->SetI("material.specular", 2);
 	
 	glm::mat4 model = transform.GetWorldTransform();
+
+	if (parent_joint != nullptr && parent_Mesh != nullptr) {
+		model *= parent_joint->TransformTo(parent_Mesh->GetAnim(), parent_Mesh->GetFrame());
+	}
 
 	unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -68,6 +82,54 @@ void Object::Draw(Shader* shader, std::vector<Camera*> cams)
 	glBindTexture(GL_TEXTURE_2D, material->SPEC);
 
 	mesh->Draw(shader);
+
+	for (int c = 0; c < children.size(); c++) 
+		children[c]->DrawChild((childShader == nullptr) ? shader : childShader, model);
+	
+}
+
+void Object::DrawChild(Shader* shader, glm::mat4 parent)
+{
+	shader->Use();
+	shader->SetI("material.diffuse", 0);
+	shader->SetI("material.normal", 1);
+	shader->SetI("material.specular", 2);
+
+	glm::mat4 par_j = glm::mat4(1.0f);
+
+	if (parent_joint != nullptr && parent_Mesh != nullptr) {
+		par_j = parent_joint->TransformTo(parent_Mesh->GetAnim(), parent_Mesh->GetFrame());
+	}
+
+	glm::mat4 model = parent * par_j * transform.GetWorldTransform();
+
+	unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	glm::mat3 normMat = glm::mat3(glm::transpose(glm::inverse(model)));
+
+	shader->SetMat3("normMat", normMat);
+
+	shader->SetF("material.shine", material->shine);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, material->DIFF);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, material->NORM);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, material->SPEC);
+
+	mesh->Draw(shader);
+
+	for (int c = 0; c < children.size(); c++)
+		children[c]->DrawChild(shader, model);
+}
+
+void Object::DestroyChild(int c)
+{
+	if (c < children.size()) {
+		delete(children[c]);
+		children.erase(children.begin() + c);
+	}
 }
 
 void Object::Rotate(glm::vec3 rot) {
@@ -94,6 +156,22 @@ void Object::SetRotation(glm::vec3 rot)
 	transform.rotation = rot;
 }
 
+
+void Object::addChild(Object* child)
+{
+	children.push_back(child);
+	child->parent = this;
+}
+
+glm::mat4 Object::getParentTransform()
+{
+	if (parent != nullptr)
+		return parent->getParentTransform() * TransformTo() * transform.GetWorldTransform();
+	else
+		return TransformTo() * transform.GetWorldTransform();
+	
+}
+
 bool Object::HitDetect(Object* other)
 {
 	return false;
@@ -102,6 +180,14 @@ bool Object::HitDetect(Object* other)
 void Object::ApplyMove() {
 	transform.position += phys.move;
 	phys.move = glm::vec3(0.0f, 0.0f, 0.0f);
+}
+
+glm::mat4 Object::TransformTo()
+{
+	if (parent_joint != nullptr)
+		return parent_joint->TransformTo(parent_Mesh->GetAnim(), parent_Mesh->GetFrame());
+	else
+		return glm::mat4(1.0f);
 }
 
 const float Player::MAX_HEALTH = 100.0f;
@@ -171,6 +257,8 @@ void Player::Update(float dt)
 		}
 	}
 
+	((SkelMesh*)mesh)->Update(dt);
+
 	Object::Update(dt);
 }
 
@@ -179,7 +267,7 @@ bool Player::HitDetect(Object* other)
 	Transform predict = transform;
 	predict.position += phys.move;
 
-	if (other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, predict)) { 
+	if (other->hitbox->HitDetect(other, (CapsuleHitbox*)this->hitbox, this)) { 
 		for (float t = 1.0f; t >= -0.1f; t -= 0.1f) {
 			t = glm::max(t, 0.0f);
 			glm::vec3 fixSpd = lerp(glm::vec3(0.0f, 0.0f, 0.0f), phys.move, t);
@@ -187,7 +275,7 @@ bool Player::HitDetect(Object* other)
 			predict = transform;
 			predict.position += fixSpd;
 
-			if (!other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, predict)) {
+			if (!other->hitbox->HitDetect(other, (CapsuleHitbox*)this->hitbox, this) || t == 0.0f) {
 				phys.move = fixSpd;
 				break;
 			}
@@ -226,7 +314,7 @@ void Attack::Update(float dt)
 
 bool Attack::HitDetect(Player* other)
 {
-	if (other->hitbox->HitDetect(other->GetTransform(), (CubeHitbox*)this->hitbox, this->GetTransform()) && Hit == false) {
+	if (other->hitbox->HitDetect(other, (CubeHitbox*)this->hitbox, this) && Hit == false) {
 		return true;
 	}
 

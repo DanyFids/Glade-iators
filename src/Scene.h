@@ -50,6 +50,7 @@ public:
 	virtual void Draw() = 0;
 	virtual void LoadScene() = 0;
 	virtual std::vector<Camera*> GetCams() { return Cam; }
+	virtual void ResizeCams();
 };
 
 class MenuItem {
@@ -84,8 +85,9 @@ class PlayScene : public Scene {
 protected:
 	std::vector<Player*> players;
 	std::vector<Object*> terrain;
-	std::vector<Shield*> shields;
-	std::vector<Attack*> attacks;
+	std::vector<Object*> shields;
+	//std::vector<Attack*> attacks;
+	std::vector<Object*> weapons;
 	std::vector<glm::vec3> beacons;
 
 	bool dodge1 = true;
@@ -111,6 +113,7 @@ protected:
 
 	std::vector<PointLight*> lights;
 	DirectionalLight * sun;
+
 
 	std::vector<UI*> ui;
 

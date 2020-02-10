@@ -7,6 +7,8 @@
 #include"Light.h"
 #include "Constants.h"
 #include"UI.h"
+#include "Game.h"
+#include "Skeleton.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -64,12 +66,12 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 	{
-		attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));
-		glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
-		p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
-		p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));
-		p1.y = players[0]->GetPosition().y;
-		attacks.back()->SetPosition(p1);
+		//attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));
+		//glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
+		//p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
+		//p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));
+		//p1.y = players[0]->GetPosition().y;
+		//attacks.back()->SetPosition(p1);
 		//attacks.back()->ABox->SetPosition(glm::vec3(0,2,4));
 	}
 	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && dodge1 == false)
@@ -119,6 +121,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		else {
 			rot.x = 0.0f;
 		}
+		
 		Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
 
 		glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -144,13 +147,13 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 			float newRot;
 
-			newRot = -(std::atan2f(dir.z, dir.x)) * (180/M_PI);
+			newRot = -(std::atan2f(dir.z, dir.x)) * (180/M_PI) + 90;
 
-			std::cout << newRot << std::endl;
+			//std::cout << newRot << std::endl;
 
 			players[player]->SetRotation({ 0.0f, newRot, 0.0f });
 
-			std::cout << "move\n";
+			//std::cout << "move\n";
 		}
 
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && player == PLAYER_1) {
@@ -159,16 +162,19 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && player == PLAYER_1) {
 			((Player*)players[player])->StopRun();
 		}
-		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_1 && atk1 == false)
+
+		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_1 && atk1 == false && block1 == false)
 		{
 			if (players[player]->GetStam() >= 15.0f) {
 				
-				attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_1));
-				glm::vec3 p1 = players[player]->GetPosition();
+				glm::vec3 p1 = glm::vec3();
 				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-				p1.y = players[player]->GetPosition().y;
-				attacks.back()->SetPosition(p1);
+
+				
+
+				//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
+				
 				std::cout << "OOF\n";
 				players[player]->dmgSTAM(15.0f);
 				atk1 = true;
@@ -204,19 +210,19 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		{
 			dodge1t -= dt;
 		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS && player == PLAYER_1 && block1 == false) { //dylanote
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS && player == PLAYER_1 && block1 == false && atk1 == false) { //dylanote
 			std::cout << "Parry God\n";
 			block1 = true;
-			shields.push_back(new Shield(Amesh, Bmat, basicCubeHB, glm::vec3(0, 0, 0), player));
-			glm::vec3 p1 = players[player]->GetPosition();
+			glm::vec3 p1 = glm::vec3();
 			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-			p1.y = players[player]->GetPosition().y;
-			shields.back()->SetPosition(p1);
+
+			players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
 		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && player == PLAYER_1) {
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && player == PLAYER_1 && block1 == true) {
 
 			block1 = false;
+			players[player]->DestroyChild(0);
 		}
 
 		////////////////////////////PLAYER 2
@@ -229,17 +235,17 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_2 && atk2 == false)
 		{
-			if (players[player]->GetStam() >= 15.0f) {
-				attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_2));
-				glm::vec3 p1 = players[player]->GetPosition();
-				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-				p1.y = players[player]->GetPosition().y;
-				attacks.back()->SetPosition(p1);
-				players[player]->dmgSTAM(15.0f);
-				std::cout << "OOF\n";
-				atk2 = true;
-			}
+			//if (players[player]->GetStam() >= 15.0f) {
+			//	attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_2));
+			//	glm::vec3 p1 = players[player]->GetPosition();
+			//	p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+			//	p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+			//	p1.y = players[player]->GetPosition().y;
+			//	attacks.back()->SetPosition(p1);
+			//	players[player]->dmgSTAM(15.0f);
+			//	std::cout << "OOF\n";
+			//	atk2 = true;
+			//}
 		}
 		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2 && player == PLAYER_2)
 		{
@@ -307,17 +313,23 @@ void PlayScene::RenderScene(Shader* shader)
 		terrain[t]->Draw(shader, Cam);
 	}
 
-	for (int a = 0; a < attacks.size(); a++)
-	{
-		attacks[a]->Draw(shader, Cam);
+	//for (int a = 0; a < attacks.size(); a++)
+	//{
+	//	attacks[a]->Draw(shader, Cam);
+	//
+	//}
 
-	}
-
-	for (int s = 0; s < shields.size(); s++)
+	/*for (int s = 0; s < shields.size(); s++)
 	{
 		shields[s]->Draw(shader, Cam);
 
-	}
+	}*/
+	//DUUDE->Draw(shader, Cam);
+}
 
-	DUUDE->Draw(shader, Cam);
+void Scene::ResizeCams()
+{
+	for (int c = 0; c < Cam.size(); c++) {
+		Cam[c]->UpdateScreen({ Game::SCREEN.x / Cam.size() * c,0, Game::SCREEN.x / Cam.size(),Game::SCREEN.y});
+	}
 }

@@ -11,6 +11,8 @@ class Material;
 class Mesh;
 class Shader;
 class Hitbox;
+class Joint;
+class SkelMesh;
 
 struct Transform {
 	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -31,10 +33,42 @@ struct Transform {
 			;
 	}
 
+	glm::mat4 GetBoneTransform() const {
+		glm::quat qPitch = glm::angleAxis(glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::quat qYaw = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::quat qRoll = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+		glm::quat rot = qYaw * qPitch * qRoll;
+
+		return
+			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f) * glm::length(position)) *
+			glm::mat4_cast(rot) *
+			glm::scale(glm::mat4(1.0f), scale)
+			;
+	}
+
+	glm::mat4 GetRotEul() const {
+		glm::quat qPitch = glm::angleAxis(glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::quat qYaw = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::quat qRoll = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+		glm::quat rot = qYaw * qPitch * qRoll;
+
+		return glm::mat4_cast(rot);
+	}
+
+	glm::mat4 GetRotQuat() const {
+		return glm::mat4_cast(glm::quat(glm::radians(rotation)));
+	}
+
 	glm::mat4 GetRotScale() const {
 		return
 			glm::mat4_cast(glm::quat(glm::radians(rotation))) *
 			glm::scale(glm::mat4(1.0f), scale);
+	}
+
+	glm::mat4 GetRot() const {
+		return glm::mat4_cast(glm::quat(glm::radians(rotation)));
 	}
 
 	glm::mat4 GetQuatTransform() const {
@@ -54,32 +88,47 @@ protected:
 	Mesh* mesh;
 	Material* material;
 	Transform transform;
+	std::vector <Object*>children;
+	Joint* parent_joint = nullptr;
+	SkelMesh* parent_Mesh = nullptr;
 
 public:
 	Hitbox* hitbox;
+	Object* parent = nullptr;
 	PhysicsBody phys;
 
 	Object();
 	Object(Mesh* me, Material* ma, Hitbox* hb);
-	Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos);
+	Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, Joint* p = nullptr, SkelMesh* m = nullptr);
 
+	glm::mat4 GetTrueTransform();
 	virtual void Update(float dt);
-	virtual void Draw(Shader* shader, std::vector<Camera*> cam);
+	virtual void Draw(Shader* shader, std::vector<Camera*> cam, Shader* childShader = nullptr);
+	virtual void DrawChild(Shader* shader, glm::mat4 parent);
+	virtual void DestroyChild(int c);
 	void Rotate(glm::vec3 rot);
 	void Rotate(float tht, glm::vec3 dir);
 	void Move(glm::vec3 dir);
 	void Scale(glm::vec3 scl);
 	void SetPosition(glm::vec3 pos);
 	void SetRotation(glm::vec3 rot);
+	void addChild(Object* child);
+
+	glm::mat4 getParentTransform();
 
 	virtual bool HitDetect(Object* other);
 
 	virtual void ApplyMove();
 
+	Joint* GetParentJoint() { return parent_joint; }
+	glm::mat4 TransformTo();
+
 	glm::vec3 GetPosition() { return transform.position; };
 	Transform GetTransform() { return transform; }
 
 	Mesh* GetMesh() { return mesh; }
+
+	friend class Hitbox;
 };
 
 class Player : public Object {
@@ -128,6 +177,7 @@ public:
 
 	Attack(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P);
 
+	int getPlayer() { return player; }
 	//void init();
 };
 

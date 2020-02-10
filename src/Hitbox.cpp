@@ -342,7 +342,7 @@ void SphereHitbox::Draw(Shader* shdr, glm::mat4 p)
 	shdr->SetI("material.normal", 1);
 	shdr->SetI("material.specular", 2);
 
-	transform.scale = glm::vec3(radius);
+	transform.scale = glm::vec3(radius) * transform.scale;
 	glm::mat4 model = p * transform.GetWorldTransform();// *glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z));
 
 	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));
@@ -487,10 +487,10 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 	shdr->SetI("material.diffuse", 0);
 	shdr->SetI("material.normal", 1);
 	shdr->SetI("material.specular", 2);
-	transform.scale = glm::vec3(radius);
+	transform.scale = glm::vec3(radius);//
 	glm::mat4 model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),lowerBound);
 
- 	glm::vec3 test = model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+ 	//glm::vec3 test = model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	
 
 	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));

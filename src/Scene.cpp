@@ -121,6 +121,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		else {
 			rot.x = 0.0f;
 		}
+		
 		Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
 
 		glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -146,7 +147,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 			float newRot;
 
-			newRot = -(std::atan2f(dir.z, dir.x)) * (180/M_PI) + 180;
+			newRot = -(std::atan2f(dir.z, dir.x)) * (180/M_PI) + 90;
 
 			//std::cout << newRot << std::endl;
 

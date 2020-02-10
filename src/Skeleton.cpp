@@ -438,7 +438,7 @@ int Skeleton::LoadFromFile(std::string f)
 			int yeetval = 1;
 			int yootval = 1;
 			while (!file.eof()) {
-				file >> read;
+				/*file >> read;
 				if (read.compare("N") == 0)
 				{
 					std::cout << yeetval << "yeet \n";
@@ -454,7 +454,7 @@ int Skeleton::LoadFromFile(std::string f)
 					AnimStates[AnimStates.size() - 1].push_back(Attack);
 					file >> read;
 					//file.ignore(2);
-				}
+				}*/
 				std::queue<float> values;
 				std::stringstream line;
 				std::string temp;

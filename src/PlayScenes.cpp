@@ -193,7 +193,7 @@ void OnePlayer::Draw()
 	morphShader->SetI("num_lights", lights.size());
 	skelShader->SetI("num_lights", lights.size());
 
-	shaderObj->SetB("enable_a", enable_ambient);
+	/*shaderObj->SetB("enable_a", enable_ambient);
 	shaderObj->SetB("enable_d", enable_diffuse);
 	shaderObj->SetB("enable_s", enable_spec);
 	shaderObj->SetB("enable_r", enable_rim);
@@ -201,7 +201,7 @@ void OnePlayer::Draw()
 	skelShader->SetB("enable_a", enable_ambient);
 	skelShader->SetB("enable_d", enable_diffuse);
 	skelShader->SetB("enable_s", enable_spec);
-	skelShader->SetB("enable_r", enable_rim);
+	skelShader->SetB("enable_r", enable_rim);*/
 
 	for (int c = 0; c < Cam.size(); c++) {
 		Cam[c]->SetupCam(shaderObj);
@@ -217,9 +217,12 @@ void OnePlayer::Draw()
 		glEnable(GL_DEPTH_TEST);
 
 		glDisable(GL_DEPTH_TEST);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		
 		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
 		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		test_player->hitbox->Draw(shaderObj, test_player->GetTransform().GetWorldTransform());
+
 
 
 		weapons[0]->hitbox->Draw(shaderObj, weapons[0]->getParentTransform());
@@ -227,6 +230,7 @@ void OnePlayer::Draw()
 		//players[0]->GetTransform().GetWorldTransform() * weapons[0]->GetTransform().GetWorldTransform();
 		//	players[1]->hitbox->Draw(shaderObj);
 
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_DEPTH_TEST);
 	}
 
@@ -307,21 +311,21 @@ void OnePlayer::LoadScene()
 	Hitbox* basicCubeHB2 = new CubeHitbox(1.0, 1.0f, 1.0f);
 
 	//Capsule testing
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f,2.0f); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,3.0f);
-	Hitbox* basicCapsuleHB3 = new CapsuleHitbox(0.6,2.0);
-	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.1f, 1.2f);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f,4.0f); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,4.0f);
+	Hitbox* basicCapsuleHB3 = new CapsuleHitbox(0.2,4.0);
+	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.1f, 2.0f);
 	//Capsule Testing
 
 	Hitbox* basicSphereHB = new SphereHitbox(1.0f);
-	Hitbox* shieldSphereHB = new SphereHitbox(0.70f);
+	Hitbox* shieldSphereHB = new SphereHitbox(1.0f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
 	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
 	players.push_back(new Player(d20, D20Tex, basicCapsuleHB2)); //P2
 
 	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
-	basicSphereHB->SetScale({0.5f, 1.0f, 1.0f});
+	shieldSphereHB->SetScale({0.2f, 1.0f, 0.1f});
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ -6.0f, 0.0f, 0.0f });
@@ -333,8 +337,8 @@ void OnePlayer::LoadScene()
 	test_player = new Player(GladiatorMesh, defaultTex, basicCapsuleHB3, { 0.0f, 0.0f, 0.0f });
 	test_player->Scale(glm::vec3(1.2f));
 
-	weapons.push_back(new Object(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_arm2.001"),GladiatorMesh));
-	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("l_arm2.001"), GladiatorMesh));
+	weapons.push_back(new Object(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_hand"),GladiatorMesh));
+	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("l_hand"), GladiatorMesh));
 
 	weapons[0]->SetPosition({0.15f, 0.0f, -0.125f});
 	weapons[0]->Scale({0.8f, 0.8f, 0.8f});
@@ -345,7 +349,7 @@ void OnePlayer::LoadScene()
 	shields[0]->Scale({ 0.7f, 0.5f, 0.5f });
 	shields[0]->SetRotation({ 0.0f, 0.0f, 270.0f });
 
-	shields[0]->hitbox->SetPosition(glm::vec3(0.0f, 0.3f, 0.0f));
+	//shields[0]->hitbox->SetPosition(glm::vec3(0.0f, 0.3f, 0.0f));
 	//glm::vec3 test = shields[0]->hitbox->GetTransform().position;
 	test_player->addChild(weapons[0]);
 	test_player->addChild(shields[0]);

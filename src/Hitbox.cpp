@@ -331,7 +331,7 @@ Material* SphereHitbox::node_ma = nullptr;
 
 void SphereHitbox::init()
 {
-	node_me = new Mesh("node.obj");
+	node_me = new Mesh("Sphere.obj");
 	node_ma = new Material("default-texture.png", "default-normal.png");
 }
 
@@ -342,6 +342,7 @@ void SphereHitbox::Draw(Shader* shdr, glm::mat4 p)
 	shdr->SetI("material.normal", 1);
 	shdr->SetI("material.specular", 2);
 
+	transform.scale = glm::vec3(radius);
 	glm::mat4 model = p * transform.GetWorldTransform();// *glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z));
 
 	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));
@@ -363,35 +364,35 @@ void SphereHitbox::Draw(Shader* shdr, glm::mat4 p)
 
 	node_me->Draw(shdr);
 
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
 }
 
 void SphereHitbox::SetTransform(Transform t)
@@ -460,7 +461,7 @@ Material* CapsuleHitbox::node_ma = nullptr;
 
 void CapsuleHitbox::init()
 {
-	node_me = new Mesh("node.obj");
+	node_me = new Mesh("Sphere.obj");
 	node_ma = new Material("default-texture.png", "default-normal.png");
 }
 
@@ -486,10 +487,12 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 	shdr->SetI("material.diffuse", 0);
 	shdr->SetI("material.normal", 1);
 	shdr->SetI("material.specular", 2);
-
+	transform.scale = glm::vec3(radius);
 	glm::mat4 model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),lowerBound);
-	glm::vec3 test = model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+ 	glm::vec3 test = model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	
+
 	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));
 
 
@@ -508,32 +511,38 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, node_ma->SPEC);
 
+	//Center Bottom
+	
 	node_me->Draw(shdr);
 
+	//Center Top
 	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),upperBound);
+	
+
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	node_me->Draw(shdr);
 
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x + radius, upperBound.y, upperBound.z));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x - radius, upperBound.y, upperBound.z));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x, upperBound.y, upperBound.z + radius));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x, upperBound.y, upperBound.z - radius));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x + radius, upperBound.y, upperBound.z));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x - radius, upperBound.y, upperBound.z));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x, upperBound.y, upperBound.z + radius));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x, upperBound.y, upperBound.z - radius));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
 }
 
 bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)

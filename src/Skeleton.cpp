@@ -258,7 +258,7 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 			animations[anim][frame].rotation.x = -val;
 			break;
 		case ChannelType::Yrotation:
-			animations[anim][frame].rotation.z = -val;
+			animations[anim][frame].rotation.z = val;
 			break;
 		case ChannelType::Zrotation:
 			animations[anim][frame].rotation.y = val;

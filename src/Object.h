@@ -33,6 +33,34 @@ struct Transform {
 			;
 	}
 
+	glm::mat4 GetBoneTransform() const {
+		glm::quat qPitch = glm::angleAxis(glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::quat qYaw = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::quat qRoll = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+		glm::quat rot = qYaw * qPitch * qRoll;
+
+		return
+			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f) * glm::length(position)) *
+			glm::mat4_cast(rot) *
+			glm::scale(glm::mat4(1.0f), scale)
+			;
+	}
+
+	glm::mat4 GetRotEul() const {
+		glm::quat qPitch = glm::angleAxis(glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::quat qYaw = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::quat qRoll = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+		glm::quat rot = qYaw * qPitch * qRoll;
+
+		return glm::mat4_cast(rot);
+	}
+
+	glm::mat4 GetRotQuat() const {
+		return glm::mat4_cast(glm::quat(glm::radians(rotation)));
+	}
+
 	glm::mat4 GetRotScale() const {
 		return
 			glm::mat4_cast(glm::quat(glm::radians(rotation))) *
@@ -66,13 +94,14 @@ protected:
 
 public:
 	Hitbox* hitbox;
-	Object* parent;
+	Object* parent = nullptr;
 	PhysicsBody phys;
 
 	Object();
 	Object(Mesh* me, Material* ma, Hitbox* hb);
 	Object(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, Joint* p = nullptr, SkelMesh* m = nullptr);
 
+	glm::mat4 GetTrueTransform();
 	virtual void Update(float dt);
 	virtual void Draw(Shader* shader, std::vector<Camera*> cam, Shader* childShader = nullptr);
 	virtual void DrawChild(Shader* shader, glm::mat4 parent);

@@ -331,7 +331,7 @@ Material* SphereHitbox::node_ma = nullptr;
 
 void SphereHitbox::init()
 {
-	node_me = new Mesh("node.obj");
+	node_me = new Mesh("Sphere.obj");
 	node_ma = new Material("default-texture.png", "default-normal.png");
 }
 
@@ -342,6 +342,7 @@ void SphereHitbox::Draw(Shader* shdr, glm::mat4 p)
 	shdr->SetI("material.normal", 1);
 	shdr->SetI("material.specular", 2);
 
+	transform.scale = glm::vec3(radius) * transform.scale;
 	glm::mat4 model = p * transform.GetWorldTransform();// *glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z));
 
 	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));
@@ -363,35 +364,35 @@ void SphereHitbox::Draw(Shader* shdr, glm::mat4 p)
 
 	node_me->Draw(shdr);
 
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y + radius, transform.position.z));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y - radius, transform.position.z));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x + radius, transform.position.y, transform.position.z));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x - radius, transform.position.y, transform.position.z));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z + radius));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z - radius));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -1.0f));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
 }
 
 void SphereHitbox::SetTransform(Transform t)
@@ -446,10 +447,13 @@ bool SphereHitbox::HitDetect(Object* th, SphereHitbox* other, Object* oth)
 
 bool SphereHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 {
-	return false;
+	return other->HitDetect(oth, this, th);
 }
 
 #pragma endregion
+
+
+
 
 #pragma region Capsule Collisions
 Mesh* CapsuleHitbox::node_me = nullptr;
@@ -457,7 +461,7 @@ Material* CapsuleHitbox::node_ma = nullptr;
 
 void CapsuleHitbox::init()
 {
-	node_me = new Mesh("node.obj");
+	node_me = new Mesh("Sphere.obj");
 	node_ma = new Material("default-texture.png", "default-normal.png");
 }
 
@@ -483,9 +487,12 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 	shdr->SetI("material.diffuse", 0);
 	shdr->SetI("material.normal", 1);
 	shdr->SetI("material.specular", 2);
-
+	transform.scale = glm::vec3(radius);//
 	glm::mat4 model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),lowerBound);
+
+ 	//glm::vec3 test = model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	
+
 	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));
 
 
@@ -504,40 +511,46 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, node_ma->SPEC);
 
+	//Center Bottom
+	
 	node_me->Draw(shdr);
 
+	//Center Top
 	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),upperBound);
+	
+
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	node_me->Draw(shdr);
 
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x + radius, upperBound.y, upperBound.z));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x - radius, upperBound.y, upperBound.z));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x, upperBound.y, upperBound.z + radius));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
-
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x, upperBound.y, upperBound.z - radius));
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x + radius, upperBound.y, upperBound.z));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x - radius, upperBound.y, upperBound.z));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x, upperBound.y, upperBound.z + radius));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
+	//
+	//model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f), glm::vec3(upperBound.x, upperBound.y, upperBound.z - radius));
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//
+	//node_me->Draw(shdr);
 }
 
 bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
  {
-	Transform t = th->GetTransform();
-	Transform oT = oth->GetTransform();
-	oT.position += oth->phys.move;
-	t.position += th->phys.move;
+	glm::mat4 t = th->getParentTransform();
+	glm::mat4 oT = oth->getParentTransform();
+	//oT = oT * glm::translate(glm::mat4(1.0f), oth->phys.move);
+	t = t * glm::translate(glm::mat4(1.0f), th->phys.move);
 	//Adding an indiscriminant value to 1 so we don't get destroyed by dividing by zero.
 
 	if (this->height == 1.0f) {
@@ -548,49 +561,148 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 		other->height += 0.000001f;
 	}
 
-	glm::vec3 tub = convertVec4(t.GetWorldTransform() * transform.GetWorldTransform() * glm::vec4(upperBound.x, upperBound.y, upperBound.z, 1.0f));
-	glm::vec3 tlb = convertVec4(t.GetWorldTransform() * transform.GetWorldTransform() * glm::vec4(lowerBound.x, lowerBound.y, lowerBound.z, 1.0f));
+	glm::vec3 tub = convertVec4(t * transform.GetWorldTransform() * glm::vec4(upperBound.x, upperBound.y, upperBound.z, 1.0f));
+	glm::vec3 tlb = convertVec4(t * transform.GetWorldTransform() * glm::vec4(lowerBound.x, lowerBound.y, lowerBound.z, 1.0f));
 
-	glm::vec3 oub = convertVec4(oT.GetWorldTransform() * other->transform.GetWorldTransform() * glm::vec4(other->upperBound.x, other->upperBound.y, other->upperBound.z, 1.0f));
-	glm::vec3 olb = convertVec4(oT.GetWorldTransform() * other->transform.GetWorldTransform() * glm::vec4(other->lowerBound.x, other->lowerBound.y, other->lowerBound.z, 1.0f));
+	glm::vec3 oub = convertVec4(oT * other->transform.GetWorldTransform() * glm::vec4(other->upperBound.x, other->upperBound.y, other->upperBound.z, 1.0f));
+	glm::vec3 olb = convertVec4(oT * other->transform.GetWorldTransform() * glm::vec4(other->lowerBound.x, other->lowerBound.y, other->lowerBound.z, 1.0f));
 
-	glm::vec3 closestPointA;
-	glm::vec3 closestPointB;
+	//glm::vec3 closestPointA;
+	//glm::vec3 closestPointB;
 
-	//Find closest point on both lines
+	float totalDist; //Calculated later
+	float totalRadius = this->radius + other->GetRadius();
+
+	//Find closest point on both lines -- Broken as of 2/1/2020
 	{
-		glm::vec3 LineA = tub - tlb;
-		glm::vec3 LineB = oub - olb;
+		//glm::vec3 LineA = tub - tlb;
+		//glm::vec3 LineB = oub - olb;
 
-		glm::vec3 PA1 = tlb;
-		glm::vec3 PA2 = tub;
+		//glm::vec3 PA1 = tlb;
+		//glm::vec3 PA2 = tub;
 
-		glm::vec3 PB1 = olb;
-		glm::vec3 PB2 = oub;
+		//glm::vec3 PB1 = olb;
+		//glm::vec3 PB2 = oub;
 
-		glm::vec3 DirA = glm::normalize(LineA);
-		glm::vec3 DirB = glm::normalize(LineB);
+		//glm::vec3 DirA = glm::normalize(LineA);
+		//glm::vec3 DirB = glm::normalize(LineB);
 
-		//Getting a scalar value for length along line B
-		float scalarB = (((glm::dot(LineA,(PB1 - PA1)) * glm::dot(LineA, LineB) / glm::dot(LineA, LineA)) - (glm::dot(LineB, (PB1 - PA1)))	) / (glm::dot(LineB, LineB) - 1));
+		////Getting a scalar value for length along line B
+		//float scalarB = (((glm::dot(LineA,(PB1 - PA1)) * glm::dot(LineA, LineB) / glm::dot(LineA, LineA)) - (glm::dot(LineB, (PB1 - PA1)))	) / (glm::dot(LineB, LineB) - 1));
 
-		//Getting a scalar value for length along line A subbing in t.
-		float scalarA = (glm::dot(LineB, (PB1 - PA1)) + glm::dot(LineB, LineB) * scalarB) / glm::dot(LineA, LineB);
+		//scalarB = glm::clamp(scalarB, -1.0f, 1.0f);
 
-		//std::cout << scalarB << std::endl;
-		//std::cout << scalarA << std::endl;
+		////Getting a scalar value for length along line A subbing in t.
+		//float scalarA = (glm::dot(LineB, (PB1 - PA1)) + glm::dot(LineB, LineB) * scalarB) / glm::dot(LineA, LineB);
 
-		closestPointA = PA1 + ((PA2-PA1) * scalarA);
-		closestPointB = PB1 + ((PB2-PB1) * scalarB);
+		//scalarA = glm::clamp(scalarA, -1.0f, 1.0f);
 
-		//closestPointA = PA1 + ((DirA) * scalarA);
-		//closestPointB = PB1 + ((DirB) * scalarB);
+		////std::cout << scalarB << std::endl;
+		////std::cout << scalarA << std::endl;
+
+		//closestPointA = PA1 + ((PA2-PA1) * scalarA);
+		//closestPointB = PB1 + ((PB2-PB1) * scalarB);
+
+		////closestPointA = PA1 + ((DirA) * scalarA);
+		////closestPointB = PB1 + ((DirB) * scalarB);
 
 
 	}
 
-	float totalDist = glm::distance(closestPointA, closestPointB);
-	float totalRadius = this->radius + other->GetRadius();
+	//Calculate Line Segment distance
+	{
+		constexpr auto SMALL_VALUE = 0.00000001;;
+
+		glm::vec3 LineA = tub - tlb; //u
+		glm::vec3 LineB = oub - olb; //v
+		glm::vec3 LineC = tlb - olb; //w
+
+		float a = glm::dot(LineA, LineA); //Always >= 0
+		float b = glm::dot(LineA,LineB); 
+		float c = glm::dot(LineB, LineB); //Always >= 0
+
+		float d = glm::dot(LineA,LineC);
+		float e = glm::dot(LineB, LineC);
+
+		float f = (a * c) - (b * b); //Always >= 0	 // D
+
+		float sc, sN, sD = f; // sc = sN / sD, by default sD = D >= 0
+		float tc, tN, tD = f; // tc = tN / tD, by default tD = D >= 0
+
+
+		//The following section is to calculate against certain cases where values may go out of real ranges.
+		//Due to the nature of Dot Product in 3D space and in certain orientations.
+		
+		//Now compute the line parameters of the two closest Points.
+		if (f < SMALL_VALUE) { //This means the line is almost parallel
+			sN = 0.0f;		   // force using lower bound for line 1
+			sD = 1.0f;		   //To prevent a future division by 0.
+			tN = e;
+			tD = c;
+		}
+		else//				Get the closest points on the infinite lines.
+		{
+			sN = (b*e - c*d);
+			tN = (a*e - b*d);
+			if (sN < 0.0f) {	//sc < 0 , the s=0  edge is visible
+				sN = 0.0f;
+				tN = e;
+				tD = c;
+			}
+			else if (sN > sD) // sc > 1 , the s=1 edge is visible.
+			{
+				sN = sD;
+				tN = e + b;
+				tD = c;
+			}
+		}
+
+
+
+		if (tN < 0.0f) { //tc < 0 , the t = 0 edge is visible.
+			tN = 0.0f;
+
+			//recompute sc for this edge
+			if (-d < 0.0f) {
+				sN = 0.0f;
+			}
+			else if (-d > a) {
+				sN = sD;
+			}
+			else {
+				sN = -d;
+				sD = a;
+			}	
+		}
+		else if (tN > tD) { //tc > 1 , the t = 1 edge is visible.
+			tN = tD;
+
+			//recompute sc for this edge.
+			if ((-d + b) < 0.0f) {
+				sN = 0;
+			}
+			else if ((-d + b) > a)
+			{
+				sN = sD;
+			}
+			else
+			{
+				sN = (-d + b);
+				sD = a;
+			}
+		}
+
+		//do division to calculate sc and tc
+		sc = (glm::abs(sN) < SMALL_VALUE ? 0.0 : (sN / sD));
+		tc = (glm::abs(tN) < SMALL_VALUE ? 0.0 : (tN / tD));
+					
+		//We get the closest vector that is between both lines so we need it's length
+		//sc and tc are the parameters for vector lines A and B (multiplier to be a point along them)
+
+		totalDist = glm::length(LineC + (sc * LineA) - (tc * LineB));
+	}
+
+	
 
 	if (totalDist <= totalRadius) {
 		return true;
@@ -641,7 +753,10 @@ bool CapsuleHitbox::HitDetect(Object* th, SphereHitbox* other, Object* oth)
 
 	float max_dist = or + radius;
 
-	return false;
+	if (glm::distance(cpa, op) <= max_dist)
+		return true;
+	else
+		return false;
 }
 
 

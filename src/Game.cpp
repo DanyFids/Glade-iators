@@ -16,8 +16,13 @@ struct UpdateBehaviour {
 	std::function<void(entt::entity e, float dt)> Function;
 };
 
+glm::ivec2 Game::SCREEN = glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT);
+Game* Game::CURRENT = nullptr;
+
 void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
+	Game::SCREEN = glm::ivec2(width, height);
+	Game::CURRENT->curScene->ResizeCams();
 }
 
 glm::vec2 mousePos = glm::vec2(400, 300);

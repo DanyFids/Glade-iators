@@ -59,7 +59,7 @@ public:
 
 	virtual void Draw(Shader*);
 	void SetTexture(Material* t);
-	void Update(float dt);
+	virtual void Update(float dt);
 
 	void LoadMesh(const char* f, std::vector<Vertex> &vertices, unsigned int& num_verts, std::vector<unsigned int> &indices, unsigned int& num_indi);
 
@@ -88,7 +88,7 @@ public:
 
 	virtual void Draw(Shader*);
 	void addPose( std::string filename);
-	void Update(float dt);
+	virtual void Update(float dt);
 	void NextPose();
 	void PrevPose();
 	
@@ -124,6 +124,8 @@ class SkelMesh : public Mesh {
 	int nexFrame;
 	int anim = 0;
 
+	float anim_time = 0.0f;
+
 	Skeleton* skeleton;
 	//Material* weightMap;
 
@@ -131,13 +133,17 @@ public:
 	SkelMesh(std::string f, Skeleton* s, std::string weightMap);
 	~SkelMesh();
 
+	virtual void Update(float dt);
+
 	virtual void Draw(Shader*);
-	void SetAnim(int id) { anim = id; }
+	void SetAnim(unsigned int id);
+	void SetFrame(unsigned int id);
 	int GetAnim() { return anim; }
-	void SetFrame(int id) { curFrame = id; }
 	int GetFrame() { return curFrame; }
 	void NextFrame();
 	void DrawSkeleton(glm::mat4 global, Shader* shdr);
 
 	Skeleton* GetSkeleton() { return skeleton; }
+
+	SkelMesh* Clone() { return new SkelMesh(*this); };
 };

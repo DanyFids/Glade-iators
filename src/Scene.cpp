@@ -7,6 +7,7 @@
 #include"Light.h"
 #include "Constants.h"
 #include"UI.h"
+#include "Game.h"
 #include "Skeleton.h"
 
 #define _USE_MATH_DEFINES
@@ -120,6 +121,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		else {
 			rot.x = 0.0f;
 		}
+		
 		Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
 
 		glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -145,7 +147,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 			float newRot;
 
-			newRot = -(std::atan2f(dir.z, dir.x)) * (180/M_PI);
+			newRot = -(std::atan2f(dir.z, dir.x)) * (180/M_PI) + 90;
 
 			//std::cout << newRot << std::endl;
 
@@ -317,11 +319,17 @@ void PlayScene::RenderScene(Shader* shader)
 	//
 	//}
 
-	for (int s = 0; s < shields.size(); s++)
+	/*for (int s = 0; s < shields.size(); s++)
 	{
 		shields[s]->Draw(shader, Cam);
 
-	}
+	}*/
+	//DUUDE->Draw(shader, Cam);
+}
 
-	DUUDE->Draw(shader, Cam);
+void Scene::ResizeCams()
+{
+	for (int c = 0; c < Cam.size(); c++) {
+		Cam[c]->UpdateScreen({ Game::SCREEN.x / Cam.size() * c,0, Game::SCREEN.x / Cam.size(),Game::SCREEN.y});
+	}
 }

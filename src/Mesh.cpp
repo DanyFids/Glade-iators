@@ -735,31 +735,67 @@ SkelMesh::~SkelMesh()
 	
 }
 
+void SkelMesh::Update(float dt)
+{
+	if (skeleton->anim_ft[anim] > 0.0f) {
+		anim_time += dt;
+
+		if (anim_time > skeleton->anim_ft[anim]) {
+			NextFrame();
+			anim_time = 0.0f;
+		}
+	}
+}
+
 void SkelMesh::Draw(Shader* shdr)
 {
 	glm::mat4* arr = nullptr;
+	glm::mat4* axis = nullptr;
+	glm::mat4* axis_i = nullptr;
 	glm::vec3* binds = nullptr;
 	glm::vec3* bind_t = nullptr;
-	skeleton->GetTransformArray(arr, binds, bind_t, anim, curFrame);
+	glm::mat3* norms = nullptr;
+	skeleton->GetTransformArray(arr, axis, axis_i, norms, binds, bind_t, anim, curFrame);
 	int num_b = skeleton->GetNumBones();
 
-	glActiveTexture(GL_TEXTURE20);
+	//glActiveTexture(GL_TEXTURE20);
 	//glBindTexture(GL_TEXTURE_2D, weightMap->DIFF);
 	//shdr->SetI("weightMap", 20);
 	
 	shdr->SetI("num_bones", num_b);
 	for (int b = 0; b < num_b; b++) {
-		shdr->SetMat4("bone_t[" + std::to_string(b) + "]", arr[b]);
-		shdr->SetVec3("bind_p[" + std::to_string(b) + "]", binds[b]);
-		shdr->SetVec3("bind_t[" + std::to_string(b) + "]", bind_t[b]);
+		std::string b_string = std::to_string(b);
+		shdr->SetMat4("bone_t[" + b_string + "]", arr[b]);
+		shdr->SetVec3("bind_p[" + b_string + "]", binds[b]);
+		shdr->SetVec3("bind_t[" + b_string + "]", bind_t[b]);
+		shdr->SetMat3("norms[" + b_string + "]", norms[b]);
+		shdr->SetMat4("b_axis[" + b_string + "]", axis[b]);
+		shdr->SetMat4("b_axis_i[" + b_string + "]", axis_i[b]);
 	}
 
 	Mesh::Draw(shdr);
 }
 
+void SkelMesh::SetAnim(unsigned int id)
+{
+	if (id < skeleton->GetNumAnims())
+		anim = id;
+
+	anim_time = 0.0f;
+	curFrame = 0;
+	nexFrame = (skeleton->GetNumFrames(anim) > 1) ? 1 : 0;
+}
+
+void SkelMesh::SetFrame(unsigned int id)
+{
+	if(id < skeleton->GetNumFrames(anim))
+	{ curFrame = id; }
+}
+
 void SkelMesh::NextFrame()
 {
-	curFrame = (curFrame < skeleton->GetNumFrames(anim) -1) ? curFrame + 1 : 0;
+	curFrame = nexFrame;
+	nexFrame = (nexFrame < skeleton->GetNumFrames(anim) -1) ? nexFrame + 1 : 0;
 }
 
 void SkelMesh::DrawSkeleton(glm::mat4 global, Shader* shdr)

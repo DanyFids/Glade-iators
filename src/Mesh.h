@@ -64,11 +64,14 @@ struct SkelVert {
 };
 
 class SkelMesh : public Mesh {
-	int curFrame;
-	int nexFrame;
-	int anim = 0;
+	static const int num_channels = 4;
+	
+	int curFrame[num_channels] = {0, 0, 0, 0};
+	int nexFrame[num_channels] = {0,0,0,0};
+	int anim[num_channels] = { 0, -1, -1, -1 };
 
-	float anim_time = 0.0f;
+	float anim_time[num_channels] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float chnl_intensity[num_channels] = { 1.0f, 0.0f, 0.0f, 0.0f };
 
 	Skeleton* skeleton;
 	//Material* weightMap;
@@ -80,9 +83,9 @@ public:
 	virtual void Update(float dt);
 
 	virtual void Draw(Shader*);
-	void SetAnim(unsigned int id);
-	void SetFrame(unsigned int id);
-	void NextFrame();
+	void SetAnim(int id, unsigned int chnl);
+	void SetFrame(unsigned int id, unsigned int chnl);
+	void NextFrame(unsigned int chnl);
 	void DrawSkeleton(glm::mat4 global, Shader* shdr);
 
 	Skeleton* GetSkeleton() { return skeleton; }

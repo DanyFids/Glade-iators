@@ -11,6 +11,7 @@ class OnePlayer: public PlayScene {
 	Shader* depthShader;
 	Shader* sunShader;
 	Shader* skelShader;
+	Shader* skelDepth;
 
 	Shader* DebugShader;
 	Mesh* DebugQuad;

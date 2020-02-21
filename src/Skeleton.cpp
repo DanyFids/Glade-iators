@@ -225,6 +225,20 @@ void Joint::FillJointArray(glm::mat4* arr, glm::mat4*& axis, glm::mat4*& axis_i,
 	}
 }
 
+void Joint::FillFrameRot(glm::mat4* arr, glm::mat3* norms, glm::mat4 global, int& cur, int anim, int frame)
+{
+	glm::mat4 trans = global * animations[anim][frame].GetRotEul();
+	glm::mat3 norm = glm::mat3(glm::transpose(glm::inverse(trans)));
+
+	arr[cur] = trans;
+	norms[cur] = norm;
+	cur++;
+
+	for (int c = 0; c < children.size(); c++) {
+		children[c]->FillFrameRot(arr, norms, trans, cur, anim, frame);
+	}
+}
+
 void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 {
 	if (animations.size() <= anim) {
@@ -258,7 +272,7 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 			animations[anim][frame].rotation.x = -val;
 			break;
 		case ChannelType::Yrotation:
-			animations[anim][frame].rotation.z = -val;
+			animations[anim][frame].rotation.z = val;
 			break;
 		case ChannelType::Zrotation:
 			animations[anim][frame].rotation.y = val;
@@ -484,6 +498,18 @@ void Skeleton::GetTransformArray(glm::mat4* & ret, glm::mat4* & axis, glm::mat4*
 		root->children[c]->FillJointArray(ret, axis, axis_i, norms, root->animations[anim][frame].GetWorldTransform(), binds, root->offset, bind_t, newPos, id, anim, frame);
 	}
 
+}
+
+void Skeleton::GetFrameRot(glm::mat4*& bones, glm::mat3*& norms, int anim, int frame)
+{
+	bones = new glm::mat4[num_bones];
+	norms = new glm::mat3[num_bones];
+
+	int id = 0;
+
+	for (int c = 0; c < root->children.size(); c++) {
+		root->children[c]->FillFrameRot(bones, norms, root->animations[anim][frame].GetRotEul(), id, anim, frame);
+	}
 }
 
 int Skeleton::GetAnimByName(std::string n)

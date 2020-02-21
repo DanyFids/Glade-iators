@@ -54,6 +54,7 @@ public:
 	void Draw(glm::mat4 global, int a, int f, Shader* shdr);
 
 	void FillJointArray(glm::mat4 * arr, glm::mat4*& axis, glm::mat4*& axis_i, glm::mat3* norms, glm::mat4 global, glm::vec3 * binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim, int frame);
+	void FillFrameRot(glm::mat4* arr, glm::mat3* norms, glm::mat4 global, int& cur, int anim, int frame);
 	void LoadAnimFrame(std::queue<float>&, int anim, int frame);
 
 	//void Recalc(int anim, int frame);
@@ -83,6 +84,7 @@ public:
 
 	void DrawSkeleton(glm::mat4 global, int a, int f, Shader* shdr) { root->Draw(global, a, f, shdr); }
 	void GetTransformArray(glm::mat4* & bones, glm::mat4*& axis, glm::mat4*& axis_i, glm::mat3* & norms, glm::vec3* & binds, glm::vec3* & bind_t, int anim, int frame);
+	void GetFrameRot(glm::mat4* & bones, glm::mat3* & norms, int anim, int frame);
 	int GetNumBones() { return num_bones; }
 	int GetNumFrames(int a) { return root->animations[a].size(); }
 	int GetNumAnims() { return root->animations.size(); }

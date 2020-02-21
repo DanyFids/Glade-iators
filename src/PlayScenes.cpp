@@ -37,7 +37,7 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 	if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS && !f3_pressed) {
 		if (!f3_pressed) {
-			((SkelMesh*)test_player->GetMesh())->NextFrame();
+			((SkelMesh*)test_player->GetMesh())->NextFrame(0);
 		}
 
 		f3_pressed = true;
@@ -150,8 +150,9 @@ void OnePlayer::Draw()
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
 		glClear(GL_DEPTH_BUFFER_BIT);
 		lights[l]->SetupDepthShader(depthShader);
+		lights[l]->SetupDepthShader(skelDepth);
 		RenderScene(depthShader);
-		test_player->Draw(depthShader, Cam);
+		test_player->Draw(skelDepth, Cam);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -210,6 +211,7 @@ void OnePlayer::LoadScene()
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
 	skelShader = new Shader("Shaders/skeleton_shader.vert", "Shaders/Basic_Shader.frag");
+	skelDepth = new Shader("Shaders/depth_skel.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 
 	Material* DiceTex = new Material("dice-texture.png", "d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
@@ -227,10 +229,10 @@ void OnePlayer::LoadScene()
 	SkelMesh* wigglyboi = new SkelMesh("wiggle/wigglyboi.obj", wiggleSkel, "wiggle/WiggleWeights.png");
 
 	gladiatorSkel->WriteTree();
-	gladiatorSkel->Find("l_arm2")->animations[0][0].rotation += glm::vec3(0.0f, -90.0f, 0.0f);
-	gladiatorSkel->Find("l_arm1")->animations[0][0].scale = glm::vec3(2.0f, 2.0f, 2.0f);
+	//gladiatorSkel->Find("l_arm2")->animations[0][0].rotation += glm::vec3(0.0f, -90.0f, 0.0f);
+	//gladiatorSkel->Find("l_arm1")->animations[0][0].scale = glm::vec3(2.0f, 2.0f, 2.0f);
 
-	wiggleSkel->Find("bone2")->animations[0][0].scale = glm::vec3(2.0f, 1.0f, 2.0f);
+	//wiggleSkel->Find("bone2")->animations[0][0].scale = glm::vec3(2.0f, 1.0f, 2.0f);
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.7f, 0.014f, 0.0007f));//lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
@@ -249,8 +251,8 @@ void OnePlayer::LoadScene()
 	players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, 0.3f, 0.0f });
 
-	GladiatorMesh->SetAnim(1);
-	GladiatorMesh->SetFrame(0);
+	GladiatorMesh->SetAnim(1, 0);
+	GladiatorMesh->SetFrame(0, 0);
 
 	//gladiatorSkel->Find("l_arm1")->WriteTransform(1, 1);
 	//gladiatorSkel->Find("r_arm1")->WriteTransform(1, 1);
@@ -334,7 +336,7 @@ void OnePlayer::LoadScene()
 
 						int a = ((SkelMesh*)target->GetMesh())->GetSkeleton()->GetAnimByName(anim);
 						if (a > -1) {
-							((SkelMesh*)target->GetMesh())->SetAnim(a);
+							((SkelMesh*)target->GetMesh())->SetAnim(a, 0);
 							std::cout << target_n + " playing: " + anim << std::endl;
 							continue;
 						}

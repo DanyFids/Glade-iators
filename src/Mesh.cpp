@@ -334,11 +334,13 @@ void Mesh::SetPosition(glm::vec3 pos)
 	model = glm::translate(model, pos);
 }
 
+//const int SkelMesh::num_channels = 4;
+
 SkelMesh::SkelMesh(std::string f, Skeleton* s, std::string w): Mesh(f.c_str())
 {
 	skeleton = s;
-	curFrame = 0;
-	nexFrame = 0;
+	//curFrame = 0;
+	//nexFrame = 0;
 
 	float** weightMap;
 	int verts;
@@ -430,12 +432,16 @@ SkelMesh::~SkelMesh()
 
 void SkelMesh::Update(float dt)
 {
-	if (skeleton->anim_ft[anim] > 0.0f) {
-		anim_time += dt;
+	for (int c = 0; c < num_channels; c++) {
+		if (anim[c] >= 0 && anim[c] < skeleton->GetNumAnims()) {
+			if (skeleton->anim_ft[anim[c]] > 0.0f) {
+				anim_time[c] += dt;
 
-		if (anim_time > skeleton->anim_ft[anim]) {
-			NextFrame();
-			anim_time = 0.0f;
+				if (anim_time[c] > skeleton->anim_ft[anim[c]]) {
+					NextFrame(c);
+					anim_time[c] = 0.0f;
+				}
+			}
 		}
 	}
 }
@@ -448,8 +454,14 @@ void SkelMesh::Draw(Shader* shdr)
 	glm::vec3* binds = nullptr;
 	glm::vec3* bind_t = nullptr;
 	glm::mat3* norms = nullptr;
-	skeleton->GetTransformArray(arr, axis, axis_i, norms, binds, bind_t, anim, curFrame);
+	skeleton->GetTransformArray(arr, axis, axis_i, norms, binds, bind_t, anim[0], curFrame[0]);
 	int num_b = skeleton->GetNumBones();
+
+	glm::mat4** support_anims = new glm::mat4* [num_channels - 1];
+
+	for (int c = 0; c < num_channels - 1; c++) {
+
+	}
 
 	//glActiveTexture(GL_TEXTURE20);
 	//glBindTexture(GL_TEXTURE_2D, weightMap->DIFF);
@@ -457,6 +469,7 @@ void SkelMesh::Draw(Shader* shdr)
 	
 	shdr->SetI("num_bones", num_b);
 	for (int b = 0; b < num_b; b++) {
+
 		std::string b_string = std::to_string(b);
 		shdr->SetMat4("bone_t[" + b_string + "]", arr[b]);
 		shdr->SetVec3("bind_p[" + b_string + "]", binds[b]);
@@ -469,29 +482,29 @@ void SkelMesh::Draw(Shader* shdr)
 	Mesh::Draw(shdr);
 }
 
-void SkelMesh::SetAnim(unsigned int id)
+void SkelMesh::SetAnim(int id, unsigned int chnl)
 {
 	if (id < skeleton->GetNumAnims())
-		anim = id;
+		anim[chnl] = id;
 
-	anim_time = 0.0f;
-	curFrame = 0;
-	nexFrame = (skeleton->GetNumFrames(anim) > 1) ? 1 : 0;
+	anim_time[chnl] = 0.0f;
+	curFrame[chnl] = 0;
+	nexFrame[chnl] = (skeleton->GetNumFrames(anim[chnl]) > 1) ? 1 : 0;
 }
 
-void SkelMesh::SetFrame(unsigned int id)
+void SkelMesh::SetFrame(unsigned int id, unsigned int chnl)
 {
-	if(id < skeleton->GetNumFrames(anim))
-	{ curFrame = id; }
+	if(id < skeleton->GetNumFrames(anim[chnl]))
+	{ curFrame[chnl] = id; }
 }
 
-void SkelMesh::NextFrame()
+void SkelMesh::NextFrame(unsigned int chnl)
 {
-	curFrame = nexFrame;
-	nexFrame = (nexFrame < skeleton->GetNumFrames(anim) -1) ? nexFrame + 1 : 0;
+	curFrame[chnl] = nexFrame[chnl];
+	nexFrame[chnl] = (nexFrame[chnl] < skeleton->GetNumFrames(anim[chnl]) -1) ? nexFrame[chnl] + 1 : 0;
 }
 
 void SkelMesh::DrawSkeleton(glm::mat4 global, Shader* shdr)
 {
-	skeleton->DrawSkeleton(global, anim, curFrame, shdr);
+	skeleton->DrawSkeleton(global, anim[0], curFrame[0], shdr);
 }

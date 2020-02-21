@@ -15,6 +15,14 @@ enum ChannelType {
 	Zrotation
 };
 
+enum FrameStates {
+	Neutral,
+	Block,
+	Roll,
+	Attack,
+	Deflect
+};
+
 ChannelType StringToChnlTp(std::string name);
 
 class Skeleton;
@@ -57,7 +65,7 @@ public:
 	void FillFrameRot(glm::mat4* arr, glm::mat3* norms, glm::mat4 global, int& cur, int anim, int frame);
 	void LoadAnimFrame(std::queue<float>&, int anim, int frame);
 
-	//void Recalc(int anim, int frame);
+	glm::mat4 TransformTo(int anim, int frame);
 
 	friend class Skeleton;
 };
@@ -75,13 +83,13 @@ class Skeleton {
 
 	friend class SkelMesh;
 public:
+	std::vector<std::vector<FrameStates>> AnimStates;
 	Skeleton(std::string name, std::string file);
 
 	void WriteTree();
 
 	int LoadFromFile(std::string file);
 	Joint* Find(std::string name);
-
 	void DrawSkeleton(glm::mat4 global, int a, int f, Shader* shdr) { root->Draw(global, a, f, shdr); }
 	void GetTransformArray(glm::mat4* & bones, glm::mat4*& axis, glm::mat4*& axis_i, glm::mat3* & norms, glm::vec3* & binds, glm::vec3* & bind_t, int anim, int frame);
 	void GetFrameRot(glm::mat4* & bones, glm::mat3* & norms, int anim, int frame);

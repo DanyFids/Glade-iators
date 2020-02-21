@@ -2,6 +2,8 @@
 #include "Scene.h"
 #include <thread>
 
+#include "Sound.h"
+
 class Light;
 class Mesh;
 class Player;
@@ -12,11 +14,14 @@ class OnePlayer: public PlayScene {
 	Shader* sunShader;
 	Shader* skelShader;
 	Shader* skelDepth;
+	Shader* morphShader;
 
 	Shader* DebugShader;
 	Mesh* DebugQuad;
 	
 	Player* test_player;
+
+	Player* test_bones;
 
 	bool debug = false;
 	bool f3_pressed;
@@ -24,12 +29,13 @@ class OnePlayer: public PlayScene {
 	
 	std::thread threadObj;
 
-	//CG ASSIGNMENT STUFF
-	bool cg_asg_input = false;
-	bool enable_ambient = true;
-	bool enable_diffuse = true;
-	bool enable_spec = true;
-	bool enable_rim = true;
+	Object* morphyBoi;
+	Object* staticBoi;
+	Sound audioEngine;
+
+	float time = 0.0f;
+	float MAX_TIME = 0.2f;
+
 public:
 	OnePlayer();
 
@@ -49,7 +55,13 @@ public:
 class TwoPlayer: public PlayScene {
 	Shader* shaderObj;
 	Shader* depthShader;
+	Shader* morphShader;
 
+
+	Shader* sunShader;
+
+
+	Object* morphyBoi;
 public:
 	TwoPlayer();
 	// Inherited via Scene

@@ -127,6 +127,8 @@ void Camera::SetupCam(Shader* shader)
 
 	glViewport(screen_dim.x, screen_dim.y, screen_dim.z, screen_dim.w);
 
+	glUseProgram(shader->ID);
+
 	unsigned int viewLoc = glGetUniformLocation(shader->ID, "view");
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(lookAt));
 	unsigned int projLoc = glGetUniformLocation(shader->ID, "project");

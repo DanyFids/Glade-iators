@@ -292,12 +292,20 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 	//animations[anim][frame].position = glm::vec3(0.0f, 0.0f, glm::length(offset));
 
 	if (name.compare("l_arm1") == 0 || name.compare("r_arm1") == 0) {
-		std::cout << "HOI!!!" << std::endl;
+		//std::cout << "HOI!!!" << std::endl;
 	}
 
 	for (int c = 0; c < children.size(); c++) {
 		children[c]->LoadAnimFrame(values, anim, frame);
 	}
+}
+
+glm::mat4 Joint::TransformTo(int anim, int frame)
+{
+	if (parent != nullptr) 
+		return parent->TransformTo(anim, frame) * animations[anim][frame].GetWorldTransform();
+	else
+		return animations[anim][frame].GetWorldTransform();
 }
 
 Skeleton::Skeleton(std::string name, std::string file)
@@ -426,6 +434,8 @@ int Skeleton::LoadFromFile(std::string f)
 			int num_frames = 0;
 			int anim = root->animations.size();
 
+			AnimStates.push_back(std::vector<FrameStates>());
+
 			file >> read; // eat
 			file >> read;
 			
@@ -439,9 +449,27 @@ int Skeleton::LoadFromFile(std::string f)
 
 			file.ignore(512, '\n');
 
+			int yeetval = 1;
+			int yootval = 1;
 			while (!file.eof()) {
+				/*file >> read;
+				if (read.compare("N") == 0)
+				{
+					std::cout << yeetval << "yeet \n";
+					yeetval++;
+					AnimStates[AnimStates.size() - 1].push_back(Neutral);
+					//file >> read;
+					//file.ignore(2);
+				}
+				if (read.compare("A") == 0)
+				{
+					std::cout << yootval  << "yoot \n";
+					yootval++;
+					AnimStates[AnimStates.size() - 1].push_back(Attack);
+					file >> read;
+					//file.ignore(2);
+				}*/
 				std::queue<float> values;
-
 				std::stringstream line;
 				std::string temp;
 

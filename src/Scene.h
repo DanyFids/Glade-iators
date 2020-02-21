@@ -4,6 +4,10 @@
 #include<GLFW/glfw3.h>
 #include<GLM/glm.hpp>
 #include<entt.hpp>
+#include "Object.h"
+#include "Hitbox.h"
+#include "Texture.h"
+#include "Mesh.h"
 
 class Camera;
 class Shader;
@@ -11,6 +15,9 @@ class Object;
 class PointLight;
 class DirectionalLight;
 class UI;
+class Player;
+class Material;
+class Hitbox;
 
 class SceneD {
 public:
@@ -76,11 +83,37 @@ public:
 
 class PlayScene : public Scene {
 protected:
-	std::vector<Object*> players;
+	std::vector<Player*> players;
 	std::vector<Object*> terrain;
+	std::vector<Object*> shields;
+	//std::vector<Attack*> attacks;
+	std::vector<Object*> weapons;
+	std::vector<glm::vec3> beacons;
+
+	bool dodge1 = true;
+	bool dodge2 = true;
+	float dodge1t;
+	float dodge2t;
+
+	bool atk1 = false;
+	bool atk2 = false;
+
+	bool block1 = false;
+	bool block2 = false;
+
+	bool Target1 = false;
+	bool Target2 = false;
+
+	SplineMan* DUUDE;
+
+	Mesh* Amesh = new Mesh("d6.obj");
+	Material* Amat = new Material("missing_tex.png");
+	Material* Bmat = new Material("green.png");
+	Hitbox* basicCubeHB = new CubeHitbox(1.0f, 1.0f, 1.0f);
 
 	std::vector<PointLight*> lights;
 	DirectionalLight * sun;
+
 
 	std::vector<UI*> ui;
 

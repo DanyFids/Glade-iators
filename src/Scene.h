@@ -36,6 +36,9 @@ private:
 class Scene {
 protected:
 	std::vector<Camera*> Cam;
+	int menuSpot = 0;
+	const float MENU_TIME = 0.2f;
+	float menu_time = 0;
 
 	// Mouse Vars
 	float m_lastX = 400;
@@ -103,6 +106,8 @@ protected:
 
 	bool Target1 = false;
 	bool Target2 = false;
+
+	bool isMenu;
 
 	SplineMan* DUUDE;
 

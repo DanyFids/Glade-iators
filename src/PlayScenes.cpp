@@ -145,9 +145,6 @@ void OnePlayer::Update(float dt)
 
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
-
-	
-
 	test_player->Update(dt);
 }
 
@@ -247,6 +244,8 @@ void OnePlayer::Draw()
 
 void OnePlayer::LoadScene()
 {
+	isMenu = false;
+
 	Joint::init();
 	//{91f62782-35bd-42df-85a1-8f359308dd0c}
 
@@ -687,6 +686,8 @@ void TwoPlayer::Draw()
 
 void TwoPlayer::LoadScene()
 {
+	isMenu = false;
+
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
@@ -806,4 +807,163 @@ void TwoPlayer::LoadScene()
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(15.0f, 1.0f, 2.0f));
 
+}
+
+MainMenu::MainMenu()
+{
+	LoadScene();
+}
+
+void MainMenu::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
+{
+	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
+		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_2, dt);
+		}
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
+		}
+	}
+	else {
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_1, dt);
+		}
+
+	}
+}
+
+void MainMenu::Update(float dt)
+{
+
+	//audioEngine.Update();
+
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Update(dt);
+	}
+
+	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
+
+}
+
+void MainMenu::Draw()
+{
+	glCullFace(GL_FRONT);
+
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
+	glClear(GL_DEPTH_BUFFER_BIT);
+	sun->SetupDepthShader(sunShader);
+
+	RenderScene(sunShader);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
+
+	for (int l = 0; l < lights.size(); l++) {
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
+		glClear(GL_DEPTH_BUFFER_BIT);
+		lights[l]->SetupDepthShader(depthShader);
+		RenderScene(depthShader);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+		glActiveTexture(GL_TEXTURE4 + l);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[l]->GetDepthMap());
+	}
+	glCullFace(GL_BACK);
+
+	sun->SetupLight(shaderObj);
+	sun->SetupLight(morphShader);
+
+	for (int c = 0; c < lights.size(); c++) {
+		lights[c]->SetupLight(shaderObj, c);
+		lights[c]->SetupLight(morphShader, c);
+
+	}
+	shaderObj->SetI("num_lights", lights.size());
+	//morphShader->SetI("num_lights", lights.size());
+
+
+	for (int c = 0; c < Cam.size(); c++) {
+		Cam[c]->SetupCam(shaderObj);
+
+		RenderScene(shaderObj);
+		Cam[c]->SetupCam(morphShader);
+		//morphyBoi->Draw(morphShader, Cam);
+
+		//glDisable(GL_DEPTH_TEST);
+		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		////	players[1]->hitbox->Draw(shaderObj);
+		//
+		//glEnable(GL_DEPTH_TEST);
+	}
+
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glDisable(GL_DEPTH_TEST);
+
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
+	}
+	glEnable(GL_DEPTH_TEST);
+
+}
+
+void MainMenu::LoadScene()
+{
+	isMenu = true;
+
+	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
+
+	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
+	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
+	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
+
+	Material* hpBarMat = new Material("yuck.png");
+	Material* stamBarMat = new Material("blue.png");
+	Material* crowdBarMat = new Material("white.png");
+	Material* blackBarMat = new Material("black.png");
+
+
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
+	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
+
+	Cam = {
+		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT))
+	};
+
+	UI* hpBG = new UI(210, 30, { 5.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* stamBG = new UI(160, 30, { 5.0f, 495.0f, -1.0f }, blackBarMat);
+	UI* crowdBG = new UI(185, 30, { 220.0f, 545.0f, -1.0f }, blackBarMat);
+
+	UI* hpBG2 = new UI(210, 30, { 585.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* stamBG2 = new UI(160, 30, { 635.0f, 495.0f, -1.0f }, blackBarMat);
+	UI* crowdBG2 = new UI(185, 30, { 395.0f, 545.0f, -1.0f }, blackBarMat);
+
+
+	ui = {
+		new Button(glm::vec2(200, 200), crowdBarMat)
+		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
+		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
+		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
+
+		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(590, 550), hpBarMat, hpBG2),
+		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(640, 500), stamBarMat, stamBG2),
+		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(395, 550), crowdBarMat, crowdBG2)
+	};
 }

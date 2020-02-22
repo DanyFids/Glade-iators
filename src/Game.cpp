@@ -31,6 +31,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	mousePos = glm::vec2(xpos, ypos);
 }
 
+void Game::setGameScene()
+{
+	curScene = OnePlayerScn;
+}
+
 Game::Game() :
 	window(nullptr),
 	windowTitle("Glade-iators"),
@@ -112,6 +117,7 @@ void Game::Initialize()
 
 	OnePlayerScn = new OnePlayer();
 	TwoPlayerScn = new TwoPlayer();
+	MainMenuScn = new MainMenu();
 	//Attack Init(0);
 	//Init.init();
 
@@ -122,7 +128,8 @@ void Game::Initialize()
 		curScene = TwoPlayerScn;
 	}
 	else {
-		curScene = OnePlayerScn;
+		//curScene = OnePlayerScn;
+		curScene = MainMenuScn;
 	}
 }
 

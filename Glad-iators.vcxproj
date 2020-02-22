@@ -114,6 +114,7 @@
     <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\PlayScenes.h" />
+    <ClInclude Include="src\PostProcess.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\SceneManager.h" />
     <ClInclude Include="src\Shader.h" />
@@ -133,6 +134,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Object.cpp" />
+    <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\PlayScenes.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\SceneManager.cpp" />

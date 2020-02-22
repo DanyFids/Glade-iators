@@ -10,6 +10,7 @@ class Game {
 public:
 	static glm::ivec2 SCREEN;
 	static Game* CURRENT;
+	void setGameScene();
 
 	Game();
 	~Game();
@@ -48,6 +49,7 @@ private:
 
 	Scene* OnePlayerScn;
 	Scene* TwoPlayerScn;
+	Scene* MainMenuScn;
 
 	bool wireframe = false;
 	bool w_pressed = false;

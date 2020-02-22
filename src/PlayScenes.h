@@ -69,3 +69,21 @@ public:
 	virtual void Draw() override;
 	virtual void LoadScene() override;
 };
+
+class MainMenu : public PlayScene {
+	Shader* shaderObj;
+	Shader* depthShader;
+	Shader* morphShader;
+	Shader* sunShader;
+	Object* morphyBoi;
+
+
+public:
+	MainMenu();
+
+	// Inherited via Scene
+	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
+	virtual void Update(float dt) override;
+	virtual void Draw() override;
+	virtual void LoadScene() override;
+};

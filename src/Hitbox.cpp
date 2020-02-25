@@ -482,18 +482,14 @@ glm::vec3 CapsuleHitbox::convertVec4(glm::vec4 _vec4)
 }
 
 void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
-{
+ {
 	shdr->Use();
 	shdr->SetI("material.diffuse", 0);
 	shdr->SetI("material.normal", 1);
 	shdr->SetI("material.specular", 2);
 	transform.scale = glm::vec3(radius);//
 	glm::mat4 model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),lowerBound);
-
- 	//glm::vec3 test = model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	
-
-	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));
 
 
 	unsigned int modelLoc = glGetUniformLocation(shdr->ID, "model");
@@ -551,15 +547,15 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 	glm::mat4 oT = oth->getParentTransform();
 	//oT = oT * glm::translate(glm::mat4(1.0f), oth->phys.move);
 	t = t * glm::translate(glm::mat4(1.0f), th->phys.move);
+
 	//Adding an indiscriminant value to 1 so we don't get destroyed by dividing by zero.
-
-	if (this->height == 1.0f) {
-		height += 0.000001f;
-	}
-
-	if (other->height == 1.0f) {
-		other->height += 0.000001f;
-	}
+	//if (this->height == 1.0f) {
+	//	height += 0.000001f;
+	//}
+	//
+	//if (other->height == 1.0f) {
+	//	other->height += 0.000001f;
+	//}
 
 	glm::vec3 tub = convertVec4(t * transform.GetWorldTransform() * glm::vec4(upperBound.x, upperBound.y, upperBound.z, 1.0f));
 	glm::vec3 tlb = convertVec4(t * transform.GetWorldTransform() * glm::vec4(lowerBound.x, lowerBound.y, lowerBound.z, 1.0f));
@@ -656,8 +652,6 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 				tD = c;
 			}
 		}
-
-
 
 		if (tN < 0.0f) { //tc < 0 , the t = 0 edge is visible.
 			tN = 0.0f;

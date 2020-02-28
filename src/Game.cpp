@@ -31,9 +31,16 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	mousePos = glm::vec2(xpos, ypos);
 }
 
-void Game::setGameScene()
+void Game::setScene(SCENES scn)
 {
-	curScene = OnePlayerScn;
+	switch (scn) {
+	case MAIN_MENU:
+		curScene = MainMenuScn;
+	case PLAY_SCENE:
+		curScene = OnePlayerScn;
+	case CHARACTER_SCENE:
+		curScene = CharacterScn;
+	}
 }
 
 Game::Game() :
@@ -118,6 +125,7 @@ void Game::Initialize()
 	OnePlayerScn = new OnePlayer();
 	TwoPlayerScn = new TwoPlayer();
 	MainMenuScn = new MainMenu();
+	CharacterScn = new CharacterC();
 	//Attack Init(0);
 	//Init.init();
 
@@ -125,7 +133,7 @@ void Game::Initialize()
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) && 
 		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
 
-		curScene = TwoPlayerScn;
+		curScene = MainMenuScn;
 	}
 	else {
 		//curScene = OnePlayerScn;

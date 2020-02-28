@@ -108,7 +108,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 {
 	GLFWgamepadstate state;
 	if (glfwGetGamepadState(controller, &state)) {
-		if (isMenu != true) {
+		if (isMenu != true && !ChangingScn) {
 			glm::vec2 rot = glm::vec2(0.0f, 0.0f);
 			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] < -0.2) {
 				rot.y = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
@@ -304,28 +304,53 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		}
 		else 
 		{
-			if (menu_time <= 0) {
-				if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2)
-				{
-					menuSpot--;
-					menu_time = MENU_TIME;
-				}
-				else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2) {
-					menuSpot++;
-					menu_time = MENU_TIME;
-				}
 
-				if (state.buttons[GLFW_GAMEPAD_BUTTON_A]) {
-					std::cout << menuSpot << std::endl;
-					if (menuSpot == 0) {
-						Game::CURRENT->setGameScene();
+			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 && menu_time[controller] <= 0)
+			{
+				menuSpot[controller]--;
+				menu_time[controller] = MENU_TIME;
+			}
+			else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2 && menu_time[controller] <= 0)
+			{	
+				menuSpot[controller]++;
+				menu_time[controller] = MENU_TIME;
+			}
+
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0) {
+				_Abutton[controller] = true;
+			}
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && menu_time[controller] <= 0) {
+				_Bbutton[controller] = true;
+			}
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && _Abutton[controller]) {
+				_Abutton[controller] = false;
+				std::cout << menuSpot[controller] << std::endl;
+				if (menuSpot[controller] == 10) {
+					if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
+						glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+						ChangingScn = true;
+						isMenu = false;
+						Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 					}
-					menu_time = MENU_TIME;
 				}
+				else if (menuSpot[controller] == 0) {
+					ChangingScn = true;
+					isMenu = false;
+					Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
+				}
+				menu_time[controller] = MENU_TIME;
+			}
+
+			if (menuSpot[controller] < MIN_MENU) {
+				menuSpot[controller] = MAX_MENU;
+			}
+			if (menuSpot[controller] > MAX_MENU) {
+				menuSpot[controller] = MIN_MENU;
 			}
 		}
 	}
-	menu_time -= dt;
+
+	menu_time[controller] -= dt;
 }
 
 void PlayScene::RenderScene(Shader* shader)

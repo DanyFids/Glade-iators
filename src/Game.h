@@ -6,11 +6,17 @@
 
 class Scene;
 
+enum SCENES {
+	MAIN_MENU,
+	PLAY_SCENE,
+	CHARACTER_SCENE
+};
+
 class Game {
 public:
 	static glm::ivec2 SCREEN;
 	static Game* CURRENT;
-	void setGameScene();
+	void setScene(SCENES scn);
 
 	Game();
 	~Game();
@@ -50,6 +56,7 @@ private:
 	Scene* OnePlayerScn;
 	Scene* TwoPlayerScn;
 	Scene* MainMenuScn;
+	Scene* CharacterScn;
 
 	bool wireframe = false;
 	bool w_pressed = false;

@@ -1,10 +1,10 @@
 #include "Scene.h"
 #include <iostream>
 
-#include"Camera.h"
-#include"Mesh.h"
-#include"Object.h"
-#include"Light.h"
+#include "Camera.h"
+#include "Mesh.h"
+#include "Object.h"
+#include "Light.h"
 #include "Constants.h"
 #include"UI.h"
 #include "Game.h"

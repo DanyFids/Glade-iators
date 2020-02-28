@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "Shader.h"
 #include"Constants.h"
+//#include <ft2build.h>
 
 Camera::Camera(glm::vec3 pos, glm::vec4 s_dim)
 {

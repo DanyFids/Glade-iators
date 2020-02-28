@@ -14,7 +14,6 @@
 
 int main() {
 	Game Instance = Game();
-
 	Instance.Run();
 }
 

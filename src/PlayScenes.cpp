@@ -3,8 +3,11 @@
 #include<GLFW/glfw3.h>
 #include<GLM/glm.hpp>
 #include <iostream>
+#include <sstream>
 #include <typeinfo>
 #include <random>
+#include <thread>
+#include <queue>
 
 #include"Mesh.h"
 #include"Shader.h"
@@ -142,8 +145,7 @@ void OnePlayer::Update(float dt)
 
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
-
-	
+	test_player->Update(dt);
 }
 
 void OnePlayer::Draw()
@@ -167,6 +169,7 @@ void OnePlayer::Draw()
 		glClear(GL_DEPTH_BUFFER_BIT);
 		lights[l]->SetupDepthShader(depthShader);
 		RenderScene(depthShader);
+		test_player->Draw(depthShader, Cam);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -187,6 +190,16 @@ void OnePlayer::Draw()
 	morphShader->SetI("num_lights", lights.size());
 	skelShader->SetI("num_lights", lights.size());
 
+	/*shaderObj->SetB("enable_a", enable_ambient);
+	shaderObj->SetB("enable_d", enable_diffuse);
+	shaderObj->SetB("enable_s", enable_spec);
+	shaderObj->SetB("enable_r", enable_rim);
+
+	skelShader->SetB("enable_a", enable_ambient);
+	skelShader->SetB("enable_d", enable_diffuse);
+	skelShader->SetB("enable_s", enable_spec);
+	skelShader->SetB("enable_r", enable_rim);*/
+
 	for (int c = 0; c < Cam.size(); c++) {
 		Cam[c]->SetupCam(shaderObj);
 
@@ -201,9 +214,12 @@ void OnePlayer::Draw()
 		glEnable(GL_DEPTH_TEST);
 
 		glDisable(GL_DEPTH_TEST);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		
 		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
 		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		test_player->hitbox->Draw(shaderObj, test_player->GetTransform().GetWorldTransform());
+
 
 
 		weapons[0]->hitbox->Draw(shaderObj, weapons[0]->getParentTransform());
@@ -211,6 +227,7 @@ void OnePlayer::Draw()
 		//players[0]->GetTransform().GetWorldTransform() * weapons[0]->GetTransform().GetWorldTransform();
 		//	players[1]->hitbox->Draw(shaderObj);
 
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_DEPTH_TEST);
 	}
 
@@ -227,6 +244,9 @@ void OnePlayer::Draw()
 
 void OnePlayer::LoadScene()
 {
+	isMenu = false;
+	ChangingScn = false;
+
 	Joint::init();
 	//{91f62782-35bd-42df-85a1-8f359308dd0c}
 
@@ -267,7 +287,7 @@ void OnePlayer::LoadScene()
 
 	Material* arenaTex = new Material("wood_texture.png");
 
-	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "Animations/attack.bvh");
+	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "bone_t.bvh");
 	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
 
 	gladiatorSkel->WriteTree();
@@ -291,25 +311,25 @@ void OnePlayer::LoadScene()
 	Hitbox* basicCubeHB2 = new CubeHitbox(1.0, 1.0f, 1.0f);
 
 	//Capsule testing
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f,2.0f); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,3.0f);
-	Hitbox* basicCapsuleHB3 = new CapsuleHitbox(0.6,2.0);
-	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.1f, 1.2f);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f,4.0f); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,4.0f);
+	Hitbox* basicCapsuleHB3 = new CapsuleHitbox(0.2,4.0);
+	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.2f, 2.0f);
 	//Capsule Testing
 
 	Hitbox* basicSphereHB = new SphereHitbox(1.0f);
-	Hitbox* shieldSphereHB = new SphereHitbox(0.70f);
+	Hitbox* shieldSphereHB = new SphereHitbox(1.0f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
 	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
-	players.push_back(new Player(d20, D20Tex, basicSphereHB)); //P2
+	players.push_back(new Player(d20, D20Tex, basicCapsuleHB2)); //P2
 
 	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
-	basicSphereHB->SetScale({0.5f, 1.0f, 1.0f});
+	//shieldSphereHB->SetScale({0.2f, 1.0f, 0.1f});
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ -6.0f, 0.0f, 0.0f });
-	//players[PLAYER_2]->Rotate(glm::vec3(0,0,25));
+	players[PLAYER_2]->Rotate(glm::vec3(45,0,45));
 	
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 
@@ -317,19 +337,19 @@ void OnePlayer::LoadScene()
 	test_player = new Player(GladiatorMesh, defaultTex, basicCapsuleHB3, { 0.0f, 0.0f, 0.0f });
 	test_player->Scale(glm::vec3(1.2f));
 
-	weapons.push_back(new Object(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_arm2.001"),GladiatorMesh));
-	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("l_arm2.001"), GladiatorMesh));
+	weapons.push_back(new Object(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_hand"),GladiatorMesh));
+	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("l_hand"), GladiatorMesh));
 
-	weapons[0]->SetPosition({0.15f, 0.0f, -0.125f});
+	weapons[0]->SetPosition({-0.12f, 0.0f, -0.12f});
 	weapons[0]->Scale({0.8f, 0.8f, 0.8f});
-	weapons[0]->SetRotation({0.0f, 0.0f, 90.0f});
+	weapons[0]->SetRotation({90.0f, 0.0f, 0.0f});
 	
 
-	shields[0]->SetPosition({ -0.35f, 0.05f, 0.0f });
-	shields[0]->Scale({ 0.7f, 0.5f, 0.5f });
+	shields[0]->SetPosition({ -0.15f, 0.05f, 0.0f });
+	shields[0]->Scale({ 0.05f, 0.4f, 0.4f });
 	shields[0]->SetRotation({ 0.0f, 0.0f, 270.0f });
 
-	shields[0]->hitbox->SetPosition(glm::vec3(0.0f, 0.3f, 0.0f));
+	//shields[0]->hitbox->SetPosition(glm::vec3(0.0f, 0.3f, 0.0f));
 	//glm::vec3 test = shields[0]->hitbox->GetTransform().position;
 	test_player->addChild(weapons[0]);
 	test_player->addChild(shields[0]);
@@ -343,8 +363,8 @@ void OnePlayer::LoadScene()
 	//players[2]->Scale(glm::vec3(1.2f)); 
 
 	Object* die = new Object(Square, DiceTex, basicCubeHB);
-	die->Move({ 4.0f, 1.0f, 0.0f });
-	//terrain.push_back(die);
+	die->Move({ 8.0f, 1.0f, -3.0f });
+	terrain.push_back(die);
 
 	////SAT Testing Stuff
 	//Object* SATtest1 = new Object(Square, DiceTex, basicCubeHB);
@@ -411,7 +431,93 @@ void OnePlayer::LoadScene()
 
 	// DEBUG THINGS
 	DebugShader = new Shader("Shaders/debug.vert", "Shaders/debug.frag");
-	DebugQuad = new Mesh(square, 4, square_index, 6); 
+	DebugQuad = new Mesh(square, 4, square_index, 6);
+
+	// Console?
+	auto console = [this]() {
+		std::string line = "";
+		std::string read;
+
+		std::queue<std::string> input;
+
+		while (true) {
+			while (input.size() > 0) {
+				input.pop();
+			}
+
+			std::cout << "> ";
+			std::getline(std::cin, line);
+
+			auto pos = line.find(" ");
+
+			while (pos != std::string::npos) {
+				read = line.substr(0, pos);
+				line.erase(0, pos+1);
+
+				input.push(read);
+
+				pos = line.find(" ");
+			}
+
+			input.push(line);
+
+			if (input.size() > 0) {
+				std::string command = input.front();
+				input.pop();
+
+				if (command.compare("play") == 0) {
+					if (input.size() >= 2) {
+						std::string target_n = input.front();
+						input.pop();
+
+						Player* target;
+
+						if (target_n.compare("test_player") == 0) {
+							target = this->GetTestPlayer();
+						}
+						else if(target_n.compare("player_1")) {
+							target = this->GetPlayer(PLAYER_1);
+						}
+						else if (target_n.compare("player_2")) {
+							target = this->GetPlayer(PLAYER_2);
+						}
+						else {
+							std::cout << "Error: Invalid Target!" << std::endl;
+							continue;
+						}
+
+						std::string anim = input.front();
+						input.pop();
+
+						int a = ((SkelMesh*)target->GetMesh())->GetSkeleton()->GetAnimByName(anim);
+						if (a > -1) {
+							((SkelMesh*)target->GetMesh())->SetAnim(a);
+							std::cout << target_n + " playing: " + anim << std::endl;
+							continue;
+						}
+						else {
+							std::cout << "Error: Animation not found." << std::endl;
+							continue;
+						}
+					}
+					else {
+						std::cout << "Error: play requires 2 arguments: [target] [anim_name]" << std::endl;
+						continue;
+					}
+				}
+				else if (command.compare("exit") == 0) {
+					break;
+				}
+				else {
+					std::cout << "Error: Invalid Command." << std::endl;
+					continue;
+				}
+
+			}
+		}
+	};
+
+	threadObj = std::thread(console);
 }
 
 
@@ -581,6 +687,9 @@ void TwoPlayer::Draw()
 
 void TwoPlayer::LoadScene()
 {
+	isMenu = false;
+	ChangingScn = false;
+
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
@@ -700,4 +809,330 @@ void TwoPlayer::LoadScene()
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(15.0f, 1.0f, 2.0f));
 
+}
+
+MainMenu::MainMenu()
+{
+	LoadScene();
+}
+
+void MainMenu::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
+{
+	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
+		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_2, dt);
+		}
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
+		}
+	}
+	else {
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_1, dt);
+		}
+
+	}
+}
+
+void MainMenu::Update(float dt)
+{
+
+	//audioEngine.Update();
+
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Update(dt);
+	}
+
+	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
+
+}
+
+void MainMenu::Draw()
+{
+	glCullFace(GL_FRONT);
+
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
+	glClear(GL_DEPTH_BUFFER_BIT);
+	sun->SetupDepthShader(sunShader);
+
+	RenderScene(sunShader);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
+
+	for (int l = 0; l < lights.size(); l++) {
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
+		glClear(GL_DEPTH_BUFFER_BIT);
+		lights[l]->SetupDepthShader(depthShader);
+		RenderScene(depthShader);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+		glActiveTexture(GL_TEXTURE4 + l);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[l]->GetDepthMap());
+	}
+	glCullFace(GL_BACK);
+
+	sun->SetupLight(shaderObj);
+	sun->SetupLight(morphShader);
+
+	for (int c = 0; c < lights.size(); c++) {
+		lights[c]->SetupLight(shaderObj, c);
+		lights[c]->SetupLight(morphShader, c);
+
+	}
+	shaderObj->SetI("num_lights", lights.size());
+	//morphShader->SetI("num_lights", lights.size());
+
+
+	for (int c = 0; c < Cam.size(); c++) {
+		Cam[c]->SetupCam(shaderObj);
+
+		RenderScene(shaderObj);
+		Cam[c]->SetupCam(morphShader);
+		//morphyBoi->Draw(morphShader, Cam);
+
+		//glDisable(GL_DEPTH_TEST);
+		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		////	players[1]->hitbox->Draw(shaderObj);
+		//
+		//glEnable(GL_DEPTH_TEST);
+	}
+
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glDisable(GL_DEPTH_TEST);
+
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
+	}
+	glEnable(GL_DEPTH_TEST);
+
+}
+
+void MainMenu::LoadScene()
+{
+	isMenu = true;
+	ChangingScn = false;
+
+	MAX_MENU = 0;
+	MIN_MENU = -2;
+
+	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
+
+	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
+	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
+	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
+
+	Material* hpBarMat = new Material("yuck.png");
+	Material* stamBarMat = new Material("blue.png");
+	Material* crowdBarMat = new Material("white.png");
+	Material* blackBarMat = new Material("black.png");
+
+
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
+	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
+
+	Cam = {
+		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT))
+	};
+
+	UI* hpBG = new UI(210, 30, { 5.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* stamBG = new UI(160, 30, { 5.0f, 495.0f, -1.0f }, blackBarMat);
+	UI* crowdBG = new UI(185, 30, { 220.0f, 545.0f, -1.0f }, blackBarMat);
+
+	UI* hpBG2 = new UI(210, 30, { 585.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* stamBG2 = new UI(160, 30, { 635.0f, 495.0f, -1.0f }, blackBarMat);
+	UI* crowdBG2 = new UI(185, 30, { 395.0f, 545.0f, -1.0f }, blackBarMat);
+
+
+	ui = {
+		new Button(glm::vec2(200, 200), crowdBarMat)
+		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
+		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
+		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
+
+		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(590, 550), hpBarMat, hpBG2),
+		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(640, 500), stamBarMat, stamBG2),
+		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(395, 550), crowdBarMat, crowdBG2)
+	};
+}
+
+CharacterC::CharacterC()
+{
+	LoadScene();
+}
+
+void CharacterC::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
+{
+	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
+		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_2, dt);
+		}
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
+		}
+	}
+	else {
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_1, dt);
+		}
+
+	}
+}
+
+void CharacterC::Update(float dt)
+{
+
+	//audioEngine.Update();
+
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Update(dt);
+	}
+
+	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
+
+}
+
+void CharacterC::Draw()
+{
+	glCullFace(GL_FRONT);
+
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
+	glClear(GL_DEPTH_BUFFER_BIT);
+	sun->SetupDepthShader(sunShader);
+
+	RenderScene(sunShader);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
+
+	for (int l = 0; l < lights.size(); l++) {
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
+		glClear(GL_DEPTH_BUFFER_BIT);
+		lights[l]->SetupDepthShader(depthShader);
+		RenderScene(depthShader);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+		glActiveTexture(GL_TEXTURE4 + l);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[l]->GetDepthMap());
+	}
+	glCullFace(GL_BACK);
+
+	sun->SetupLight(shaderObj);
+	sun->SetupLight(morphShader);
+
+	for (int c = 0; c < lights.size(); c++) {
+		lights[c]->SetupLight(shaderObj, c);
+		lights[c]->SetupLight(morphShader, c);
+
+	}
+	shaderObj->SetI("num_lights", lights.size());
+	//morphShader->SetI("num_lights", lights.size());
+
+
+	for (int c = 0; c < Cam.size(); c++) {
+		Cam[c]->SetupCam(shaderObj);
+
+		RenderScene(shaderObj);
+		Cam[c]->SetupCam(morphShader);
+		//morphyBoi->Draw(morphShader, Cam);
+
+		//glDisable(GL_DEPTH_TEST);
+		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		////	players[1]->hitbox->Draw(shaderObj);
+		//
+		//glEnable(GL_DEPTH_TEST);
+	}
+
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glDisable(GL_DEPTH_TEST);
+
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
+	}
+	glEnable(GL_DEPTH_TEST);
+
+}
+
+void CharacterC::LoadScene()
+{
+	isMenu = true;
+	ChangingScn = false;
+
+	MAX_MENU = 10;
+	MIN_MENU = 8;
+
+	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
+
+	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
+	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
+	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
+
+	Material* hpBarMat = new Material("yuck.png");
+	Material* stamBarMat = new Material("blue.png");
+	Material* crowdBarMat = new Material("white.png");
+	Material* blackBarMat = new Material("black.png");
+
+
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
+	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
+
+	Cam = {
+		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT))
+	};
+
+	UI* hpBG = new UI(210, 30, { 5.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* stamBG = new UI(160, 30, { 5.0f, 495.0f, -1.0f }, blackBarMat);
+	UI* crowdBG = new UI(185, 30, { 220.0f, 545.0f, -1.0f }, blackBarMat);
+
+	UI* hpBG2 = new UI(210, 30, { 585.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* stamBG2 = new UI(160, 30, { 635.0f, 495.0f, -1.0f }, blackBarMat);
+	UI* crowdBG2 = new UI(185, 30, { 395.0f, 545.0f, -1.0f }, blackBarMat);
+
+
+	ui = {
+		new Button(glm::vec2(400, 200), crowdBarMat)
+		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
+		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
+		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
+
+		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(590, 550), hpBarMat, hpBG2),
+		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(640, 500), stamBarMat, stamBG2),
+		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(395, 550), crowdBarMat, crowdBG2)
+	};
 }

@@ -92,3 +92,14 @@ public:
 	virtual void Update(float dt);
 	virtual void Draw(glm::vec2 scrn);
 };
+
+class Button : public UI {
+	static const int HEIGHT;
+	static const int MAX_WIDTH;
+
+public:
+	Button(glm::vec2 pos, Material* ma);
+
+	virtual void Update(float dt);
+	virtual void Draw(glm::vec2 scrn);
+};

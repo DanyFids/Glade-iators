@@ -16,14 +16,31 @@ struct UpdateBehaviour {
 	std::function<void(entt::entity e, float dt)> Function;
 };
 
+glm::ivec2 Game::SCREEN = glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT);
+Game* Game::CURRENT = nullptr;
+
 void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
+	Game::SCREEN = glm::ivec2(width, height);
+	Game::CURRENT->curScene->ResizeCams();
 }
 
 glm::vec2 mousePos = glm::vec2(400, 300);
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	mousePos = glm::vec2(xpos, ypos);
+}
+
+void Game::setScene(SCENES scn)
+{
+	switch (scn) {
+	case MAIN_MENU:
+		curScene = MainMenuScn;
+	case PLAY_SCENE:
+		curScene = OnePlayerScn;
+	case CHARACTER_SCENE:
+		curScene = CharacterScn;
+	}
 }
 
 Game::Game() :
@@ -107,6 +124,8 @@ void Game::Initialize()
 
 	OnePlayerScn = new OnePlayer();
 	TwoPlayerScn = new TwoPlayer();
+	MainMenuScn = new MainMenu();
+	CharacterScn = new CharacterC();
 	//Attack Init(0);
 	//Init.init();
 
@@ -114,10 +133,11 @@ void Game::Initialize()
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) && 
 		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
 
-		curScene = TwoPlayerScn;
+		curScene = MainMenuScn;
 	}
 	else {
-		curScene = OnePlayerScn;
+		//curScene = OnePlayerScn;
+		curScene = MainMenuScn;
 	}
 }
 

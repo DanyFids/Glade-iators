@@ -147,7 +147,8 @@ void Shader::Use()
 void Shader::SetB(const std::string name, bool value)
 {
 	Use();
-	glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
+	unsigned int loc = glGetUniformLocation(ID, name.c_str());
+	glUniform1i(loc, (int)value);
 }
 
 void Shader::SetI(const std::string name, int value)

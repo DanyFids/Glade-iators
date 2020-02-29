@@ -7,6 +7,8 @@
 #include<fstream>
 #include<iostream>
 #include<sstream>
+#include <math.h>
+#include <stack>
 
 ChannelType StringToChnlTp(std::string name)
 {
@@ -32,12 +34,39 @@ ChannelType StringToChnlTp(std::string name)
 	return ChannelType::INVALID_CHNL_TYPE;
 }
 
+glm::mat4 FindAxisRot(glm::vec3 tail) {
+	glm::vec3 base(0.0f, 0.0f, 1.0f);
+	glm::vec3 ntail = glm::normalize(tail);
+
+	glm::vec3 rot = glm::vec3();
+
+	rot.x = std::atan2f(-tail.y, tail.z);
+	rot.y = std::atan2f(tail.x, tail.z);
+	//rot.z = std::atan2f(ntail.x, ntail.y);
+
+	glm::mat4 axisRot = glm::mat4(glm::angleAxis(rot.x, glm::vec3(1.0f, 0.0f, 0.0f)) * glm::angleAxis(rot.y, glm::vec3(0.0f, 1.0f, 0.0f)) * glm::angleAxis(rot.z, glm::vec3(0.0f, 0.0f, 1.0f)));
+
+	glm::vec4 test = glm::inverse(axisRot) * (glm::vec4(tail / glm::length(tail), 1.0f));
+	glm::vec4 test2 = glm::vec4(glm::vec3(test.x, test.y, test.z) * glm::length(tail), 1.0) * axisRot;
+	glm::vec4 test3 = axisRot * glm::vec4(glm::vec3(test.x, test.y, test.z) * glm::length(tail), 1.0);
+	glm::vec4 test4 = glm::inverse(axisRot) * glm::rotate(glm::mat4(1.0f), 0.5f, {0.0f, 1.0f, 0.0f}) * axisRot * glm::vec4(tail, 1.0f);
+	glm::vec4 test5 = glm::rotate(glm::mat4(1.0f), 0.5f, { 0.0f, 1.0f, 0.0f }) * glm::vec4(tail, 1.0f);
+
+	if (tail.x != 0 && tail.y != 0 && tail.z != 0) {
+		std::cout << "HOI!!!" << std::endl;
+	}
+
+ 	return axisRot;
+}
+
 Mesh* Joint::node_mesh = nullptr;
 Material* Joint::node_mat = nullptr;
 
 void Joint::init()
 {
-	if(node_mesh == nullptr) node_mesh = new Mesh("node.obj");
+	if (node_mesh == nullptr) {
+		node_mesh = new Mesh("node.obj");
+	}
 	if (node_mat == nullptr) node_mat = new Material("default-texture.png", "default-normal.png");
 }
 
@@ -140,13 +169,47 @@ void Joint::Draw(glm::mat4 global, int a, int f, Shader* shader)
 	}
 }
 
-void Joint::FillJointArray(glm::mat4* arr, glm::mat4 global, glm::vec3* binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim = 0, int frame = 0)
+void Joint::FillJointArray(glm::mat4* arr, glm::mat4*& axis, glm::mat4*& axis_i, glm::mat3* norms, glm::mat4 global, glm::vec3* binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim = 0, int frame = 0)
 {
-	glm::mat4 trans = global * animations[anim][frame].GetQuatTransform();
+	glm::mat4 local_trans;
+
+	if (parent != nullptr) {
+		std::stack<glm::mat4> parentStack;
+		Joint* cur = parent;
+		while (cur != nullptr) {
+			parentStack.push(cur->axisRot);
+			cur = cur->parent;
+		}
+
+		glm::mat4 local_rot = animations[anim][frame].GetRotEul();
+
+		while (parentStack.size() > 0) {
+			auto par = parentStack.top();
+			local_rot = glm::inverse(par) * local_rot * par;
+			parentStack.pop();
+		}
+
+		local_rot = local_rot * axisRot;
+
+		local_trans = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f) * glm::length(offset)) * // Offset
+			glm::translate(glm::mat4(1.0f), animations[anim][frame].position - offset) * // Translations
+			local_rot * // Rotation
+			glm::scale(glm::mat4(1.0f), animations[anim][frame].scale); // scale
+	}
+	else {
+		local_trans = glm::translate(glm::mat4(1.0f), animations[anim][frame].position) * axisRot * animations[anim][frame].GetRotEul() * glm::scale(glm::mat4(1.0f), animations[anim][frame].scale);
+	}
+
+	//glm::mat4 trans = global * local_trans;
+	glm::mat4 trans = global * animations[anim][frame].GetWorldTransform();
 	glm::vec3 bind = last + offset;
+	glm::mat3 norm = glm::mat3(glm::transpose(glm::inverse(trans)));
 	arr[cur] = trans;
 	binds[cur] = bind;
+	axis[cur] = axisRot;
+	axis_i[cur] = glm::inverse(axisRot);
 	//bind_t[cur] = global;
+	norms[cur] = norm;
 	cur++;
 	
 	/*if ((name.compare("l_shoulder") == 0 || name.compare("r_shoulder") == 0 || name.compare("neck") == 0 ) && frame == 1) {
@@ -158,7 +221,7 @@ void Joint::FillJointArray(glm::mat4* arr, glm::mat4 global, glm::vec3* binds, g
 	for (int c = 0; c < children.size(); c++) {
 		glm::vec3 next_bt = last_b + glm::vec3(trans * glm::vec4(children[c]->offset, 0.0f));
 		bind_t[cur] = next_bt;
-		children[c]->FillJointArray(arr, trans, binds, bind, bind_t, next_bt, cur, anim, frame);
+		children[c]->FillJointArray(arr, axis, axis_i, norms, trans, binds, bind, bind_t, next_bt, cur, anim, frame);
 	}
 }
 
@@ -170,6 +233,10 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 
 	if (animations[anim].size() <= frame) {
 		animations[anim].push_back(Transform());
+	}
+
+	if (this->name.compare("l_leg2") == 0) {
+		std::cout << "HOI!!" << std::endl;
 	}
 
 	for (int c = 0; c < channels.size(); c++) {
@@ -188,13 +255,13 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 			animations[anim][frame].position.y = val;
 			break;
 		case ChannelType::Xrotation:
-			animations[anim][frame].rotation.x = -val * corr;
+			animations[anim][frame].rotation.x = -val;
 			break;
 		case ChannelType::Yrotation:
-			animations[anim][frame].rotation.z = val;
+			animations[anim][frame].rotation.z = -val;
 			break;
 		case ChannelType::Zrotation:
-			animations[anim][frame].rotation.y = val * corr;
+			animations[anim][frame].rotation.y = val;
 			break;
 		default:
 			std::cout << "ERROR::SKELETON:: '" + name + "' ::LOAD_FRAME::INVALID_CHANNEL";
@@ -203,6 +270,12 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 
 		values.pop();
 	}
+
+	if (channels.size() <= 3 && (int)channels[0] > 3) {
+		animations[anim][frame].position = offset;
+	}
+
+	//animations[anim][frame].position = glm::vec3(0.0f, 0.0f, glm::length(offset));
 
 	if (name.compare("l_arm1") == 0 || name.compare("r_arm1") == 0) {
 		//std::cout << "HOI!!!" << std::endl;
@@ -276,11 +349,13 @@ int Skeleton::LoadFromFile(std::string f)
 		else if (read.compare("OFFSET") == 0) {
 			if (cur != nullptr) {
 				file >> read;
-				cur->offset.x = std::stof(read);
+				cur->offset.x = -std::stof(read);
 				file >> read;
 				cur->offset.z = std::stof(read);
 				file >> read;
 				cur->offset.y = std::stof(read);
+
+				cur->animations[0][0].position = cur->offset;
 				continue;
 			}
 			else return -3;
@@ -296,31 +371,74 @@ int Skeleton::LoadFromFile(std::string f)
 		}
 		else if (read.compare("}") == 0) {
 			if (cur != nullptr) {
+				if (cur->children.size() > 0) {
+					glm::vec3 avg = glm::vec3(0.0f);
+					for (int c = 0; c < cur->children.size(); c++) {
+						avg += cur->children[c]->offset;
+					}
+					avg /= cur->children.size();
+
+					cur->tail = avg;
+				}
+
+
+				cur->axisRot = FindAxisRot(cur->tail);
+
 				cur = cur->parent;
 				continue;
 			}
 			else return -3;
 		}
 		else if (read.compare("End") == 0) {
+			glm::vec3 temp;
+
 			file.ignore(512, (int)'\n');
 			file.ignore(512, (int)'\n');
+
+			file >> read; // eat OFFSET
+			file >> read; // x offset;
+			temp.x = std::stof(read);
+			
+			file >> read; // y offset
+			temp.z = std::stof(read);
+
+			file >> read; // z offset
+			temp.y = std::stof(read);
+
 			file.ignore(512, (int)'\n');
 			file.ignore(512, (int)'\n');
+
+			cur->tail = temp;
+
 			continue;
 		}
 		else if (read.compare("MOTION") == 0) {
+			file >> read;
+			
+			anim_names.push_back(read);
+
 			int num_frames = 0;
 			int anim = root->animations.size();
 
 			AnimStates.push_back(std::vector<FrameStates>());
 
+			file >> read; // eat
 			file >> read;
-			file.ignore(512, (int)'\n');
-			file.ignore(512, (int)'\n');
+			
+			int expected_frames = std::stoi(read);
+
+			file >> read; // eat
+			file >> read; // eat
+			file >> read;
+
+			anim_ft.push_back(std::stof(read));
+
+			file.ignore(512, '\n');
+
 			int yeetval = 1;
 			int yootval = 1;
 			while (!file.eof()) {
-				file >> read;
+				/*file >> read;
 				if (read.compare("N") == 0)
 				{
 					std::cout << yeetval << "yeet \n";
@@ -336,10 +454,11 @@ int Skeleton::LoadFromFile(std::string f)
 					AnimStates[AnimStates.size() - 1].push_back(Attack);
 					file >> read;
 					//file.ignore(2);
-				}
+				}*/
 				std::queue<float> values;
 				std::stringstream line;
 				std::string temp;
+
 
 				std::getline(file, temp);
 
@@ -376,18 +495,36 @@ Joint* Skeleton::Find(std::string name)
 	return ret;
 }
 
-void Skeleton::GetTransformArray(glm::mat4* & ret, glm::vec3* & binds, glm::vec3*& bind_t, int anim = 0, int frame = 0)
+void Skeleton::GetTransformArray(glm::mat4* & ret, glm::mat4* & axis, glm::mat4* & axis_i, glm::mat3* & norms, glm::vec3* & binds, glm::vec3*& bind_t, int anim = 0, int frame = 0)
 {
 	ret = new glm::mat4[num_bones];
 	binds = new glm::vec3[num_bones];
 	bind_t = new glm::vec3[num_bones];
+	norms = new glm::mat3[num_bones];
+	axis = new glm::mat4[num_bones];
+	axis_i = new glm::mat4[num_bones];
 
 	int id = 0;
 
 	for (int c = 0; c < root->children.size(); c++) {
 		glm::vec3 newPos = root->offset + glm::vec3(root->animations[anim][frame].GetWorldTransform() * glm::vec4(root->children[c]->offset, 0.0f));
 		bind_t[id] = glm::vec3(newPos);
-		root->children[c]->FillJointArray(ret, root->animations[anim][frame].GetWorldTransform(), binds, root->offset, bind_t, newPos, id, anim, frame);
+		root->children[c]->FillJointArray(ret, axis, axis_i, norms, root->animations[anim][frame].GetWorldTransform(), binds, root->offset, bind_t, newPos, id, anim, frame);
 	}
 
+}
+
+int Skeleton::GetAnimByName(std::string n)
+{
+	int ret;
+
+	for (ret = 0; ret < anim_names.size(); ret++) {
+		if (anim_names[ret].compare(n) == 0)
+			break;
+	}
+
+	if (ret < anim_names.size())
+		return ret;
+	else
+		return -1;
 }

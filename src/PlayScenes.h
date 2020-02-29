@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include <thread>
 
 #include "Sound.h"
 
@@ -24,6 +25,8 @@ class OnePlayer: public PlayScene {
 	bool debug = false;
 	bool f3_pressed;
 	int disp_depth = 0;
+	
+	std::thread threadObj;
 
 	Object* morphyBoi;
 	Object* staticBoi;
@@ -40,6 +43,12 @@ public:
 	virtual void Update(float dt) override;
 	virtual void Draw() override;
 	virtual void LoadScene() override;
+
+	Player* GetPlayer(int i) { return (Player*) players[i]; }
+	Player* GetTestPlayer() { return test_player; }
+
+	// CG ASSINGMENT FUNCS
+
 };
 
 class TwoPlayer: public PlayScene {
@@ -54,6 +63,38 @@ class TwoPlayer: public PlayScene {
 	Object* morphyBoi;
 public:
 	TwoPlayer();
+	// Inherited via Scene
+	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
+	virtual void Update(float dt) override;
+	virtual void Draw() override;
+	virtual void LoadScene() override;
+};
+
+class MainMenu : public PlayScene {
+	Shader* shaderObj;
+	Shader* depthShader;
+	Shader* morphShader;
+	Shader* sunShader;
+
+public:
+	MainMenu();
+
+	// Inherited via Scene
+	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
+	virtual void Update(float dt) override;
+	virtual void Draw() override;
+	virtual void LoadScene() override;
+};
+
+class CharacterC : public PlayScene {
+	Shader* shaderObj;
+	Shader* depthShader;
+	Shader* morphShader;
+	Shader* sunShader;
+
+public:
+	CharacterC();
+
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
 	virtual void Update(float dt) override;

@@ -36,6 +36,13 @@ private:
 class Scene {
 protected:
 	std::vector<Camera*> Cam;
+	int menuSpot[2]{ 0, 0 };
+	int MAX_MENU;
+	int MIN_MENU;
+	const float MENU_TIME = 0.2f;
+	float menu_time[2];
+	bool _Abutton[2] {false, false};
+	bool _Bbutton[2] {false, false};
 
 	// Mouse Vars
 	float m_lastX = 400;
@@ -50,6 +57,7 @@ public:
 	virtual void Draw() = 0;
 	virtual void LoadScene() = 0;
 	virtual std::vector<Camera*> GetCams() { return Cam; }
+	virtual void ResizeCams();
 };
 
 class MenuItem {
@@ -102,6 +110,9 @@ protected:
 
 	bool Target1 = false;
 	bool Target2 = false;
+
+	bool isMenu;
+	bool ChangingScn = false;
 
 	SplineMan* DUUDE;
 

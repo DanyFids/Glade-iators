@@ -35,6 +35,8 @@ public:
 
 	void TogglePerspective();
 
+	void UpdateScreen(glm::vec4 screen_dim);
+
 	// Getters
 	glm::mat4 GetLookAt();
 	glm::mat4 GetProject();

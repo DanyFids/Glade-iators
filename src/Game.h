@@ -6,12 +6,24 @@
 
 class Scene;
 
+enum SCENES {
+	MAIN_MENU,
+	PLAY_SCENE,
+	CHARACTER_SCENE
+};
+
 class Game {
 public:
+	static glm::ivec2 SCREEN;
+	static Game* CURRENT;
+	void setScene(SCENES scn);
+
 	Game();
 	~Game();
 
 	void Run();
+
+	friend void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height);
 protected:
 	void Initialize();
 	void Shutdown();
@@ -43,6 +55,8 @@ private:
 
 	Scene* OnePlayerScn;
 	Scene* TwoPlayerScn;
+	Scene* MainMenuScn;
+	Scene* CharacterScn;
 
 	bool wireframe = false;
 	bool w_pressed = false;

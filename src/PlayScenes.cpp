@@ -63,18 +63,6 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void OnePlayer::Update(float dt)
 {
-	if (players[0]->HitDetect(weapons[0])) {
-		/*if ((players[1]->GetMesh()).AnimStates[0][0] == Attack) {
-			std::cout << "WEAPON HIT\n";
-		}*/
-		/*else {
-			std::cout << "WEAPON NEUTRAL\n";
-		}*/
-	}
-
-	if (players[PLAYER_1]->HitDetect(shields[0])) {
-
-	}
 
 	audioEngine.Update();
 	for (int c = 0; c < players.size(); c++) {
@@ -88,8 +76,6 @@ void OnePlayer::Update(float dt)
 				}
 			}
 		}
-
-
 
 
 		if (glfwJoystickPresent(c) && glfwJoystickIsGamepad(c)) {
@@ -323,15 +309,16 @@ void OnePlayer::LoadScene()
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
 
-	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
+	players.push_back(new Player(boi, defaultTex, basicCapsuleHB, { -4.0f, 0.0f, 0.0f })); // P1
 	players.push_back(new Player(d20, D20Tex, basicCapsuleHB2)); //P2
 
 	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
 	//shieldSphereHB->SetScale({0.2f, 1.0f, 0.1f});
+	players[PLAYER_1]->dmgHP(50);
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ -6.0f, 0.0f, 0.0f });
-	players[PLAYER_2]->Rotate(glm::vec3(45,0,45));
+	//players[PLAYER_2]->Rotate(glm::vec3(45,0,45));
 	
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 

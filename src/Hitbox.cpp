@@ -543,10 +543,10 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 
 bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
  {
+
 	glm::mat4 t = th->getParentTransform();
-	glm::mat4 oT = oth->getParentTransform();
+	glm::mat4 oT = oth->getParentTransform(glm::translate(glm::mat4(1.0f), oth->phys.move));
 	//oT = oT * glm::translate(glm::mat4(1.0f), oth->phys.move);
-	t = t * glm::translate(glm::mat4(1.0f), th->phys.move);
 
 	//Adding an indiscriminant value to 1 so we don't get destroyed by dividing by zero.
 	//if (this->height == 1.0f) {
@@ -694,15 +694,19 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 		//sc and tc are the parameters for vector lines A and B (multiplier to be a point along them)
 
 		totalDist = glm::length(LineC + (sc * LineA) - (tc * LineB));
+
 	}
 
-	
-
-	if (totalDist <= totalRadius) {
+	//float difference = totalDist - totalRadius;
+	//
+	//if (difference < 0.00000599f && difference > -0.00000599f) {
+	//	return true;
+	//}
+	//else
+	if (totalDist < totalRadius)
 		return true;
-	}
-
-	return false;
+	else
+		return false;
 }
 
 bool CapsuleHitbox::HitDetect(Object* th, CubeHitbox* other, Object* oth)

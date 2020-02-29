@@ -114,7 +114,7 @@ public:
 	void SetRotation(glm::vec3 rot);
 	void addChild(Object* child);
 
-	glm::mat4 getParentTransform();
+	glm::mat4 getParentTransform(glm::mat4 pred = glm::mat4(1.0f));
 
 	virtual bool HitDetect(Object* other);
 

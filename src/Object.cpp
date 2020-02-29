@@ -163,12 +163,12 @@ void Object::addChild(Object* child)
 	child->parent = this;
 }
 
-glm::mat4 Object::getParentTransform()
+glm::mat4 Object::getParentTransform(glm::mat4 pred)
 {
 	if (parent != nullptr)
-		return parent->getParentTransform() * TransformTo() * transform.GetWorldTransform();
+		return parent->getParentTransform() * TransformTo() * pred * transform.GetWorldTransform();
 	else
-		return TransformTo() * transform.GetWorldTransform();
+		return TransformTo() * pred * transform.GetWorldTransform();
 	
 }
 
@@ -264,19 +264,21 @@ void Player::Update(float dt)
 
 bool Player::HitDetect(Object* other) 
 {
-	Transform predict = transform;
-	predict.position += phys.move;
+	if (glm::length(phys.move) > 0.0f) {
+		int i = 1 + 1;
+	}
 
 	if (other->hitbox->HitDetect(other, (CapsuleHitbox*)this->hitbox, this)) { 
-		for (float t = 1.0f; t >= -0.1f; t -= 0.1f) {
-			t = glm::max(t, 0.0f);
-			glm::vec3 fixSpd = lerp(glm::vec3(0.0f, 0.0f, 0.0f), phys.move, t);
+		for (int t = 10; t >= 0; t--) {
+			float l = (float)t / 10.0f;
+			glm::vec3 fixSpd = lerp(glm::vec3(0.0f, 0.0f, 0.0f), phys.move, l);
 
-			predict = transform;
-			predict.position += fixSpd;
+			//predict = transform;
+			//predict.position += fixSpd;
+			phys.move = fixSpd;
 
-			if (!other->hitbox->HitDetect(other, (CapsuleHitbox*)this->hitbox, this) || t == 0.0f) {
-				phys.move = fixSpd;
+
+			if (!other->hitbox->HitDetect(other, (CapsuleHitbox*)this->hitbox, this) || t == 0) {
 				break;
 			}
 		}

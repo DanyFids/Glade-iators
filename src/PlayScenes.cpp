@@ -23,6 +23,7 @@
 #include"Skeleton.h"
 #include"Lerp.h"
 #include "Sound.h"
+#include "Text.h"
 
 OnePlayer::OnePlayer()
 {
@@ -914,6 +915,9 @@ void MainMenu::Draw()
 		//glEnable(GL_DEPTH_TEST);
 	}
 
+
+
+
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glDisable(GL_DEPTH_TEST);
@@ -921,6 +925,8 @@ void MainMenu::Draw()
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+
 	glEnable(GL_DEPTH_TEST);
 
 }
@@ -938,6 +944,7 @@ void MainMenu::LoadScene()
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
+	
 
 	Material* hpBarMat = new Material("yuck.png");
 	Material* stamBarMat = new Material("blue.png");
@@ -961,9 +968,13 @@ void MainMenu::LoadScene()
 	UI* stamBG2 = new UI(160, 30, { 635.0f, 495.0f, -1.0f }, blackBarMat);
 	UI* crowdBG2 = new UI(185, 30, { 395.0f, 545.0f, -1.0f }, blackBarMat);
 
+	
+	//RenderText(shader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
+	//RenderText(shader, "(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
 
 	ui = {
 		new Button(glm::vec2(200, 200), crowdBarMat)
+
 		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
 		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
 		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),

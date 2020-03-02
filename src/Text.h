@@ -3,23 +3,30 @@
 #include FT_FREETYPE_H
 #include <iostream>
 #include <GLM/glm.hpp>
-#include<GLM/gtc/matrix_transform.hpp>
+#include <GLM/gtc/matrix_transform.hpp>
 #include <map>
+#include "Game.h"
+#include "Shader.h"
 
 struct Char {
-	int TextureID;  // ID handle of the glyph texture
-	glm::vec2 Size;       // Size of glyph
-	glm::vec2 Bearing;    // Offset from baseline to left/top of glyph
-	int Advance;    // Offset to advance to next glyph
+	GLint TextureID;  // ID handle of the glyph texture
+	glm::ivec2 Size;       // Size of glyph
+	glm::ivec2 Bearing;    // Offset from baseline to left/top of glyph
+	GLint Advance;    // Offset to advance to next glyph
 };
+
+//class Shader;
 
 class TextRenderer
 {
-	TextRenderer(bool Bold);
+public:
+	TextRenderer();
 
-	void RenderText();
-	glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
-
+	static Shader* TEXTSHADER;
+	std::map<GLchar, Char> Chars;
+	void RenderText(Shader* s, std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color);
+	static glm::mat4 projection;
+	static void INIT();
 
 };
 

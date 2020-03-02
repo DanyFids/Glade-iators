@@ -56,7 +56,6 @@ class TwoPlayer: public PlayScene {
 	Shader* depthShader;
 	Shader* morphShader;
 
-
 	Shader* sunShader;
 
 
@@ -75,7 +74,6 @@ class MainMenu : public PlayScene {
 	Shader* depthShader;
 	Shader* morphShader;
 	Shader* sunShader;
-
 public:
 	MainMenu();
 

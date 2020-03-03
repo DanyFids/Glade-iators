@@ -127,6 +127,7 @@ void Game::Initialize()
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
 	UI::INIT();
+	TextRenderer::INIT();
 
 	OnePlayerScn = new OnePlayer();
 	TwoPlayerScn = new TwoPlayer();

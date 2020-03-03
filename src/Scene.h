@@ -8,6 +8,7 @@
 #include "Hitbox.h"
 #include "Texture.h"
 #include "Mesh.h"
+#include "Text.h"
 
 class Camera;
 class Shader;
@@ -44,6 +45,7 @@ protected:
 	float menu_time[2];
 	bool _Abutton[2] {false, false};
 	bool _Bbutton[2] {false, false};
+	TextRenderer* Textcontroller = new TextRenderer();
 
 	ButtonSelect* playerOne;
 	ButtonSelect* playerTwo;

@@ -23,6 +23,7 @@
 #include"Skeleton.h"
 #include"Lerp.h"
 #include "Sound.h"
+#include "Text.h"
 
 OnePlayer::OnePlayer()
 {
@@ -907,11 +908,18 @@ void MainMenu::Draw()
 		//morphyBoi->Draw(morphShader, Cam);
 	}
 
+
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
 	glDisable(GL_DEPTH_TEST);
 
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
+
+
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+
 	glEnable(GL_DEPTH_TEST);
 
 }
@@ -929,6 +937,7 @@ void MainMenu::LoadScene()
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
+	
 
 	//Material* hpBarMat = new Material("yuck.png");
 	//Material* stamBarMat = new Material("blue.png");
@@ -953,7 +962,7 @@ void MainMenu::LoadScene()
 	playerTwo = new ButtonSelect(1, glm::vec2(75, 245), secondPlayer);
 
 	ui = {
-		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), blackBarMat),
+		//new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), blackBarMat),
 		playerOne,
 		playerTwo,
 		new Button(glm::vec2(80, 250), buttonPlay), 

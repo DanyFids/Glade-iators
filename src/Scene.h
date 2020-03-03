@@ -18,6 +18,7 @@ class UI;
 class Player;
 class Material;
 class Hitbox;
+class ButtonSelect;
 
 class SceneD {
 public:
@@ -43,6 +44,9 @@ protected:
 	float menu_time[2];
 	bool _Abutton[2] {false, false};
 	bool _Bbutton[2] {false, false};
+
+	ButtonSelect* playerOne;
+	ButtonSelect* playerTwo;
 
 	// Mouse Vars
 	float m_lastX = 400;

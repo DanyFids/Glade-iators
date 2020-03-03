@@ -36,10 +36,13 @@ void Game::setScene(SCENES scn)
 	switch (scn) {
 	case MAIN_MENU:
 		curScene = MainMenuScn;
+		break;
 	case PLAY_SCENE:
 		curScene = OnePlayerScn;
+		break;
 	case CHARACTER_SCENE:
 		curScene = CharacterScn;
+		break;
 	}
 }
 
@@ -94,7 +97,7 @@ void Game::Initialize()
 	}
 
 	// Enable transparent backbuffers for our windows (note that Windows expects our colors to be pre-multiplied with alpha)
-	glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, true);
+	//glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, true);
 	// Create a new GLFW window
 	window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, windowTitle, nullptr, nullptr);
 	// We want GL commands to be executed for our window, so we make our window's context the current one
@@ -112,6 +115,9 @@ void Game::Initialize()
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//glEnable(GL_SCISSOR_TEST);
 

@@ -45,6 +45,8 @@ public:
 	virtual void Draw() override;
 	virtual void LoadScene() override;
 
+	virtual void ResizeCams();
+
 	Player* GetPlayer(int i) { return (Player*) players[i]; }
 	Player* GetTestPlayer() { return test_player; }
 

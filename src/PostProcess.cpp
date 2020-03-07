@@ -59,6 +59,8 @@ void FrameBuffer::Resize()
 {
 	glBindTexture(GL_TEXTURE_2D, OUT);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Game::SCREEN.x, Game::SCREEN.y, 0, GL_RGBA, GL_FLOAT, NULL);
+	glBindTexture(GL_TEXTURE_2D, DEPTH);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Game::SCREEN.x, Game::SCREEN.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 }
 
 PostProcess::PostProcess(std::vector<unsigned int> inputs, Shader* effect)

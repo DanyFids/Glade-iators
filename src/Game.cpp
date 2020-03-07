@@ -112,6 +112,8 @@ void Game::Initialize()
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
 	UI::INIT();
+	CapsuleHitbox::init();
+	SphereHitbox::init();
 
 	float quad_prim[] = {
 		// x, y, z, r, g, b, u, v

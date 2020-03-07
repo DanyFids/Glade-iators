@@ -3,6 +3,9 @@
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 #include<iostream>
+#include<fstream>
+#include<sstream>
+#include<vector>
 #include "Texture.h"
 
 Material::Material(std::string f, std::string n, std::string s)
@@ -59,8 +62,9 @@ Material::Material(std::string f, std::string n, std::string s)
 
 	glBindTexture(GL_TEXTURE_2D, texture[2]);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -114,4 +118,64 @@ Skybox::Skybox(std::string f)
 	}
 
 	stbi_image_free(data);
+}
+
+LUT::LUT(std::string f)
+{
+	std::ifstream file(f.c_str());
+
+	if (!file) {
+		std::cout << "ERROR::TEXTURE::LUT::ERROR_LOADING_FILE: '" << f << "'\n" << std::endl;
+	}
+	else {
+		std::vector<RGB> data;
+
+		while (!file.eof()) {
+			std::string temp, read;
+			std::stringstream line;
+
+			std::getline(file, temp);
+
+			if (temp.compare("") == 0 || temp[0] == '#') {
+				continue;
+			}
+			
+			line.str(temp);
+
+			line >> read;
+
+			if (read.compare("TITLE") == 0) {
+				line >> read;
+				name = read;
+			}
+			else if(read.compare("LUT_3D_SIZE") == 0){
+				line >> read;
+				LUT_SIZE = std::stoi(read);
+			}
+			else if (!isalpha(read[0])) {
+				RGB t;
+				t.r = std::stof(read);
+				line >> read;
+				t.g = std::stof(read);
+				line >> read;
+				t.b = std::stof(read);
+
+				data.push_back(t);
+			}
+		}
+
+		glGenTextures(1, &ID);
+		glBindTexture(GL_TEXTURE_3D, ID);
+
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+
+		if (data.size() < LUT_SIZE * LUT_SIZE * LUT_SIZE) std::cout << "ERROR::TEXTURE::LUT::INCORECT_SIZE\n";
+
+		glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB, LUT_SIZE, LUT_SIZE, LUT_SIZE, 0, GL_RGB, GL_FLOAT, data.data());
+	}
 }

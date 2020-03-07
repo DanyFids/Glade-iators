@@ -6,6 +6,7 @@ class Material;
 class Shader;
 class Camera;
 class Skeleton;
+enum FrameStates;
 
 struct Vertex {
 	glm::vec3 position;
@@ -120,14 +121,20 @@ struct SkelVert {
 };
 
 class SkelMesh : public Mesh {
-	int curFrame;
-	int nexFrame;
-	int anim = 0;
+	static const int num_channels = 4;
+	
+	int curFrame[num_channels] = {0, 0, 0, 0};
+	int nexFrame[num_channels] = {0,0,0,0};
+	int anim[num_channels] = { 0, -1, -1, -1 };
 
-	float anim_time = 0.0f;
+	float play_spd[num_channels] = { 1.0f, 0.0f, 0.0f, 0.0f };
+	float anim_time[num_channels] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float chnl_intensity[num_channels] = { 1.0f, 0.0f, 0.0f, 0.0f };
 
 	Skeleton* skeleton;
 	//Material* weightMap;
+
+	//glm::vec3 root_pos, p_root_pos;
 
 public:
 	SkelMesh(std::string f, Skeleton* s, std::string weightMap);
@@ -136,14 +143,19 @@ public:
 	virtual void Update(float dt);
 
 	virtual void Draw(Shader*);
-	void SetAnim(unsigned int id);
-	void SetFrame(unsigned int id);
-	int GetAnim() { return anim; }
-	int GetFrame() { return curFrame; }
-	void NextFrame();
+	void SetAnim(int id, unsigned int chnl, float i = 1.0f, float s = 1.0f);
+	void SetFrame(unsigned int id, unsigned int chnl);
+	void NextFrame(unsigned int chnl);
+	void SetIntensity(unsigned int chnl, float i) { chnl_intensity[chnl] = i; }
+	int GetAnim() { return anim[0]; }
+	int GetFrame() { return curFrame[0]; }
 	void DrawSkeleton(glm::mat4 global, Shader* shdr);
+
+	FrameStates GetFrameCode();
 
 	Skeleton* GetSkeleton() { return skeleton; }
 
 	SkelMesh* Clone() { return new SkelMesh(*this); };
+
+	glm::vec3 GetRootMv();
 };

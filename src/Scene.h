@@ -20,6 +20,8 @@ class Player;
 class Material;
 class Hitbox;
 class ButtonSelect;
+class FrameBuffer;
+class PostProcess;
 
 class SceneD {
 public:
@@ -130,11 +132,17 @@ protected:
 	std::vector<PointLight*> lights;
 	DirectionalLight * sun;
 
+	FrameBuffer* main_pass;
+	std::vector<PostProcess*> post_pass;
 
 	std::vector<UI*> ui;
 
 public:
+	PlayScene();
+
+	static Shader* POST_OUT;
+
 	virtual void KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt) override;
 	virtual void ControllerInput(unsigned int controller, int player, float dt) override;
-	void RenderScene(Shader* shader);
+	void RenderScene(Shader* shader, Shader* playerShader);
 };

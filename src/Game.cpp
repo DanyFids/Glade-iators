@@ -10,6 +10,7 @@
 #include"PlayScenes.h"
 #include "Camera.h"
 #include "Object.h"
+#include "Mesh.h"
 #include<UI.h>
 
 struct UpdateBehaviour {
@@ -18,6 +19,7 @@ struct UpdateBehaviour {
 
 glm::ivec2 Game::SCREEN = glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT);
 Game* Game::CURRENT = nullptr;
+Mesh* Game::QUAD = nullptr;
 
 void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
@@ -115,7 +117,7 @@ void Game::Initialize()
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
+	glEnable(GL_TEXTURE_3D);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -128,6 +130,21 @@ void Game::Initialize()
 
 	UI::INIT();
 	TextRenderer::INIT();
+
+	float quad_prim[] = {
+		// x, y, z, r, g, b, u, v
+		-1.0f, -1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f,
+		 1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, 0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f,
+		 1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,  0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f,
+		-1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,  0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f
+	};
+
+	unsigned int quad_index[] = {
+		0, 1, 2,
+		0, 2, 3
+	};
+
+	Game::QUAD = new Mesh(quad_prim, 4, quad_index, 6);
 
 	OnePlayerScn = new OnePlayer();
 	TwoPlayerScn = new TwoPlayer();

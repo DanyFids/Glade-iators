@@ -5,6 +5,7 @@
 #include<vector>
 
 class Scene;
+class Mesh;
 
 enum SCENES {
 	MAIN_MENU = 0,
@@ -17,6 +18,7 @@ public:
 	static glm::ivec2 SCREEN;
 	static Game* CURRENT;
 	void setScene(SCENES scn);
+	static Mesh* QUAD;
 
 	Game();
 	~Game();

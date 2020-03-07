@@ -201,6 +201,7 @@ Player::Player() {
 	stamina = MAX_STAMINA;
 
 	mesh = nullptr;
+	_mesh = nullptr;
 	material = nullptr;
 	hitbox = nullptr;
 	transform.position = glm::vec3();
@@ -208,11 +209,12 @@ Player::Player() {
 	transform.rotation = glm::vec3();
 }
 
-Player::Player(Mesh* me, Material* ma, Hitbox* hb) {
+Player::Player(SkelMesh* me, Material* ma, Hitbox* hb) {
 	health = MAX_HEALTH;
 	stamina = MAX_STAMINA;
 
 	mesh = me;
+	_mesh = me;
 	material = ma;
 	hitbox = hb;
 	transform.position = glm::vec3();
@@ -220,12 +222,13 @@ Player::Player(Mesh* me, Material* ma, Hitbox* hb) {
 	transform.rotation = glm::vec3();
 }
 
-Player::Player(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos) : Object(me, ma, hb, pos)
+Player::Player(SkelMesh* me, Material* ma, Hitbox* hb, glm::vec3 pos) : Object(me, ma, hb, pos)
 {
 	health = MAX_HEALTH;
 	stamina = MAX_STAMINA;
 
 	mesh = me;
+	_mesh = me;
 	material = ma;
 	hitbox = hb;
 	transform.position = pos;
@@ -238,6 +241,10 @@ void Player::Update(float dt)
 	if (recov_timer > 0.0f) {
 		recov_timer -= dt;
 	}
+
+	glm::vec3 rp = _mesh->GetRootMv();
+
+	phys.move = glm::mat3(transform.GetRotEul()) * rp;
 
 	if (run) {
 		if (stamina > 0.0f && glm::length(phys.move) != 0.0f) {
@@ -257,9 +264,14 @@ void Player::Update(float dt)
 		}
 	}
 
-	((SkelMesh*)mesh)->Update(dt);
+	_mesh->Update(dt);
 
 	Object::Update(dt);
+
+	if (_mesh->GetFrameCode() == End) {
+		Idle();
+	}
+
 }
 
 bool Player::HitDetect(Object* other) 
@@ -295,6 +307,11 @@ bool Player::HitDetect(Object* other)
 	return false;
 }
 
+void Player::PlayAnim(std::string n, unsigned int c, float i, float s)
+{
+	_mesh->SetAnim(_mesh->GetSkeleton()->GetAnimByName(n), c, i, s);
+}
+
 void Player::Run()
 {
 	if (!run && recov_timer <= 0.0f) {
@@ -305,6 +322,27 @@ void Player::Run()
 void Player::StopRun()
 {
 	run = false;
+}
+
+void Player::Roll()
+{
+	if (_mesh->GetFrameCode() == Neutral && state != rolling) {
+		anim_lock = true;
+		PlayAnim("roll", 0, 1.0f, 2.0f);
+		PlayAnim("base", 1, 0.0f);
+		state = rolling;
+		dmgSTAM(20.0f);
+	}
+}
+
+void Player::Idle()
+{
+	if (state != idle) {
+		anim_lock = false;
+		PlayAnim("dab");
+		_mesh->SetIntensity(1, 0.0f);
+		state = idle;
+	}
 }
 
 
@@ -448,4 +486,25 @@ void SplineMan::CatmullBetweenPoints(glm::vec3 a, glm::vec3 b, glm::vec3 c, glm:
 SplineMan::SplineMan(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<glm::vec3> wasd) : Object(me, ma, hb, pos)
 {
 	pathPos = wasd;
+}
+
+Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, std::vector<std::string> atks, float dam, float stam) : Object(me, ma, hb)
+{
+	attack_anims = atks;
+	damage = dam;
+	stamina_cost = stam;
+}
+
+std::string Weapon::GetAtkAnim(unsigned int c_id)
+{
+	if (c_id < attack_anims.size()) {
+		return attack_anims[c_id];
+	}
+
+	return "";
+}
+
+bool Weapon::HitDetect(Object* other)
+{
+	return false;
 }

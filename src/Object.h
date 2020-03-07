@@ -4,6 +4,7 @@
 #include<GLM/gtc/quaternion.hpp>
 #include<vector>
 #include <cmath>
+#include <string>
 //#include <chrono>
 
 class Camera;
@@ -131,23 +132,38 @@ public:
 	friend class Hitbox;
 };
 
+enum PLAYER_STATE {
+	idle, walking, attacking, blocking, rolling, taunting
+};
+
+class Weapon;
+
 class Player : public Object {
 	static const float STAM_DECAY;
 	static const float STAM_RECOV;
 	static const float RECOV_TIME;
 
 	bool run = false;
+	bool anim_lock = false;
 	float health;
 	float stamina;
 	float recov_timer = 0.0f;
+
+	SkelMesh* _mesh;
+
+	PLAYER_STATE state;
+
+	Weapon* weapon;
+
+	glm::vec3 last_root_pos = glm::vec3(0.0f);
 
 public:
 	static const float MAX_HEALTH;
 	static const float MAX_STAMINA;
 
 	Player();
-	Player(Mesh* me, Material* ma, Hitbox* hb);
-	Player(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos);
+	Player(SkelMesh* me, Material* ma, Hitbox* hb);
+	Player(SkelMesh* me, Material* ma, Hitbox* hb, glm::vec3 pos);
 
 	virtual void Update(float dt);
 	virtual bool HitDetect(Object* other);
@@ -158,9 +174,35 @@ public:
 	float GetStam() { return stamina; }
 	bool CanRun() { return recov_timer <= 0.0f; }
 
+	void PlayAnim(std::string n, unsigned int c = 0, float i = 1.0f, float s = 1.0f);
+
 	void Run();
 	void StopRun();
+
+	void Roll();
+	void Idle();
+	void Attack();
+
+	PLAYER_STATE GetState() {return state;}
+	void SetState(PLAYER_STATE s) {state = s;}
+	bool IsLocked() { return anim_lock; }
 };
+
+class Weapon : public Object {
+private:
+	float damage, stamina_cost;
+
+	std::vector<std::string> attack_anims;
+public:
+	Weapon(Mesh* me, Material* ma, Hitbox* hb, std::vector<std::string> atks, float dmg, float stam);
+
+	std::string GetAtkAnim(unsigned int c_id = 0);
+	float GetDamage() {return damage;}
+	float GetStaminaCost() { return stamina_cost; }
+
+	virtual bool HitDetect(Object* other);
+};
+
 
 class Attack : public Object
 {

@@ -339,7 +339,7 @@ void Player::Idle()
 {
 	if (state != idle) {
 		anim_lock = false;
-		PlayAnim("dab");
+		PlayAnim("idle");
 		_mesh->SetIntensity(1, 0.0f);
 		state = idle;
 	}

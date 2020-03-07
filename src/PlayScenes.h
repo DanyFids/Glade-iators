@@ -56,6 +56,7 @@ class TwoPlayer: public PlayScene {
 	Shader* shaderObj;
 	Shader* depthShader;
 	Shader* morphShader;
+	Shader* skelShader;
 
 	Shader* sunShader;
 

@@ -263,7 +263,7 @@ CrowdBar::CrowdBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg) : UI(MAX_WID
 
 void CrowdBar::Update(float dt)
 {
-	float perc = time / MAX_TIME;
+	float perc = 1.0f;
 
 	dim.x = (float)MAX_WIDTH * perc;
 	 

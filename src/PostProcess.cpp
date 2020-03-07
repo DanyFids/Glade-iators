@@ -5,7 +5,7 @@
 
 FrameBuffer::FrameBuffer()
 {
-	// Generate Buffers
+	// Generate Buffers 
 	glGenFramebuffers(1, &ID);
 	glGenTextures(1, &OUT);
 	glGenTextures(1, &DEPTH);
@@ -73,7 +73,8 @@ void PostProcess::Draw()
 	effect->Use();
 
 	for (int c = 0; c < IN.size(); c++) {
-		glBindTexture(GL_TEXTURE0 + c, IN[c]);
+		glActiveTexture(GL_TEXTURE0 + c);
+		glBindTexture(GL_TEXTURE_2D, IN[c]);
 		effect->SetI("INPUT_" + std::to_string(c), c);
 	}
 

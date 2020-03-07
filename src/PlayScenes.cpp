@@ -257,15 +257,30 @@ void OnePlayer::LoadScene()
 {
 	main_pass = new FrameBuffer();
 
-	// Post processing passes
-
+	// Post processing passes 
+	
 	Material* LUT_TEST = new Material("LUTs/LUT_TEST.png");
 
+	highlightshader = new Shader("Shaders/PostProcess/PostProcess.vert","Shaders/PostProcess/Highlights.frag");
+
+	vergausshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/GausBlur.frag");
+	vergausshader->SetB("isHorizontal", false);
+	horgausshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/GausBlur.frag");
+	horgausshader->SetB("isHorizontal", true);
+
+	bloomshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Bloom.frag");
+	pixelshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Pixelation.frag");
 	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
 	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/Winterfell Extra 2.cube"), main_pass->GetOutput()));
+	// Sampler2d INPUT  
+	   
+	post_pass.push_back(new PostProcess({main_pass->GetOutput()}, highlightshader)); 
+	post_pass.push_back(new PostProcess({post_pass.at(0)->buff->GetOutput()}, horgausshader));
+	post_pass.push_back(new PostProcess({ post_pass.at(1)->buff->GetOutput() }, vergausshader));
+	post_pass.push_back(new PostProcess({ post_pass.at(2)->buff->GetOutput(),main_pass->GetOutput() }, bloomshader));
+	post_pass.push_back(new PostProcess({ post_pass.at(3)->buff->GetOutput() }, pixelshader));
 
-
-	isMenu = false;
+	isMenu = false; 
 	ChangingScn = false;
 
 	Joint::init();

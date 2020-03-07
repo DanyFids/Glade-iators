@@ -15,9 +15,16 @@ class OnePlayer: public PlayScene {
 	Shader* skelShader;
 	Shader* skelDepth;
 	Shader* morphShader;
-
+	
 	Shader* DebugShader;
+	Shader* vergausshader;
+	Shader* horgausshader;
+	Shader* highlightshader;
+	Shader* bloomshader;
+	Shader* pixelshader;
+
 	Mesh* DebugQuad;
+
 	
 	Player* test_player;
 

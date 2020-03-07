@@ -12,7 +12,7 @@ class PostProcess {
 protected:
 	std::vector<unsigned int> IN;
 
-	Shader* effect;
+	Shader* effect; 
 
 public:
 	FrameBuffer* buff;

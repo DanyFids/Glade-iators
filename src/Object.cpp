@@ -283,6 +283,7 @@ bool Player::HitDetect(Object* other)
 			}
 		}
 
+
 		if (run) {
 			run = false;
 			recov_timer = RECOV_TIME;

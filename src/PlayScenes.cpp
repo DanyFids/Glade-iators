@@ -909,7 +909,7 @@ void MainMenu::Draw()
 	}
 
 
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glDisable(GL_DEPTH_TEST);
 

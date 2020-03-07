@@ -105,7 +105,7 @@ void TextRenderer::RenderText(Shader* s, std::string text, GLfloat x, GLfloat y,
 		GLfloat width = character.Size.x * scale;
 		GLfloat height = character.Size.y * scale;
 
-		//update VBOs
+		//update VBOsf
 		GLfloat vertices[6][4] = {
 			{xpos, ypos + height, 0.0, 0.0},
 			{xpos, ypos, 0.0, 1.0 },

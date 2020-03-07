@@ -45,6 +45,12 @@ int UI::scaleX(int _x)
 	return scale.x;
 }
 
+void UI::Resize(int x, int y)
+{
+	dim.x = x;
+	dim.y = y;
+}
+
 void UI::Draw(glm::vec2 scrn) {
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(pos.x, pos.y, 0.0f));
@@ -54,6 +60,7 @@ void UI::Draw(glm::vec2 scrn) {
 
 	SHADER->SetMat4("proj", projection);
 	SHADER->SetMat4("model", model);
+	SHADER->SetF("opacity", opacity);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, material->DIFF);
@@ -256,7 +263,7 @@ CrowdBar::CrowdBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg) : UI(MAX_WID
 
 void CrowdBar::Update(float dt)
 {
-	float perc = time / MAX_TIME;
+	float perc = 1.0f;
 
 	dim.x = (float)MAX_WIDTH * perc;
 	 
@@ -267,5 +274,54 @@ void CrowdBar::Draw(glm::vec2 scrn)
 {
 	bg->Draw(scrn);
 
+	UI::Draw(scrn);
+}
+
+const int Button::HEIGHT = 70;
+const int Button::MAX_WIDTH = 200;
+Button::Button(glm::vec2 pos, Material* ma) : UI(MAX_WIDTH, HEIGHT, glm::vec3(pos, 0), ma)
+{
+}
+
+//Button::Button(int width, int height, glm::vec2 pos, Material* ma) : UI(width, height, glm::vec3(pos, 0), ma)
+//{
+//}
+
+void Button::Update(float dt)
+{
+}
+
+void Button::Draw(glm::vec2 scrn)
+{
+	UI::Draw(scrn);
+}
+
+const int ButtonSelect::HEIGHT = 80;
+const int ButtonSelect::MAX_WIDTH = 210;
+ButtonSelect::ButtonSelect(int _player, glm::vec2 _pos, Material* ma) : UI(MAX_WIDTH, HEIGHT, glm::vec3(_pos, 0), ma)
+{
+	player = _player;
+	opacity = 0.6;
+}
+
+//ButtonSelect::ButtonSelect(int width, int height, int _player, glm::vec2 pos, Material* ma) : UI(width, height, glm::vec3(pos, 0), ma)
+//{
+//	player = _player;
+//	opacity = 0.6;
+//}
+
+void ButtonSelect::move(int _x, int _y)
+{
+	pos.x += _x;
+	pos.y += _y;
+}
+
+void ButtonSelect::Update(float dt)
+{
+
+}
+
+void ButtonSelect::Draw(glm::vec2 scrn)
+{
 	UI::Draw(scrn);
 }

@@ -33,6 +33,21 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	mousePos = glm::vec2(xpos, ypos);
 }
 
+void Game::setScene(SCENES scn)
+{
+	switch (scn) {
+	case MAIN_MENU:
+		curScene = MainMenuScn;
+		break;
+	case PLAY_SCENE:
+		curScene = TwoPlayerScn;
+		break;
+	case CHARACTER_SCENE:
+		curScene = CharacterScn;
+		break;
+	}
+}
+
 Game::Game() :
 	window(nullptr),
 	windowTitle("Glade-iators"),
@@ -84,7 +99,7 @@ void Game::Initialize()
 	}
 
 	// Enable transparent backbuffers for our windows (note that Windows expects our colors to be pre-multiplied with alpha)
-	glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, true);
+	//glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, true);
 	// Create a new GLFW window
 	window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, windowTitle, nullptr, nullptr);
 	// We want GL commands to be executed for our window, so we make our window's context the current one
@@ -104,6 +119,8 @@ void Game::Initialize()
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_TEXTURE_3D);
 
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	//glEnable(GL_SCISSOR_TEST);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -114,6 +131,7 @@ void Game::Initialize()
 	UI::INIT();
 	CapsuleHitbox::init();
 	SphereHitbox::init();
+	TextRenderer::INIT();
 
 	float quad_prim[] = {
 		// x, y, z, r, g, b, u, v
@@ -132,6 +150,8 @@ void Game::Initialize()
 
 	OnePlayerScn = new OnePlayer();
 	TwoPlayerScn = new TwoPlayer();
+	MainMenuScn = new MainMenu();
+	CharacterScn = new CharacterC();
 	//Attack Init(0);
 	//Init.init();
 
@@ -139,10 +159,11 @@ void Game::Initialize()
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) && 
 		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
 
-		curScene = TwoPlayerScn;
+		curScene = MainMenuScn;
 	}
 	else {
-		curScene = OnePlayerScn;
+		//curScene = OnePlayerScn;
+		curScene = MainMenuScn;
 	}
 }
 

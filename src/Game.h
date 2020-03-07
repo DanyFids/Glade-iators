@@ -7,16 +7,25 @@
 class Scene;
 class Mesh;
 
+enum SCENES {
+	MAIN_MENU = 0,
+	PLAY_SCENE = 1,
+	CHARACTER_SCENE = 2
+};
+
 class Game {
 public:
 	static glm::ivec2 SCREEN;
 	static Game* CURRENT;
+	void setScene(SCENES scn);
 	static Mesh* QUAD;
 
 	Game();
 	~Game();
 
 	void Run();
+
+	GLFWwindow* GetWindow() { return window; }
 
 	friend void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height);
 protected:
@@ -50,6 +59,8 @@ private:
 
 	Scene* OnePlayerScn;
 	Scene* TwoPlayerScn;
+	Scene* MainMenuScn;
+	Scene* CharacterScn;
 
 	bool wireframe = false;
 	bool w_pressed = false;

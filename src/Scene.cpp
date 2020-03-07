@@ -1,10 +1,10 @@
 #include "Scene.h"
 #include <iostream>
 
-#include"Camera.h"
-#include"Mesh.h"
-#include"Object.h"
-#include"Light.h"
+#include "Camera.h"
+#include "Mesh.h"
+#include "Object.h"
+#include "Light.h"
 #include "Constants.h"
 #include"UI.h"
 #include "Game.h"
@@ -118,119 +118,242 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 	GLFWgamepadstate state;
 	if (glfwGetGamepadState(controller, &state)) {
-		glm::vec2 rot = glm::vec2(0.0f, 0.0f);
-		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] < -0.2) {
-			rot.y = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
-		}
-		else {
-			rot.y = 0.0f;
-		}
-		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] < -0.2) {
-			rot.x = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
-		}
-		else {
-			rot.x = 0.0f;
-		}
-		
-		Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
-
-		glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 camF = Cam[player]->GetDirection();
-		glm::vec3 camR = Cam[player]->GetRight();
-
-		glm::vec2 axisPos = glm::vec2(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X], state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
-
-		if (glm::length(axisPos) > dead_zone)
-		{
-			t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-			//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-			t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
-			//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-			if (players[player]->GetState() != PLAYER_STATE::walking && !players[player]->IsLocked()) {
-				players[player]->PlayAnim("walk", 0, glm::length(axisPos));
-				//players[player]->PlayAnim("idle", 1, 1.0f - glm::length(axisPos));
-				players[player]->SetState(walking);
+		if (isMenu != true && !ChangingScn) {
+			glm::vec2 rot = glm::vec2(0.0f, 0.0f);
+			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] < -0.2) {
+				rot.y = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
 			}
-			else if(!players[player]->IsLocked()){
-				((SkelMesh*)players[player]->GetMesh())->SetIntensity(0, glm::length(axisPos));
-				//((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f - glm::length(axisPos));
+			else {
+				rot.y = 0.0f;
 			}
-		}
-		else if (players[player]->GetState() == PLAYER_STATE::walking) {
-			players[player]->Idle();
-		}
-			
-		if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
-			//players[player]->phys.move = glm::normalize(t) * 10.f * dt;
-			
-			glm::vec3 dir = glm::normalize(t);
+			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] < -0.2) {
+				rot.x = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
+			}
+			else {
+				rot.x = 0.0f;
+			}
 
-			float newRot;
+			Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
 
-			newRot = -(std::atan2f(dir.z, dir.x)) * (180/M_PI) + 90;
+			glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
+			glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
+			glm::vec3 camF = Cam[player]->GetDirection();
+			glm::vec3 camR = Cam[player]->GetRight();
 
-			//std::cout << newRot << std::endl;
+			glm::vec2 axisPos = glm::vec2(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X], state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
 
-			players[player]->SetRotation({ 0.0f, newRot, 0.0f });
+			if (glm::length(axisPos) > dead_zone)
+			{
+				t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+				//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+				t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+				//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+				if (players[player]->GetState() != PLAYER_STATE::walking && !players[player]->IsLocked()) {
+					players[player]->PlayAnim("walk", 0, glm::length(axisPos));
+					//players[player]->PlayAnim("idle", 1, 1.0f - glm::length(axisPos));
+					players[player]->SetState(walking);
+				}
+				else if (!players[player]->IsLocked()) {
+					((SkelMesh*)players[player]->GetMesh())->SetIntensity(0, glm::length(axisPos));
+					//((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f - glm::length(axisPos));
+				}
+			}
+			else if (players[player]->GetState() == PLAYER_STATE::walking) {
+				players[player]->Idle();
+			}
 
-			//std::cout << "move\n";
-		}
+			if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
+				//players[player]->phys.move = glm::normalize(t) * 10.f * dt;
+				glm::vec3 dir = glm::normalize(t);
 
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
-			((Player*)players[player])->Run();
-		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
-			((Player*)players[player])->StopRun();
-		}
+				float newRot;
 
-		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2)
-		{
-			if (players[player]->GetStam() >= 15.0f) {
-				
+				newRot = -(std::atan2f(dir.z, dir.x)) * (180 / M_PI) + 90;
+
+				//std::cout << newRot << std::endl;
+
+				players[player]->SetRotation({ 0.0f, newRot, 0.0f });
+
+				//std::cout << "move\n";
+			}
+
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
+				((Player*)players[player])->Run();
+			}
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
+				((Player*)players[player])->StopRun();
+			}
+
+			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2)
+			{
+				if (players[player]->GetStam() >= 15.0f) {
+
+					glm::vec3 p1 = glm::vec3();
+					p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+					p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+
+
+
+					//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
+
+					std::cout << "OOF\n";
+					players[player]->dmgSTAM(15.0f);
+					atk1 = true;
+				}
+			}
+			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2)
+			{
+				atk1 = false;
+			}
+
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS)
+			{
+				if (players[player]->GetStam() >= 20.0f) {
+					players[player]->Roll();
+					dodge1 = false;
+					dodge1t = 0.1;
+				}
+			}
+
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
+				std::cout << "Parry God\n";
+				block1 = true;
 				glm::vec3 p1 = glm::vec3();
 				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
 
-				
+				//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
+			}
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE) {
 
-				//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
-				
-				std::cout << "OOF\n";
-				players[player]->dmgSTAM(15.0f);
-				atk1 = true;
+				block1 = false;
+				//players[player]->DestroyChild(0);
 			}
 		}
-		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2)
+		else
 		{
-			atk1 = false;
-		}
 
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS)
-		{
-			if (players[player]->GetStam() >= 20.0f) {
-				players[player]->Roll();
-				dodge1 = false;
-				dodge1t = 0.1;
+			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 && menu_time[controller] <= 0)
+			{
+				menuSpot[controller]--;
+				if (controller == 0) {
+					if (MAX_MENU == 0)
+						playerOne->move(0, -100);
+					else
+						playerOne->move(0, -75);
+				}
+				else {
+					if (MAX_MENU == 0)
+						playerTwo->move(0, -100);
+					else
+						playerTwo->move(0, -75);
+				}
+				menu_time[controller] = MENU_TIME;
 			}
-		}
-		
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
-			std::cout << "Parry God\n";
-			block1 = true;
-			glm::vec3 p1 = glm::vec3();
-			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+			else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2 && menu_time[controller] <= 0)
+			{
+				menuSpot[controller]++;
+				if (controller == 0) {
+					if (MAX_MENU == 0)
+						playerOne->move(0, 100);
+					else
+						playerOne->move(0, 75);
+				}
+				else {
+					if (MAX_MENU == 0)
+						playerTwo->move(0, 100);
+					else
+						playerTwo->move(0, 75);
+				}
+				menu_time[controller] = MENU_TIME;
+			}
 
-			//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
-		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE) {
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
+				_Abutton[controller] = true;
+			}
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
+				_Bbutton[controller] = true;
+			}
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && _Bbutton[controller] && !ChangingScn && MAX_MENU == 10) {
+				_Bbutton[controller] = false;
+				ChangingScn = true;
+				isMenu = false;
+				Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			}
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && _Abutton[controller] && !ChangingScn) {
+				_Abutton[controller] = false;
+				std::cout << menuSpot[controller] << std::endl;
+				if (menuSpot[controller] == 7) {
+					//if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
+					//	glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+					ChangingScn = true;
+					isMenu = false;
+					Game::CURRENT->setScene(SCENES::PLAY_SCENE);
+					//}
+				}
+				else if (menuSpot[controller] == 0) {
+					ChangingScn = true;
+					MAX_MENU = 10;
+					isMenu = false;
+					Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
+				}
+				else if (menuSpot[controller] == -2) {
+					//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
+					glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
+				}
+				menu_time[controller] = MENU_TIME;
+			}
 
-			block1 = false;
-			//players[player]->DestroyChild(0);
+			if (menuSpot[controller] < MIN_MENU)
+			{
+				menuSpot[controller] = MAX_MENU;
+				if (!ChangingScn) {
+					if (controller == 0) {
+						playerOne->move(0, 300);
+					}
+					else {
+						playerTwo->move(0, 300);
+					}
+				}
+			}
+			else if (menuSpot[controller] > MAX_MENU)
+			{
+				menuSpot[controller] = MIN_MENU;
+				if (!ChangingScn) {
+					if (controller == 0) {
+						playerOne->move(0, -300);
+					}
+					else {
+						playerTwo->move(0, -300);
+					}
+				}
+			}
+
+			if (menuSpot[controller] == 10) {
+				if (controller == 0) {
+				}
+				else {
+				}
+			}
+			else if (menuSpot[controller] == 9 || menuSpot[controller] == 8) {
+				if (controller == 0) {
+				}
+				else {
+				}
+			}
+			else if (menuSpot[controller] == 7) {
+				if (controller == 0) {
+				}
+				else {
+				}
+			}
 		}
 	}
+
+
+	menu_time[controller] -= dt;
 }
+
 
 void PlayScene::RenderScene(Shader* shader, Shader* playerShader)
 {

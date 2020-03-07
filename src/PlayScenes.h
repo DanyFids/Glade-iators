@@ -58,7 +58,7 @@ class TwoPlayer: public PlayScene {
 	Shader* shaderObj;
 	Shader* depthShader;
 	Shader* morphShader;
-
+	Shader* skelShader;
 
 	Shader* sunShader;
 
@@ -66,6 +66,39 @@ class TwoPlayer: public PlayScene {
 	Object* morphyBoi;
 public:
 	TwoPlayer();
+	// Inherited via Scene
+	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
+	virtual void Update(float dt) override;
+	virtual void Draw() override;
+	virtual void LoadScene() override;
+};
+
+class MainMenu : public PlayScene {
+	Shader* shaderObj;
+	Shader* depthShader;
+	Shader* morphShader;
+	Shader* sunShader;
+	Shader* skelDepth;
+public:
+	MainMenu();
+
+	// Inherited via Scene
+	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
+	virtual void Update(float dt) override;
+	virtual void Draw() override;
+	virtual void LoadScene() override;
+};
+
+class CharacterC : public PlayScene {
+	Shader* shaderObj;
+	Shader* depthShader;
+	Shader* morphShader;
+	Shader* sunShader;
+	Shader* skelDepth;
+
+public:
+	CharacterC();
+
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
 	virtual void Update(float dt) override;

@@ -482,18 +482,14 @@ glm::vec3 CapsuleHitbox::convertVec4(glm::vec4 _vec4)
 }
 
 void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
-{
+ {
 	shdr->Use();
 	shdr->SetI("material.diffuse", 0);
 	shdr->SetI("material.normal", 1);
 	shdr->SetI("material.specular", 2);
 	transform.scale = glm::vec3(radius);//
 	glm::mat4 model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),lowerBound);
-
- 	//glm::vec3 test = model * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	
-
-	//glm::mat4 model2 = parent.GetWorldTransform() * glm::translate(glm::mat4(1.0f), convertVec4(upperBound));
 
 
 	unsigned int modelLoc = glGetUniformLocation(shdr->ID, "model");
@@ -547,19 +543,19 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 
 bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
  {
+
 	glm::mat4 t = th->getParentTransform();
-	glm::mat4 oT = oth->getParentTransform();
+	glm::mat4 oT = oth->getParentTransform(glm::translate(glm::mat4(1.0f), oth->phys.move));
 	//oT = oT * glm::translate(glm::mat4(1.0f), oth->phys.move);
-	t = t * glm::translate(glm::mat4(1.0f), th->phys.move);
+
 	//Adding an indiscriminant value to 1 so we don't get destroyed by dividing by zero.
-
-	if (this->height == 1.0f) {
-		height += 0.000001f;
-	}
-
-	if (other->height == 1.0f) {
-		other->height += 0.000001f;
-	}
+	//if (this->height == 1.0f) {
+	//	height += 0.000001f;
+	//}
+	//
+	//if (other->height == 1.0f) {
+	//	other->height += 0.000001f;
+	//}
 
 	glm::vec3 tub = convertVec4(t * transform.GetWorldTransform() * glm::vec4(upperBound.x, upperBound.y, upperBound.z, 1.0f));
 	glm::vec3 tlb = convertVec4(t * transform.GetWorldTransform() * glm::vec4(lowerBound.x, lowerBound.y, lowerBound.z, 1.0f));
@@ -657,8 +653,6 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 			}
 		}
 
-
-
 		if (tN < 0.0f) { //tc < 0 , the t = 0 edge is visible.
 			tN = 0.0f;
 
@@ -700,15 +694,19 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 		//sc and tc are the parameters for vector lines A and B (multiplier to be a point along them)
 
 		totalDist = glm::length(LineC + (sc * LineA) - (tc * LineB));
+
 	}
 
-	
-
-	if (totalDist <= totalRadius) {
+	//float difference = totalDist - totalRadius;
+	//
+	//if (difference < 0.00000599f && difference > -0.00000599f) {
+	//	return true;
+	//}
+	//else
+	if (totalDist < totalRadius)
 		return true;
-	}
-
-	return false;
+	else
+		return false;
 }
 
 bool CapsuleHitbox::HitDetect(Object* th, CubeHitbox* other, Object* oth)

@@ -256,14 +256,18 @@ void OnePlayer::Draw()
 void OnePlayer::LoadScene()
 {
 	main_pass = new FrameBuffer();
+	main_pass->AddComponent();
 
 	// Post processing passes
 
 	Material* LUT_TEST = new Material("LUTs/LUT_TEST.png");
 
-	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
-	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/Winterfell Extra 2.cube"), main_pass->GetOutput()));
+	LUT* lut_cool = new LUT("LUTs/Bluedabadee.cube");
+	LUT* lut_hot = new LUT("LUTs/ThatsHotBBY.cube");
+	LUT* lut_custom = new LUT("LUTs/EdgeLord.cube");
 
+	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
+	//post_pass.push_back(new LutColorCorrection(lut_custom, main_pass->GetOutput()));
 
 	isMenu = false;
 	ChangingScn = false;

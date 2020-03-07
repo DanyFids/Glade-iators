@@ -648,7 +648,7 @@ SkelMesh::SkelMesh(std::string f, Skeleton* s, std::string w): Mesh(f.c_str())
 	skeleton = s;
 	//curFrame = 0;
 	//nexFrame = 0;
-
+	
 	float** weightMap;
 	int verts;
 	int joints;
@@ -742,7 +742,7 @@ void SkelMesh::Update(float dt)
 	for (int c = 0; c < num_channels; c++) {
 		if (anim[c] >= 0 && anim[c] < skeleton->GetNumAnims()) {
 			if (skeleton->anim_ft[anim[c]] > 0.0f) {
-				anim_time[c] += dt;
+				anim_time[c] += dt * play_spd[c];
 
 				if (anim_time[c] > skeleton->anim_ft[anim[c]]) {
 					NextFrame(c);
@@ -761,14 +761,17 @@ void SkelMesh::Draw(Shader* shdr)
 	glm::vec3* binds = nullptr;
 	glm::vec3* bind_t = nullptr;
 	glm::mat3* norms = nullptr;
-	skeleton->GetTransformArray(arr, axis, axis_i, norms, binds, bind_t, anim[0], curFrame[0]);
+	skeleton->GetTransformArray(arr, axis, axis_i, norms, binds, bind_t, chnl_intensity,anim, curFrame, num_channels);
 	int num_b = skeleton->GetNumBones();
 
-	glm::mat4** support_anims = new glm::mat4* [num_channels - 1];
+	/*glm::mat4** support_anims = new glm::mat4* [num_channels];
+	glm::mat3** support_norms = new glm::mat3* [num_channels];
 
-	for (int c = 0; c < num_channels - 1; c++) {
-
-	}
+	for (int c = 0; c < num_channels; c++) {
+		if (anim[c] >= 0 && anim[c] < skeleton->GetNumAnims()) {
+			skeleton->GetFrameRot(support_anims[c], support_norms[c], anim[c], curFrame[c]);
+		}
+	}*/
 
 	//glActiveTexture(GL_TEXTURE20);
 	//glBindTexture(GL_TEXTURE_2D, weightMap->DIFF);
@@ -776,6 +779,16 @@ void SkelMesh::Draw(Shader* shdr)
 	
 	shdr->SetI("num_bones", num_b);
 	for (int b = 0; b < num_b; b++) {
+
+		/*glm::mat4 sup_trans = glm::mat4(1.0f);
+		glm::mat3 sup_norm = glm::mat3(1.0f);
+
+		for (int c = 0; c < num_channels; c++) {
+			if (anim[c] >= 0 && anim[c] < skeleton->GetNumAnims()) {
+				sup_trans = support_anims[c][b] * sup_trans;
+				sup_norm = support_norms[c][b] * sup_norm;
+			}
+		}*/
 
 		std::string b_string = std::to_string(b);
 		shdr->SetMat4("bone_t[" + b_string + "]", arr[b]);
@@ -789,7 +802,7 @@ void SkelMesh::Draw(Shader* shdr)
 	Mesh::Draw(shdr);
 }
 
-void SkelMesh::SetAnim(int id, unsigned int chnl)
+void SkelMesh::SetAnim(int id, unsigned int chnl, float i, float s)
 {
 	if (id < skeleton->GetNumAnims())
 		anim[chnl] = id;
@@ -797,6 +810,8 @@ void SkelMesh::SetAnim(int id, unsigned int chnl)
 	anim_time[chnl] = 0.0f;
 	curFrame[chnl] = 0;
 	nexFrame[chnl] = (skeleton->GetNumFrames(anim[chnl]) > 1) ? 1 : 0;
+	play_spd[chnl] = s;
+	chnl_intensity[chnl] = i;
 }
 
 void SkelMesh::SetFrame(unsigned int id, unsigned int chnl)
@@ -814,4 +829,28 @@ void SkelMesh::NextFrame(unsigned int chnl)
 void SkelMesh::DrawSkeleton(glm::mat4 global, Shader* shdr)
 {
 	skeleton->DrawSkeleton(global, anim[0], curFrame[0], shdr);
+}
+
+FrameStates SkelMesh::GetFrameCode()
+{
+	return skeleton->AnimStates[anim[0]][curFrame[0]];
+}
+
+glm::vec3 SkelMesh::GetRootMv()
+{
+	glm::vec3 cur, prev = cur = glm::vec3(0.0f);
+
+	for (int r = 0; r < num_channels; r++) {
+		if (anim[r] >= 0 && anim[r] < skeleton->root->animations.size()) {
+			if (curFrame[r] > 0) {
+				prev += chnl_intensity[r] * (skeleton->root->animations[anim[r]][curFrame[r] - 1].position - skeleton->root->GetOffset());
+			}
+
+			cur += chnl_intensity[r] * (skeleton->root->animations[anim[r]][curFrame[r]].position - skeleton->root->GetOffset());
+		}
+	}
+
+	glm::vec3 ret = cur - prev;
+
+	return glm::vec3(ret.x, 0.0f, ret.z);
 }

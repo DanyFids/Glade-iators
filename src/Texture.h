@@ -23,3 +23,15 @@ public:
 
 	Skybox(std::string f);
 };
+
+class LUT {
+public:
+	std::string name;
+	unsigned int LUT_SIZE;
+
+	LUT(std::string file);
+
+	unsigned int ID;
+
+	struct RGB { float r, g, b; };
+};

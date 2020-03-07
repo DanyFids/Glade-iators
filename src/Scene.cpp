@@ -9,6 +9,7 @@
 #include"UI.h"
 #include "Game.h"
 #include "Skeleton.h"
+#include "Shader.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -37,6 +38,13 @@ void MenuScene::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 {
 }
 
+
+PlayScene::PlayScene()
+{
+	if (POST_OUT == nullptr) {
+		POST_OUT = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Output.frag");
+	}
+}
 
 void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt)
 {
@@ -106,6 +114,8 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 
 void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 {
+	static const float dead_zone = 0.35f;
+
 	GLFWgamepadstate state;
 	if (glfwGetGamepadState(controller, &state)) {
 		glm::vec2 rot = glm::vec2(0.0f, 0.0f);
@@ -128,20 +138,31 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 camF = Cam[player]->GetDirection();
 		glm::vec3 camR = Cam[player]->GetRight();
-		if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2)
+
+		glm::vec2 axisPos = glm::vec2(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X], state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
+
+		if (glm::length(axisPos) > dead_zone)
 		{
 			t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
 			//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-		}
-			
-		if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2)
-		{
 			t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 			//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+			if (players[player]->GetState() != PLAYER_STATE::walking && !players[player]->IsLocked()) {
+				players[player]->PlayAnim("walk", 0, glm::length(axisPos));
+				//players[player]->PlayAnim("idle", 1, 1.0f - glm::length(axisPos));
+				players[player]->SetState(walking);
+			}
+			else if(!players[player]->IsLocked()){
+				((SkelMesh*)players[player]->GetMesh())->SetIntensity(0, glm::length(axisPos));
+				//((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f - glm::length(axisPos));
+			}
+		}
+		else if (players[player]->GetState() == PLAYER_STATE::walking) {
+			players[player]->Idle();
 		}
 			
 		if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
-			players[player]->phys.move = glm::normalize(t) * 10.f * dt;
+			//players[player]->phys.move = glm::normalize(t) * 10.f * dt;
 			
 			glm::vec3 dir = glm::normalize(t);
 
@@ -156,14 +177,14 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			//std::cout << "move\n";
 		}
 
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && player == PLAYER_1) {
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
 			((Player*)players[player])->Run();
 		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && player == PLAYER_1) {
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
 			((Player*)players[player])->StopRun();
 		}
 
-		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_1 && atk1 == false && block1 == false)
+		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2)
 		{
 			if (players[player]->GetStam() >= 15.0f) {
 				
@@ -180,151 +201,48 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				atk1 = true;
 			}
 		}
-		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2 && player == PLAYER_1)
+		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2)
 		{
 			atk1 = false;
 		}
 
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && player == PLAYER_1 && dodge1 == true && t != glm::vec3(0.0f, 0.0f, 0.0f))
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS)
 		{
 			if (players[player]->GetStam() >= 20.0f) {
-				players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
-				std::cout << "Dodgy boi\n";
-
-				players[player]->dmgSTAM(20.0f);
+				players[player]->Roll();
 				dodge1 = false;
 				dodge1t = 0.1;
 			}
 		}
 		
-		if (dodge1t <= -0.4 && dodge1 == false && player == PLAYER_1)
-		{
-			dodge1 = true;
-		}
-		else if (dodge1 == false && dodge1t >= 0 && player == PLAYER_1)
-		{
-			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
-			dodge1t -= dt;
-		}
-		else
-		{
-			dodge1t -= dt;
-		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS && player == PLAYER_1 && block1 == false && atk1 == false) { //dylanote
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
 			std::cout << "Parry God\n";
 			block1 = true;
 			glm::vec3 p1 = glm::vec3();
 			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
 
-			players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
+			//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
 		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && player == PLAYER_1 && block1 == true) {
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE) {
 
 			block1 = false;
-			players[player]->DestroyChild(0);
-		}
-
-		////////////////////////////PLAYER 2
-
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && player == PLAYER_2) {
-			((Player*)players[player])->Run();
-		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && player == PLAYER_2) {
-			((Player*)players[player])->StopRun();
-		}
-		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2 && player == PLAYER_2 && atk2 == false)
-		{
-			//if (players[player]->GetStam() >= 15.0f) {
-			//	attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0, 0, 0), PLAYER_2));
-			//	glm::vec3 p1 = players[player]->GetPosition();
-			//	p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-			//	p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-			//	p1.y = players[player]->GetPosition().y;
-			//	attacks.back()->SetPosition(p1);
-			//	players[player]->dmgSTAM(15.0f);
-			//	std::cout << "OOF\n";
-			//	atk2 = true;
-			//}
-		}
-		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2 && player == PLAYER_2)
-		{
-			atk2 = false; 
-		}
-
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && player == PLAYER_2 && dodge2 == true && t != glm::vec3(0.0f, 0.0f, 0.0f))
-		{
-			if (players[player]->GetStam() >= 20.0f) {
-				players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
-				std::cout << "Dodgy boi\n";
-				players[player]->dmgSTAM(20.0f);
-				dodge2 = false;
-				dodge2t = 0.1;
-			}
-		}
-
-		if (dodge2t <= -0.4 && dodge2 == false && player == PLAYER_2)
-		{
-			dodge2 = true;
-		}
-		else if (dodge2 == false && dodge2t >= 0 && player == PLAYER_2)
-		{
-			players[player]->phys.move = t * (PLAYER_SPEED * 6) * dt;
-			dodge2t -= dt;
-		}
-		else
-		{
-			dodge2t -= dt;
-		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS && player == PLAYER_2 && block2 == false) {
-			std::cout << "Parry God\n";
-			block2 = true;
-			shields.push_back(new Shield(Amesh, Bmat, basicCubeHB, glm::vec3(0, 0, 0), player));
-			glm::vec3 p1 = players[player]->GetPosition();
-			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-			p1.y = players[player]->GetPosition().y;
-			shields.back()->SetPosition(p1);
-		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && player == PLAYER_2) {
-
-			block2 = false;
-		}
-		
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && player == PLAYER_2 && Target2 == false) {
-			std::cout << "Look at me\n";
-			//glm::vec3 direction = glm::normalize(players[0]->GetPosition() - players[1]->GetPosition());
-			Target2 == true;
-		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_RELEASE && player == PLAYER_2) {
-
-			Target2 = false;
+			//players[player]->DestroyChild(0);
 		}
 	}
 }
 
-void PlayScene::RenderScene(Shader* shader)
+void PlayScene::RenderScene(Shader* shader, Shader* playerShader)
 {
 	for (int c = 0; c < players.size(); c++) {
-		players[c]->Draw(shader, Cam);
+		players[c]->Draw(playerShader, Cam, shader);
 	}
 
 	for (int t = 0; t < terrain.size(); t++) {
 		terrain[t]->Draw(shader, Cam);
 	}
 
-	//for (int a = 0; a < attacks.size(); a++)
-	//{
-	//	attacks[a]->Draw(shader, Cam);
-	//
-	//}
-
-	/*for (int s = 0; s < shields.size(); s++)
-	{
-		shields[s]->Draw(shader, Cam);
-
-	}*/
-	//DUUDE->Draw(shader, Cam);
+	
 }
 
 void Scene::ResizeCams()
@@ -333,3 +251,5 @@ void Scene::ResizeCams()
 		Cam[c]->UpdateScreen({ Game::SCREEN.x / Cam.size() * c,0, Game::SCREEN.x / Cam.size(),Game::SCREEN.y});
 	}
 }
+
+Shader* PlayScene::POST_OUT = nullptr;

@@ -5,11 +5,13 @@
 #include<vector>
 
 class Scene;
+class Mesh;
 
 class Game {
 public:
 	static glm::ivec2 SCREEN;
 	static Game* CURRENT;
+	static Mesh* QUAD;
 
 	Game();
 	~Game();

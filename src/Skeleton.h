@@ -20,7 +20,8 @@ enum FrameStates {
 	Block,
 	Roll,
 	Attack,
-	Deflect
+	Deflect,
+	End
 };
 
 ChannelType StringToChnlTp(std::string name);
@@ -61,11 +62,13 @@ public:
 
 	void Draw(glm::mat4 global, int a, int f, Shader* shdr);
 
-	void FillJointArray(glm::mat4 * arr, glm::mat4*& axis, glm::mat4*& axis_i, glm::mat3* norms, glm::mat4 global, glm::vec3 * binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, int& cur, int anim, int frame);
+	void FillJointArray(glm::mat4 * arr, glm::mat4*& axis, glm::mat4*& axis_i, glm::mat3* norms, glm::mat4 global, glm::vec3 * binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, float* anim_i, int* anim_c,  int& cur, int* frame, int num_channels);
 	void FillFrameRot(glm::mat4* arr, glm::mat3* norms, glm::mat4 global, int& cur, int anim, int frame);
 	void LoadAnimFrame(std::queue<float>&, int anim, int frame);
 
 	glm::mat4 TransformTo(int anim, int frame);
+
+	glm::vec3 GetOffset() { return offset; }
 
 	friend class Skeleton;
 };
@@ -83,7 +86,7 @@ class Skeleton {
 
 	friend class SkelMesh;
 public:
-	std::vector<std::vector<FrameStates>> AnimStates;
+	std::vector<std::vector<FrameStates>> AnimStates = { {Neutral} };
 	Skeleton(std::string name, std::string file);
 
 	void WriteTree();
@@ -91,7 +94,7 @@ public:
 	int LoadFromFile(std::string file);
 	Joint* Find(std::string name);
 	void DrawSkeleton(glm::mat4 global, int a, int f, Shader* shdr) { root->Draw(global, a, f, shdr); }
-	void GetTransformArray(glm::mat4* & bones, glm::mat4*& axis, glm::mat4*& axis_i, glm::mat3* & norms, glm::vec3* & binds, glm::vec3* & bind_t, int anim, int frame);
+	void GetTransformArray(glm::mat4* & bones, glm::mat4*& axis, glm::mat4*& axis_i, glm::mat3* & norms, glm::vec3* & binds, glm::vec3* & bind_t, float* anim_i, int* anim_c, int* frame, int num_channels);
 	void GetFrameRot(glm::mat4* & bones, glm::mat3* & norms, int anim, int frame);
 	int GetNumBones() { return num_bones; }
 	int GetNumFrames(int a) { return root->animations[a].size(); }

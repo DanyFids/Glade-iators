@@ -37,7 +37,7 @@ public:
 class FrameBuffer {
 private:
 	unsigned int ID;
-	unsigned int OUT;
+	 std::vector<unsigned int> OUT;
 	unsigned int DEPTH;
 
 public:
@@ -48,7 +48,8 @@ public:
 	void Clear();
 
 	unsigned int GetBuffer() { return ID; }
-	unsigned int GetOutput() { return OUT; }
+	unsigned int GetOutput(int c = 0) { return OUT[c]; }
+	void AddComponent();
 
 	void Resize();
 };

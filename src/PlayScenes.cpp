@@ -151,7 +151,7 @@ void OnePlayer::Draw()
 	sun->SetupDepthShader(sunShader);
 	RenderScene(sunShader, sunShader);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	glViewport(0, 0, Game::SCREEN.x, Game::SCREEN.y);
 	
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
@@ -165,7 +165,7 @@ void OnePlayer::Draw()
 		RenderScene(depthShader, skelDepth);
 		test_player->Draw(skelDepth, Cam);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		glViewport(0, 0, Game::SCREEN.x, Game::SCREEN.y);
 
 		glActiveTexture(GL_TEXTURE4 + l);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[l]->GetDepthMap());
@@ -256,14 +256,18 @@ void OnePlayer::Draw()
 void OnePlayer::LoadScene()
 {
 	main_pass = new FrameBuffer();
+	main_pass->AddComponent();
 
 	// Post processing passes
 
 	Material* LUT_TEST = new Material("LUTs/LUT_TEST.png");
 
-	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
-	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/Winterfell Extra 2.cube"), main_pass->GetOutput()));
+	LUT* lut_cool = new LUT("LUTs/Bluedabadee.cube");
+	LUT* lut_hot = new LUT("LUTs/ThatsHotBBY.cube");
+	LUT* lut_custom = new LUT("LUTs/EdgeLord.cube");
 
+	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
+	//post_pass.push_back(new LutColorCorrection(lut_custom, main_pass->GetOutput()));
 
 	isMenu = false;
 	ChangingScn = false;
@@ -282,9 +286,6 @@ void OnePlayer::LoadScene()
 
 	//// Play the event
 	audioEngine.PlayEvent("MenuPlaceholder");
-
-	CapsuleHitbox::init();
-	SphereHitbox::init();
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
@@ -553,7 +554,15 @@ void OnePlayer::LoadScene()
 	threadObj = std::thread(console);
 }
 
+void OnePlayer::ResizeCams()
+{
+	Scene::ResizeCams();
+	main_pass->Resize();
 
+	for (int c = 0; c < post_pass.size(); c++) {
+		post_pass[c]->buff->Resize();
+	}
+}
 
 
 /*******************************************************************************************

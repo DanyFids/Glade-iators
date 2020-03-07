@@ -133,6 +133,8 @@ void Game::Initialize()
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
 	UI::INIT();
+	CapsuleHitbox::init();
+	SphereHitbox::init();
 	TextRenderer::INIT();
 
 	float quad_prim[] = {
@@ -164,8 +166,8 @@ void Game::Initialize()
 		curScene = MainMenuScn;
 	}
 	else {
-		//curScene = OnePlayerScn;
-		curScene = MainMenuScn;
+		curScene = OnePlayerScn;
+		//curScene = MainMenuScn;
 	}
 }
 

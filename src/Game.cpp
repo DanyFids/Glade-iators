@@ -37,12 +37,16 @@ void Game::setScene(SCENES scn)
 {
 	switch (scn) {
 	case MAIN_MENU:
+		MainMenuScn = new MainMenu();
 		curScene = MainMenuScn;
 		break;
 	case PLAY_SCENE:
-		curScene = TwoPlayerScn;
+		OnePlayerScn = new OnePlayer();
+		//TwoPlayerScn = new TwoPlayer();
+		curScene = OnePlayerScn;
 		break;
 	case CHARACTER_SCENE:
+		CharacterScn = new CharacterC();
 		curScene = CharacterScn;
 		break;
 	}
@@ -146,10 +150,10 @@ void Game::Initialize()
 
 	Game::QUAD = new Mesh(quad_prim, 4, quad_index, 6);
 
-	OnePlayerScn = new OnePlayer();
-	TwoPlayerScn = new TwoPlayer();
+	//OnePlayerScn = new OnePlayer();
+	//TwoPlayerScn = new TwoPlayer();
 	MainMenuScn = new MainMenu();
-	CharacterScn = new CharacterC();
+	//CharacterScn = new CharacterC();
 	//Attack Init(0);
 	//Init.init();
 

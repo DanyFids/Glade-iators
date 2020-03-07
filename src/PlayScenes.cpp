@@ -67,7 +67,7 @@ void OnePlayer::Update(float dt)
 	audioEngine.Update();
 	for (int c = 0; c < players.size(); c++) {
 		players[c]->Update(dt);
-	
+		
 
 		for (int p = 0; p < players.size(); p++) {
 			if (players[c] != players[p]) {

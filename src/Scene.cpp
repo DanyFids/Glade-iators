@@ -308,44 +308,116 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 && menu_time[controller] <= 0)
 			{
 				menuSpot[controller]--;
+				if (controller == 0) {
+					if (MAX_MENU == 0)
+					playerOne->move(0, -100);
+					else
+						playerOne->move(0, -75);
+				}
+				else {
+					if (MAX_MENU == 0)
+					playerTwo->move(0, -100);
+					else
+						playerTwo->move(0, -75);
+				}
 				menu_time[controller] = MENU_TIME;
 			}
 			else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2 && menu_time[controller] <= 0)
 			{	
-				menuSpot[controller]++;
+				menuSpot[controller]++; 
+				if (controller == 0) {
+					if (MAX_MENU == 0) 
+					playerOne->move(0, 100);
+					else
+						playerOne->move(0, 75);
+				}
+				else {
+					if (MAX_MENU == 0)
+					playerTwo->move(0, 100);
+					else
+						playerTwo->move(0, 75);
+				}
 				menu_time[controller] = MENU_TIME;
 			}
 
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0) {
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
 				_Abutton[controller] = true;
 			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && menu_time[controller] <= 0) {
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
 				_Bbutton[controller] = true;
 			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && _Abutton[controller]) {
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && _Bbutton[controller] && !ChangingScn && MAX_MENU == 10) {
+				_Bbutton[controller] = false;
+				ChangingScn = true;
+				isMenu = false;
+				Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			}
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && _Abutton[controller] && !ChangingScn) {
 				_Abutton[controller] = false;
 				std::cout << menuSpot[controller] << std::endl;
-				if (menuSpot[controller] == 10) {
-					if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
-						glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+				if (menuSpot[controller] == 7) {
+					//if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
+					//	glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
 						ChangingScn = true;
 						isMenu = false;
 						Game::CURRENT->setScene(SCENES::PLAY_SCENE);
-					}
+					//}
 				}
 				else if (menuSpot[controller] == 0) {
-					ChangingScn = true;
+					ChangingScn = true; 
+					MAX_MENU = 10;
 					isMenu = false;
 					Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
+				}
+				else if (menuSpot[controller] == -2) {
+					//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
+					glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
 				}
 				menu_time[controller] = MENU_TIME;
 			}
 
-			if (menuSpot[controller] < MIN_MENU) {
+			if (menuSpot[controller] < MIN_MENU) 
+			{
 				menuSpot[controller] = MAX_MENU;
+				if (!ChangingScn) {
+					if (controller == 0) {
+						playerOne->move(0, 300);
+					}
+					else {
+						playerTwo->move(0, 300);
+					}
+				}
 			}
-			if (menuSpot[controller] > MAX_MENU) {
+			else if (menuSpot[controller] > MAX_MENU) 
+			{
 				menuSpot[controller] = MIN_MENU;
+				if (!ChangingScn) {
+					if (controller == 0) {
+						playerOne->move(0, -300);
+					}
+					else {
+						playerTwo->move(0, -300);
+					}
+				}
+			}
+
+			if (menuSpot[controller] == 10) {
+				if (controller == 0) {
+				}
+				else {
+				}
+			}
+			else if (menuSpot[controller] == 9 || menuSpot[controller] == 8) {
+				if (controller == 0) {
+				}
+				else {
+				}
+			}
+			else if (menuSpot[controller] == 7) {
+				if (controller == 0) {
+				}
+				else {
+				}
 			}
 		}
 	}

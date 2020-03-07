@@ -7,9 +7,9 @@
 class Scene;
 
 enum SCENES {
-	MAIN_MENU,
-	PLAY_SCENE,
-	CHARACTER_SCENE
+	MAIN_MENU = 0,
+	PLAY_SCENE = 1,
+	CHARACTER_SCENE = 2
 };
 
 class Game {
@@ -22,6 +22,8 @@ public:
 	~Game();
 
 	void Run();
+
+	GLFWwindow* GetWindow() { return window; }
 
 	friend void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height);
 protected:

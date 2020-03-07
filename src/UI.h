@@ -19,6 +19,8 @@ protected:
 	glm::vec2 dim;
 	glm::vec2 scale = {1.0f , 1.0f};
 
+	float opacity = 1.0f;
+
 	glm::mat4 model;
 	Material* material;
 	UI* bg = nullptr;
@@ -30,6 +32,7 @@ public:
 
 	UI(int width, int height, glm::vec3 pos, Material* ma);
 	int scaleX(int _x);
+	void Resize(int x, int y);
 	virtual void Draw(glm::vec2 scrn);
 	virtual void Update(float dt) {};
 };
@@ -99,6 +102,22 @@ class Button : public UI {
 
 public:
 	Button(glm::vec2 pos, Material* ma);
+	//Button(int width, int height, glm::vec2 pos, Material* ma);
+
+	virtual void Update(float dt);
+	virtual void Draw(glm::vec2 scrn);
+};
+
+class ButtonSelect : public UI {
+	static const int HEIGHT;
+	static const int MAX_WIDTH;
+
+	int player;
+public:
+	ButtonSelect(int _player, glm::vec2 pos, Material* ma);
+	//ButtonSelect(int width, int height, int _player, glm::vec2 pos, Material* ma);
+
+	void move(int _x, int _y);
 
 	virtual void Update(float dt);
 	virtual void Draw(glm::vec2 scrn);

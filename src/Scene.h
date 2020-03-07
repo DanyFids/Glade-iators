@@ -19,6 +19,7 @@ class UI;
 class Player;
 class Material;
 class Hitbox;
+class ButtonSelect;
 
 class SceneD {
 public:
@@ -45,6 +46,9 @@ protected:
 	bool _Abutton[2] {false, false};
 	bool _Bbutton[2] {false, false};
 	TextRenderer* Textcontroller = new TextRenderer();
+
+	ButtonSelect* playerOne;
+	ButtonSelect* playerTwo;
 
 	// Mouse Vars
 	float m_lastX = 400;

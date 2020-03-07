@@ -872,7 +872,7 @@ void MainMenu::Draw()
 		lights[l]->SetupDepthShader(depthShader);
 		RenderScene(depthShader);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		//glViewport(0, 0,  , SCREEN_HEIGHT);
 
 		glActiveTexture(GL_TEXTURE4 + l);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[l]->GetDepthMap());
@@ -897,25 +897,18 @@ void MainMenu::Draw()
 		RenderScene(shaderObj);
 		Cam[c]->SetupCam(morphShader);
 		//morphyBoi->Draw(morphShader, Cam);
-
-		//glDisable(GL_DEPTH_TEST);
-		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
-		////	players[1]->hitbox->Draw(shaderObj);
-		//
-		//glEnable(GL_DEPTH_TEST);
 	}
 
 
-
-
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glDisable(GL_DEPTH_TEST);
 
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
+
+
 	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 
 	glEnable(GL_DEPTH_TEST);
@@ -937,11 +930,16 @@ void MainMenu::LoadScene()
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
 	
 
-	Material* hpBarMat = new Material("yuck.png");
-	Material* stamBarMat = new Material("blue.png");
-	Material* crowdBarMat = new Material("white.png");
+	//Material* hpBarMat = new Material("yuck.png");
+	//Material* stamBarMat = new Material("blue.png");
+	//Material* crowdBarMat = new Material("white.png");
 	Material* blackBarMat = new Material("black.png");
-
+	Material* firstPlayer = new Material("redPlayer.png");
+	Material* secondPlayer = new Material("bluePlayer.png");
+	Material* buttonPlay = new Material("playButton.png");
+	Material* buttonSettings = new Material("settingsButton.png");
+	Material* buttonExit = new Material("exitButton.png");
+	Material* buttonBlank = new Material("blankButton.png");
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
@@ -949,30 +947,18 @@ void MainMenu::LoadScene()
 
 	Cam = {
 		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT))
-	};
+	}; 
 
-	UI* hpBG = new UI(210, 30, { 5.0f, 545.0f, -1.0f }, blackBarMat);
-	UI* stamBG = new UI(160, 30, { 5.0f, 495.0f, -1.0f }, blackBarMat);
-	UI* crowdBG = new UI(185, 30, { 220.0f, 545.0f, -1.0f }, blackBarMat);
-
-	UI* hpBG2 = new UI(210, 30, { 585.0f, 545.0f, -1.0f }, blackBarMat);
-	UI* stamBG2 = new UI(160, 30, { 635.0f, 495.0f, -1.0f }, blackBarMat);
-	UI* crowdBG2 = new UI(185, 30, { 395.0f, 545.0f, -1.0f }, blackBarMat);
-
-	
-	//RenderText(shader, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(0.5, 0.8f, 0.2f));
-	//RenderText(shader, "(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
+	playerOne = new ButtonSelect(0, glm::vec2(75, 245), firstPlayer);
+	playerTwo = new ButtonSelect(1, glm::vec2(75, 245), secondPlayer);
 
 	ui = {
-		new Button(glm::vec2(200, 200), crowdBarMat)
-
-		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
-		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
-		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
-
-		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(590, 550), hpBarMat, hpBG2),
-		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(640, 500), stamBarMat, stamBG2),
-		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(395, 550), crowdBarMat, crowdBG2)
+		//new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), blackBarMat),
+		playerOne,
+		playerTwo,
+		new Button(glm::vec2(80, 250), buttonPlay), 
+		new Button(glm::vec2(80, 150), buttonSettings),
+		new Button(glm::vec2(80, 50), buttonExit)
 	};
 }
 
@@ -1071,15 +1057,7 @@ void CharacterC::Draw()
 		Cam[c]->SetupCam(morphShader);
 		//morphyBoi->Draw(morphShader, Cam);
 
-		//glDisable(GL_DEPTH_TEST);
-		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
-		////	players[1]->hitbox->Draw(shaderObj);
-		//
-		//glEnable(GL_DEPTH_TEST);
 	}
-
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -1096,7 +1074,7 @@ void CharacterC::LoadScene()
 	ChangingScn = false;
 
 	MAX_MENU = 10;
-	MIN_MENU = 8;
+	MIN_MENU = 7;
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1104,11 +1082,18 @@ void CharacterC::LoadScene()
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
 
+	Material* firstPlayer = new Material("redPlayer.png");
+	Material* secondPlayer = new Material("bluePlayer.png");
+	Material* buttonPlay = new Material("readyButton.png");
+	Material* buttonRandom = new Material("randomButton.png");
+
 	Material* hpBarMat = new Material("yuck.png");
 	Material* stamBarMat = new Material("blue.png");
 	Material* crowdBarMat = new Material("white.png");
 	Material* blackBarMat = new Material("black.png");
 
+	playerOne = new ButtonSelect(0, glm::vec2(145, 230), firstPlayer);
+	playerTwo = new ButtonSelect(1, glm::vec2(585, 230), secondPlayer);
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
@@ -1118,23 +1103,25 @@ void CharacterC::LoadScene()
 		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT))
 	};
 
-	UI* hpBG = new UI(210, 30, { 5.0f, 545.0f, -1.0f }, blackBarMat);
-	UI* stamBG = new UI(160, 30, { 5.0f, 495.0f, -1.0f }, blackBarMat);
-	UI* crowdBG = new UI(185, 30, { 220.0f, 545.0f, -1.0f }, blackBarMat);
-
-	UI* hpBG2 = new UI(210, 30, { 585.0f, 545.0f, -1.0f }, blackBarMat);
-	UI* stamBG2 = new UI(160, 30, { 635.0f, 495.0f, -1.0f }, blackBarMat);
-	UI* crowdBG2 = new UI(185, 30, { 395.0f, 545.0f, -1.0f }, blackBarMat);
-
-
 	ui = {
-		new Button(glm::vec2(400, 200), crowdBarMat)
-		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
-		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
-		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
-
-		//new HealthBar((Player*)players[PLAYER_1], glm::vec2(590, 550), hpBarMat, hpBG2),
-		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(640, 500), stamBarMat, stamBG2),
-		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(395, 550), crowdBarMat, crowdBG2)
+		playerOne,
+		playerTwo,
+		new Button(glm::vec2(150, 160), crowdBarMat),
+		new Button(glm::vec2(150, 85), crowdBarMat),
+		new Button(glm::vec2(590, 160), crowdBarMat),
+		new Button(glm::vec2(590, 85), crowdBarMat),
+		new Button(glm::vec2(100, 10), buttonPlay),
+		new Button(glm::vec2(100, 235), buttonRandom),
+		new Button(glm::vec2(540, 235), buttonRandom)
 	};
+
+	ui[0]->Resize(70, 70);
+	ui[1]->Resize(70, 70);
+	ui[2]->Resize(60, 60);
+	ui[3]->Resize(60, 60);
+	ui[4]->Resize(60, 60);
+	ui[5]->Resize(60, 60);
+	ui[6]->Resize(600, 60);
+	ui[7]->Resize(140, 60);
+	ui[8]->Resize(140, 60);
 }

@@ -40,7 +40,7 @@ void Game::setScene(SCENES scn)
 		curScene = MainMenuScn;
 		break;
 	case PLAY_SCENE:
-		curScene = OnePlayerScn;
+		curScene = TwoPlayerScn;
 		break;
 	case CHARACTER_SCENE:
 		curScene = CharacterScn;

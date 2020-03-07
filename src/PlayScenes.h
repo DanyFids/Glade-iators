@@ -75,6 +75,7 @@ class MainMenu : public PlayScene {
 	Shader* depthShader;
 	Shader* morphShader;
 	Shader* sunShader;
+	Shader* skelDepth;
 public:
 	MainMenu();
 
@@ -90,6 +91,7 @@ class CharacterC : public PlayScene {
 	Shader* depthShader;
 	Shader* morphShader;
 	Shader* sunShader;
+	Shader* skelDepth;
 
 public:
 	CharacterC();

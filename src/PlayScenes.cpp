@@ -899,8 +899,9 @@ void MainMenu::Draw()
 	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
 	glClear(GL_DEPTH_BUFFER_BIT);
 	sun->SetupDepthShader(sunShader);
+	//sun->SetupDepthShader(skelDepth);
 
-	RenderScene(sunShader);
+	RenderScene(sunShader, sunShader);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -912,7 +913,7 @@ void MainMenu::Draw()
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
 		glClear(GL_DEPTH_BUFFER_BIT);
 		lights[l]->SetupDepthShader(depthShader);
-		RenderScene(depthShader);
+		RenderScene(depthShader, sunShader);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//glViewport(0, 0,  , SCREEN_HEIGHT);
 
@@ -936,7 +937,7 @@ void MainMenu::Draw()
 	for (int c = 0; c < Cam.size(); c++) {
 		Cam[c]->SetupCam(shaderObj);
 
-		RenderScene(shaderObj);
+		RenderScene(shaderObj, sunShader);
 		Cam[c]->SetupCam(morphShader);
 		//morphyBoi->Draw(morphShader, Cam);
 	}
@@ -1058,8 +1059,9 @@ void CharacterC::Draw()
 	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
 	glClear(GL_DEPTH_BUFFER_BIT);
 	sun->SetupDepthShader(sunShader);
+	//sun->SetupDepthShader(skelDepth);
 
-	RenderScene(sunShader);
+	RenderScene(sunShader, sunShader);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -1071,7 +1073,7 @@ void CharacterC::Draw()
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
 		glClear(GL_DEPTH_BUFFER_BIT);
 		lights[l]->SetupDepthShader(depthShader);
-		RenderScene(depthShader);
+		RenderScene(depthShader, sunShader);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -1095,7 +1097,7 @@ void CharacterC::Draw()
 	for (int c = 0; c < Cam.size(); c++) {
 		Cam[c]->SetupCam(shaderObj);
 
-		RenderScene(shaderObj);
+		RenderScene(shaderObj, sunShader);
 		Cam[c]->SetupCam(morphShader);
 		//morphyBoi->Draw(morphShader, Cam);
 

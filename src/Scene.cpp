@@ -133,115 +133,118 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				rot.x = 0.0f;
 			}
 
-		glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
-		glm::vec3 camF = Cam[player]->GetDirection();
-		glm::vec3 camR = Cam[player]->GetRight();
-
-		glm::vec2 axisPos = glm::vec2(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X], state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
-
-		if (glm::length(axisPos) > dead_zone)
-		{
-			t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-			//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-			t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
-			//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-			if (players[player]->GetState() != PLAYER_STATE::walking && !players[player]->IsLocked()) {
-				players[player]->PlayAnim("walk", 0, glm::length(axisPos));
-				//players[player]->PlayAnim("idle", 1, 1.0f - glm::length(axisPos));
-				players[player]->SetState(walking);
-			}
-			else if(!players[player]->IsLocked()){
-				((SkelMesh*)players[player]->GetMesh())->SetIntensity(0, glm::length(axisPos));
-				//((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f - glm::length(axisPos));
-			}
-		}
-		else if (players[player]->GetState() == PLAYER_STATE::walking) {
-			players[player]->Idle();
-		}
-			
-		if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
-			//players[player]->phys.move = glm::normalize(t) * 10.f * dt;
-			
-			glm::vec3 dir = glm::normalize(t);
-
 			glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 camF = Cam[player]->GetDirection();
 			glm::vec3 camR = Cam[player]->GetRight();
-			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2)
+
+			glm::vec2 axisPos = glm::vec2(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X], state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
+
+			if (glm::length(axisPos) > dead_zone)
 			{
 				t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
 				//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-			}
-
-			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2)
-			{
 				t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 				//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+				if (players[player]->GetState() != PLAYER_STATE::walking && !players[player]->IsLocked()) {
+					players[player]->PlayAnim("walk", 0, glm::length(axisPos));
+					//players[player]->PlayAnim("idle", 1, 1.0f - glm::length(axisPos));
+					players[player]->SetState(walking);
+				}
+				else if (!players[player]->IsLocked()) {
+					((SkelMesh*)players[player]->GetMesh())->SetIntensity(0, glm::length(axisPos));
+					//((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f - glm::length(axisPos));
+				}
+			}
+			else if (players[player]->GetState() == PLAYER_STATE::walking) {
+				players[player]->Idle();
 			}
 
 			if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
-				players[player]->phys.move = glm::normalize(t) * 10.f * dt;
+				//players[player]->phys.move = glm::normalize(t) * 10.f * dt;
 
 				glm::vec3 dir = glm::normalize(t);
 
-				float newRot;
+				glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
+				glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
+				glm::vec3 camF = Cam[player]->GetDirection();
+				glm::vec3 camR = Cam[player]->GetRight();
+				if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2)
+				{
+					t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+					//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+				}
 
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
-			((Player*)players[player])->Run();
-		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
-			((Player*)players[player])->StopRun();
-		}
+				if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2)
+				{
+					t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+					//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+				}
 
-		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2)
-		{
-			if (players[player]->GetStam() >= 15.0f) {
-				
-				glm::vec3 p1 = glm::vec3();
-				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+				if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
+					players[player]->phys.move = glm::normalize(t) * 10.f * dt;
 
-				players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
+					glm::vec3 dir = glm::normalize(t);
+
+					float newRot;
+
+					if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
+						((Player*)players[player])->Run();
+					}
+					if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
+						((Player*)players[player])->StopRun();
+					}
+
+					if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2)
+					{
+						if (players[player]->GetStam() >= 15.0f) {
+
+							glm::vec3 p1 = glm::vec3();
+							p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+							p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+
+							players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
+						}
+						if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && player == PLAYER_1 && block1 == true) {
+
+							block1 = false;
+							players[player]->DestroyChild(0);
+						}
+					}
+					if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2)
+					{
+						atk1 = false;
+					}
+
+					if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS)
+					{
+						if (players[player]->GetStam() >= 20.0f) {
+							players[player]->Roll();
+							dodge1 = false;
+							dodge1t = 0.1;
+						}
+					}
+
+					if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
+						std::cout << "Parry God\n";
+						block1 = true;
+						glm::vec3 p1 = glm::vec3();
+						p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+						p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+
+						//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
+					}
+					if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE) {
+
+						block1 = false;
+						//players[player]->DestroyChild(0);
+					}
+				}
+
+				menu_time[controller] -= dt;
 			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && player == PLAYER_1 && block1 == true) {
-
-				block1 = false;
-				players[player]->DestroyChild(0);
-			}
-		}
-		if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2)
-		{
-			atk1 = false;
-		}
-
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS)
-		{
-			if (players[player]->GetStam() >= 20.0f) {
-				players[player]->Roll();
-				dodge1 = false;
-				dodge1t = 0.1;
-			}
-		}
-		
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
-			std::cout << "Parry God\n";
-			block1 = true;
-			glm::vec3 p1 = glm::vec3();
-			p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-			p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
-
-			//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
-		}
-		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE) {
-
-			block1 = false;
-			//players[player]->DestroyChild(0);
 		}
 	}
-
-	menu_time[controller] -= dt;
 }
 
 void PlayScene::RenderScene(Shader* shader, Shader* playerShader)

@@ -133,6 +133,8 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				rot.x = 0.0f;
 			}
 
+			Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
+
 			glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 camF = Cam[player]->GetDirection();

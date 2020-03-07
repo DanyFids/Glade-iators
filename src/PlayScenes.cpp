@@ -597,7 +597,7 @@ void TwoPlayer::Update(float dt)
 
 			players[c]->ApplyMove();
 
-			Cam[c]->SetTarget(players[c]->GetPosition());
+			Cam[c]->SetTarget(players[c]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f));
 		}
 	}
 
@@ -679,26 +679,30 @@ void TwoPlayer::Draw()
 
 	sun->SetupLight(shaderObj);
 	sun->SetupLight(morphShader);
+	sun->SetupLight(skelShader);
 
 	for (int c = 0; c < lights.size(); c++) {
 		lights[c]->SetupLight(shaderObj, c);
 		lights[c]->SetupLight(morphShader, c);
+		lights[c]->SetupLight(skelShader, c);
 
 	}
 	shaderObj->SetI("num_lights", lights.size());
 	morphShader->SetI("num_lights", lights.size());
+	skelShader->SetI("num_lights", lights.size());
 
 
 	for (int c = 0; c < Cam.size(); c++) {
 		Cam[c]->SetupCam(shaderObj);
+		Cam[c]->SetupCam(skelShader);
 
-		RenderScene(shaderObj, shaderObj);
+		RenderScene(shaderObj, skelShader);
 		Cam[c]->SetupCam(morphShader);
 		morphyBoi->Draw(morphShader, Cam);
 
 		glDisable(GL_DEPTH_TEST);
-		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
 		//	players[1]->hitbox->Draw(shaderObj);
 
 		glEnable(GL_DEPTH_TEST);
@@ -727,6 +731,7 @@ void TwoPlayer::LoadScene()
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
+	skelShader = new Shader("Shaders/skeleton_shader.vert", "Shaders/Basic_Shader.frag");
 
 	Material* DiceTex = new Material("dice-texture.png", "d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
@@ -734,7 +739,6 @@ void TwoPlayer::LoadScene()
 	Material* defaultTex = new Material("default-texture.png", "default-normal.png");
 
 	Material* arenaTex = new Material("wood_texture.png");
-
 
 	Material* hpBarMat = new Material("yuck.png");
 	Material* stamBarMat = new Material("blue.png");
@@ -772,7 +776,8 @@ void TwoPlayer::LoadScene()
 	Mesh* arena = new Mesh("ColitreeumV2.obj");
 
 	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "bone_t.bvh");
-	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
+	SkelMesh* P1_MESH = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
+	SkelMesh* P2_MESH = new SkelMesh(*P1_MESH);
 
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f, 1.0f, 1.0f);
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
@@ -782,10 +787,10 @@ void TwoPlayer::LoadScene()
 	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.3f, 2.0f); //radius + height
 	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.3f, 2.0f);
 
-	players.push_back(new Player(GladiatorMesh, defaultTex, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
+	players.push_back(new Player(P1_MESH, defaultTex, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
 	players[PLAYER_1]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
 	//players[PLAYER_1]->Rotate(glm::vec3(0.0f,90.0f,0.0f));
-	players.push_back(new Player(GladiatorMesh, defaultTex, basicCapsuleHB2)); // THIS IS PLAYER TWO
+	players.push_back(new Player(P2_MESH, defaultTex, basicCapsuleHB2)); // THIS IS PLAYER TWO
 	players[PLAYER_2]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
@@ -816,6 +821,38 @@ void TwoPlayer::LoadScene()
 
 	//terrain.push_back(floor);
 
+	Mesh* SwordMesh = new Mesh("Weapons/Sword.obj");
+	Mesh* ShieldMesh = new Mesh("Weapons/Circle_Shield.obj");
+
+	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.09f, 12.8f);
+	Hitbox* shieldSphereHB = new SphereHitbox(1.0f);
+	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
+
+	Object* P1_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P1_MESH);
+	Object* P2_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P2_MESH);
+
+	Object* P1_shield = new Object(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f }, gladiatorSkel->Find("l_hand"), P1_MESH);
+	Object* P2_shield = new Object(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f }, gladiatorSkel->Find("l_hand"), P2_MESH);
+
+	P1_sword->Scale({ 0.9f, 0.9f, 0.9f });
+	P1_sword->SetRotation({ 0.0f, 90.0f, 90.0f });
+
+	P2_sword->Scale({ 0.9f, 0.9f, 0.9f });
+	P2_sword->SetRotation({ 0.0f, 90.0f, 90.0f });
+
+	P1_shield->Scale({ 0.8f, 0.8f, 0.8f });
+	P1_shield->SetRotation({ 0.0f, 0.0f, 270.0f });
+
+	P2_shield->Scale({ 0.8f, 0.8f, 0.8f });
+	P2_shield->SetRotation({ 0.0f, 0.0f, 270.0f });
+
+	players[PLAYER_1]->addChild(P1_sword);
+	players[PLAYER_1]->addChild(P1_shield);
+
+	players[PLAYER_2]->addChild(P2_sword);
+	players[PLAYER_2]->addChild(P2_shield);
+
+
 	Cam = {
 		new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec4(0,0, SCREEN_WIDTH / 2, SCREEN_HEIGHT)), // Cam 1
 		new Camera(glm::vec3(2.0f, 0.0f, -4.0f), glm::vec4(SCREEN_WIDTH / 2,0, SCREEN_WIDTH / 2, SCREEN_HEIGHT)) // Cam 2
@@ -843,6 +880,8 @@ void TwoPlayer::LoadScene()
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(15.0f, 1.0f, 2.0f));
 
+	players[PLAYER_1]->dmgHP(40);
+	players[PLAYER_2]->dmgHP(60);
 }
 
 MainMenu::MainMenu()
@@ -984,8 +1023,8 @@ void MainMenu::LoadScene()
 	Material* buttonExit = new Material("exitButton.png");
 	Material* buttonBlank = new Material("blankButton.png");
 
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
-	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
+	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	Cam = {

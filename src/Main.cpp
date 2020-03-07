@@ -15,7 +15,6 @@
 int main() {
 	Game Instance = Game();
 	Game::CURRENT = &Instance;
-
 	Instance.Run();
 }
 

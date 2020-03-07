@@ -269,3 +269,19 @@ void CrowdBar::Draw(glm::vec2 scrn)
 
 	UI::Draw(scrn);
 }
+
+const int Button::MAX_WIDTH = 200;
+const int Button::HEIGHT = 20;
+
+Button::Button(glm::vec2 pos, Material* ma) : UI(MAX_WIDTH, HEIGHT, glm::vec3(pos, 0), ma)
+{
+}
+
+void Button::Update(float dt)
+{
+}
+
+void Button::Draw(glm::vec2 scrn)
+{
+	UI::Draw(scrn);
+}

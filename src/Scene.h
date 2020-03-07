@@ -8,6 +8,7 @@
 #include "Hitbox.h"
 #include "Texture.h"
 #include "Mesh.h"
+#include "Text.h"
 
 class Camera;
 class Shader;
@@ -36,6 +37,14 @@ private:
 class Scene {
 protected:
 	std::vector<Camera*> Cam;
+	int menuSpot[2]{ 0, 0 };
+	int MAX_MENU;
+	int MIN_MENU;
+	const float MENU_TIME = 0.2f;
+	float menu_time[2];
+	bool _Abutton[2] {false, false};
+	bool _Bbutton[2] {false, false};
+	TextRenderer* Textcontroller = new TextRenderer();
 
 	// Mouse Vars
 	float m_lastX = 400;
@@ -103,6 +112,9 @@ protected:
 
 	bool Target1 = false;
 	bool Target2 = false;
+
+	bool isMenu;
+	bool ChangingScn = false;
 
 	SplineMan* DUUDE;
 

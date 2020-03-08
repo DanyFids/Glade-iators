@@ -19,6 +19,7 @@ class UI;
 class Player;
 class Material;
 class Hitbox;
+class Button;
 class ButtonSelect;
 class FrameBuffer;
 class PostProcess;
@@ -45,12 +46,46 @@ protected:
 	int MIN_MENU;
 	const float MENU_TIME = 0.2f;
 	float menu_time[2];
-	bool _Abutton[2] {false, false};
-	bool _Bbutton[2] {false, false};
+	bool _Abutton[2]{ false, false };
+	bool _Bbutton[2]{ false, false };
+	const int MAX_W = 4;
+	const int MIN_W = 0;
+	const int MAX_S = 2;
+	const int MIN_S = 0;
+	int weapon[2]{ 0, 0 };
+	int shield[2]{ 0, 0 };
+	bool changeW[2]{ false, false };
+	bool changeS[2]{ false, false };
+
+	Material* swordIcon = new Material("iconSword.png");
+	Material* spearIcon = new Material("iconSpear.png");
+	Material* tridentIcon = new Material("iconTrident.png");
+	Material* hammerIcon = new Material("iconHammer.png");
+	Material* daggerIcon = new Material("iconDagger.png");
+
+	Material* bucklerIcon = new Material("iconBuckler.png");
+	Material* shieldIcon = new Material("iconShield.png");
+	Material* nothingIcon = new Material("nothing.png");
+
 	TextRenderer* Textcontroller = new TextRenderer();
 
 	ButtonSelect* playerOne;
 	ButtonSelect* playerTwo;
+
+	Button* wOne;
+	Button* wTwo;
+	Button* sOne;
+	Button* sTwo;
+
+	Button* wOne_p1;
+	Button* wTwo_p1;
+	Button* sOne_p1;
+	Button* sTwo_p1;
+	Button* wOne_p2;
+	Button* wTwo_p2;
+	Button* sOne_p2;
+	Button* sTwo_p2;
+	
 
 	// Mouse Vars
 	float m_lastX = 400;

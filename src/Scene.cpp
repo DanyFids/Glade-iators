@@ -230,9 +230,13 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				//players[player]->DestroyChild(0);
 			}
 		}
+		//MENU STUFF BELOW
 		else
 		{
 
+		/*****************/
+		/* Menu Movement */
+		/*****************/
 			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 && menu_time[controller] <= 0)
 			{
 				menuSpot[controller]--;
@@ -268,42 +272,9 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				menu_time[controller] = MENU_TIME;
 			}
 
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
-				_Abutton[controller] = true;
-			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
-				_Bbutton[controller] = true;
-			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && _Bbutton[controller] && !ChangingScn && MAX_MENU == 10) {
-				_Bbutton[controller] = false;
-				ChangingScn = true;
-				isMenu = false;
-				Game::CURRENT->setScene(SCENES::MAIN_MENU);
-			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && _Abutton[controller] && !ChangingScn) {
-				_Abutton[controller] = false;
-				std::cout << menuSpot[controller] << std::endl;
-				if (menuSpot[controller] == 7) {
-					//if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
-					//	glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-					ChangingScn = true;
-					isMenu = false;
-					Game::CURRENT->setScene(SCENES::PLAY_SCENE);
-					//}
-				}
-				else if (menuSpot[controller] == 0) {
-					ChangingScn = true;
-					MAX_MENU = 10;
-					isMenu = false;
-					Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
-				}
-				else if (menuSpot[controller] == -2) {
-					//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
-					glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
-				}
-				menu_time[controller] = MENU_TIME;
-			}
-
+			/************************/
+			/* MENU SPOT CORRECTION */
+			/************************/
 			if (menuSpot[controller] < MIN_MENU)
 			{
 				menuSpot[controller] = MAX_MENU;
@@ -329,23 +300,289 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				}
 			}
 
-			if (menuSpot[controller] == 10) {
-				if (controller == 0) {
+			/**********************/
+			/* Anthony, Edit Here */
+			/**********************/
+
+
+			/************/
+			/* Player 1 */
+			/************/
+			if (controller == 0) {
+				switch (menuSpot[controller]) {
+				case 10:
+					//Random Button
+					break;
+				case 9:
+					//Swords
+					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
+						weapon[controller]--;
+						changeW[controller] = true;
+						menu_time[controller] = MENU_TIME;
+					}
+					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
+						weapon[controller]++;
+						changeW[controller] = true;
+						menu_time[controller] = MENU_TIME;
+					}
+					break;
+				case 8:
+					//Shields
+					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
+						shield[controller]--;
+						changeS[controller] = true;
+						menu_time[controller] = MENU_TIME;
+					}
+					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
+						shield[controller]++;
+						changeS[controller] = true;
+						menu_time[controller] = MENU_TIME;
+					}
+					break;
+				case 7:
+					//Ready Button
+					break;
+				case 0:
+					//Play Button
+					break;
+				case -1:
+					//Settings Button
+					break;
+				case -2:
+					//Exit Button
+					break;
 				}
-				else {
+				//std::cout << weapon[0] << std::endl;
+				//IMAGE CHANGE
+				if (weapon[controller] > MAX_W)
+					weapon[controller] = MIN_W;
+				if (weapon[controller] < MIN_W)
+					weapon[controller] = MAX_W;
+
+				if (shield[controller] > MAX_S)
+					shield[controller] = MIN_S;
+				if (shield[controller] < MIN_S)
+					shield[controller] = MAX_S;
+
+				if (changeW[controller]) {
+					switch (weapon[controller]) {
+					case 0:
+						wOne->ChangeTex(swordIcon);
+						wOne_p1->ChangeTex(daggerIcon);
+						wOne_p2->ChangeTex(spearIcon);
+						changeW[controller] = false;
+						break;
+					case 1:
+						wOne->ChangeTex(spearIcon);
+						wOne_p1->ChangeTex(swordIcon);
+						wOne_p2->ChangeTex(hammerIcon);
+						changeW[controller] = false;
+						break;
+					case 2:
+						wOne->ChangeTex(hammerIcon);
+						wOne_p1->ChangeTex(spearIcon);
+						wOne_p2->ChangeTex(tridentIcon);
+						changeW[controller] = false;
+						break;
+					case 3:
+						wOne->ChangeTex(tridentIcon);
+						wOne_p1->ChangeTex(hammerIcon);
+						wOne_p2->ChangeTex(daggerIcon);
+						changeW[controller] = false;
+						break;
+					case 4:
+						wOne->ChangeTex(daggerIcon);
+						wOne_p1->ChangeTex(tridentIcon);
+						wOne_p2->ChangeTex(swordIcon);
+						changeW[controller] = false;
+						break;
+					}
+				}
+				if (changeS[controller]) {
+					switch (shield[controller]) {
+					case 0:
+						sOne->ChangeTex(shieldIcon);
+						sOne_p1->ChangeTex(nothingIcon);
+						sOne_p2->ChangeTex(bucklerIcon);
+						changeS[controller] = false;
+						break;
+					case 1:
+						sOne->ChangeTex(bucklerIcon);
+						sOne_p1->ChangeTex(shieldIcon);
+						sOne_p2->ChangeTex(nothingIcon);
+						changeS[controller] = false;
+						break;
+					case 2:
+						sOne->ChangeTex(nothingIcon);
+						sOne_p1->ChangeTex(bucklerIcon);
+						sOne_p2->ChangeTex(shieldIcon);
+						changeS[controller] = false;
+						break;
+					}
 				}
 			}
-			else if (menuSpot[controller] == 9 || menuSpot[controller] == 8) {
-				if (controller == 0) {
+
+			/************/
+			/* Player 2 */
+			/************/
+			else {
+				switch (menuSpot[controller]) {
+				case 10:
+					//Random Button
+					break;
+				case 9:
+					//Swords
+					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
+						weapon[controller]--;
+						changeW[controller] = true;
+						menu_time[controller] = MENU_TIME;
+					}
+					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
+						weapon[controller]++;
+						changeW[controller] = true;
+						menu_time[controller] = MENU_TIME;
+					}
+					break;
+				case 8:
+					//Shields
+					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
+						shield[controller]--;
+						changeS[controller] = true;
+						menu_time[controller] = MENU_TIME;
+					}
+					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
+						shield[controller]++;
+						changeS[controller] = true;
+						menu_time[controller] = MENU_TIME;
+					}
+					break;
+				case 7:
+					//Ready Button
+					break;
+				case 0:
+					//Play Button
+					break;
+				case -1:
+					//Settings Button
+					break;
+				case -2:
+					//Exit Button
+					break;
 				}
-				else {
+
+				//IMAGE CHANGE
+				if (weapon[controller] > MAX_W)
+					weapon[controller] = MIN_W;
+				if (weapon[controller] < MIN_W)
+					weapon[controller] = MAX_W;
+
+				if (shield[controller] > MAX_S)
+					shield[controller] = MIN_S;
+				if (shield[controller] < MIN_S)
+					shield[controller] = MAX_S;
+
+				if (changeW[controller]) {
+					switch (weapon[controller]) {
+					case 0:
+						wTwo->ChangeTex(swordIcon);
+						wTwo_p1->ChangeTex(daggerIcon);
+						wTwo_p2->ChangeTex(spearIcon);
+						changeW[controller] = false;
+						break;
+					case 1:
+						wTwo->ChangeTex(spearIcon);
+						wTwo_p1->ChangeTex(swordIcon);
+						wTwo_p2->ChangeTex(hammerIcon);
+						changeW[controller] = false;
+						break;
+					case 2:
+						wTwo->ChangeTex(hammerIcon);
+						wTwo_p1->ChangeTex(spearIcon);
+						wTwo_p2->ChangeTex(tridentIcon);
+						changeW[controller] = false;
+						break;
+					case 3:
+						wTwo->ChangeTex(tridentIcon);
+						wTwo_p1->ChangeTex(hammerIcon);
+						wTwo_p2->ChangeTex(daggerIcon);
+						changeW[controller] = false;
+						break;
+					case 4:
+						wTwo->ChangeTex(daggerIcon);
+						wTwo_p1->ChangeTex(tridentIcon);
+						wTwo_p2->ChangeTex(swordIcon);
+						changeW[controller] = false;
+						break;
+					}
+				}
+				if (changeS[controller]) {
+					switch (shield[controller]) {
+					case 0:
+						sTwo->ChangeTex(shieldIcon);
+						sTwo_p1->ChangeTex(nothingIcon);
+						sTwo_p2->ChangeTex(bucklerIcon);
+						changeS[controller] = false;
+						break;
+					case 1:
+						sTwo->ChangeTex(bucklerIcon);
+						sTwo_p1->ChangeTex(shieldIcon);
+						sTwo_p2->ChangeTex(nothingIcon);
+						changeS[controller] = false;
+						break;
+					case 2:
+						sTwo->ChangeTex(nothingIcon);
+						sTwo_p1->ChangeTex(bucklerIcon);
+						sTwo_p2->ChangeTex(shieldIcon);
+						changeS[controller] = false;
+						break;
+					}
 				}
 			}
-			else if (menuSpot[controller] == 7) {
-				if (controller == 0) {
+			
+			/*********************/
+			/* Button Management */
+			/*         &         */
+			/*  Scene Selection  */
+			/*********************/
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
+				_Abutton[controller] = true;
+			}
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
+				_Bbutton[controller] = true;
+			}
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && _Bbutton[controller] && !ChangingScn && MAX_MENU == 10) {
+				_Bbutton[controller] = false;
+				ChangingScn = true;
+				isMenu = false;
+				Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			}
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && _Abutton[controller] && !ChangingScn) {
+				_Abutton[controller] = false;
+				//std::cout << menuSpot[controller] << std::endl;
+				if (menuSpot[controller] == 7) {
+					//Play
+					ChangingScn = true;
+					isMenu = false;
+					Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 				}
-				else {
+				else if (menuSpot[controller] == 10) {
+					//Randomize
 				}
+				else if (menuSpot[0] == 0) {
+					//Character Scene
+					ChangingScn = true;
+					isMenu = false;
+					Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
+				}
+				else if (menuSpot[0] == -1) {
+					//Settings
+				}
+				else if (menuSpot[0] == -2) {
+					//Exit
+					//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
+					glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
+				}
+				menu_time[controller] = MENU_TIME;
 			}
 		}
 	}

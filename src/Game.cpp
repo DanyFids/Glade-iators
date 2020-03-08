@@ -41,9 +41,9 @@ void Game::setScene(SCENES scn)
 		curScene = MainMenuScn;
 		break;
 	case PLAY_SCENE:
-		OnePlayerScn = new OnePlayer();
-		//TwoPlayerScn = new TwoPlayer();
-		curScene = OnePlayerScn;
+		//OnePlayerScn = new OnePlayer();
+		TwoPlayerScn = new TwoPlayer();
+		curScene = TwoPlayerScn;
 		break;
 	case CHARACTER_SCENE:
 		CharacterScn = new CharacterC();
@@ -166,8 +166,8 @@ void Game::Initialize()
 		curScene = MainMenuScn;
 	}
 	else {
-		curScene = OnePlayerScn;
-		//curScene = MainMenuScn;
+		//curScene = OnePlayerScn;
+		curScene = MainMenuScn;
 	}
 }
 

@@ -435,7 +435,7 @@ void OnePlayer::LoadScene()
 	//DUUDE = new SplineMan(BsMesh, BsMat, basicCubeHB, glm::vec3(1, 1, 1), beacons);
 
 	Cam = {
-		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT)) 
+		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
 	};
 
 	UI* hpBG = new UI(210, 30, { 5.0f, 545.0f, -1.0f }, blackBarMat);
@@ -863,8 +863,8 @@ void TwoPlayer::LoadScene()
 
 
 	Cam = {
-		new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec4(0,0, SCREEN_WIDTH / 2, SCREEN_HEIGHT)), // Cam 1
-		new Camera(glm::vec3(2.0f, 0.0f, -4.0f), glm::vec4(SCREEN_WIDTH / 2,0, SCREEN_WIDTH / 2, SCREEN_HEIGHT)) // Cam 2
+		new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec4(0,0, Game::SCREEN.x / 2, Game::SCREEN.y)), // Cam 1
+		new Camera(glm::vec3(2.0f, 0.0f, -4.0f), glm::vec4(Game::SCREEN.x / 2,0, Game::SCREEN.x / 2, Game::SCREEN.y)) // Cam 2
 	};
 
 	UI* hpBG = new UI(210, 30, { 5.0f, 545.0f, -1.0f }, blackBarMat);
@@ -1000,7 +1000,7 @@ void MainMenu::Draw()
 	}
 
 
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -1031,25 +1031,26 @@ void MainMenu::LoadScene()
 	Material* buttonSettings = new Material("settingsButton.png");
 	Material* buttonExit = new Material("exitButton.png");
 	Material* buttonBlank = new Material("blankButton.png");
+	Material* titleImage = new Material("gladewallpaper.png");
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	Cam = {
-		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT))
+		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
 	}; 
 
-	playerOne = new ButtonSelect(0, glm::vec2(75, 245), firstPlayer);
-	playerTwo = new ButtonSelect(1, glm::vec2(75, 245), secondPlayer);
+	playerOne = new ButtonSelect(0, glm::vec2(0, 275), firstPlayer);
+	playerTwo = new ButtonSelect(1, glm::vec2(0, 275), secondPlayer);
 
 	ui = {
-		//new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), blackBarMat),
+		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), titleImage),
 		playerOne,
-		playerTwo,
-		new Button(glm::vec2(80, 250), buttonPlay), 
-		new Button(glm::vec2(80, 150), buttonSettings),
-		new Button(glm::vec2(80, 50), buttonExit)
+		//playerTwo,
+		new Button(glm::vec2(5, 280), buttonPlay), 
+		new Button(glm::vec2(5, 180), buttonSettings),
+		new Button(glm::vec2(5, 80), buttonExit)
 	};
 }
 
@@ -1166,6 +1167,8 @@ void CharacterC::LoadScene()
 	ChangingScn = false;
 
 	MAX_MENU = 10;
+	menuSpot[0] = 10;
+	menuSpot[1] = 10;
 	MIN_MENU = 7;
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
@@ -1179,32 +1182,77 @@ void CharacterC::LoadScene()
 	Material* buttonPlay = new Material("readyButton.png");
 	Material* buttonRandom = new Material("randomButton.png");
 
-	Material* hpBarMat = new Material("yuck.png");
+	Material* backDrop = new Material("backdrop.png");
+	Material* backDropMain = new Material("backdrop2.png");
+
+	Material* swordIcon = new Material("iconSword.png");
+	Material* daggerIcon = new Material("iconDagger.png");
+	Material* spearIcon = new Material("iconSpear.png");
+	Material* shieldIcon = new Material("iconShield.png");
+	Material* bucklerIcon = new Material("iconBuckler.png");
+
 	Material* stamBarMat = new Material("blue.png");
 	Material* crowdBarMat = new Material("white.png");
 	Material* blackBarMat = new Material("black.png");
 
 	playerOne = new ButtonSelect(0, glm::vec2(145, 230), firstPlayer);
 	playerTwo = new ButtonSelect(1, glm::vec2(585, 230), secondPlayer);
+	wOne = new Button(glm::vec2(150, 160), swordIcon);
+	sOne = new Button(glm::vec2(155, 90), shieldIcon);
+	wTwo = new Button(glm::vec2(590, 160), swordIcon);
+	sTwo = new Button(glm::vec2(595, 90), shieldIcon);
+
+	wOne_p1 = new Button(glm::vec2(90, 165), daggerIcon);
+	sOne_p1 = new Button(glm::vec2(90, 90), backDrop);
+	wTwo_p1 = new Button(glm::vec2(530, 165), daggerIcon);
+	sTwo_p1 = new Button(glm::vec2(530, 90), backDrop);
+
+	wOne_p2 = new Button(glm::vec2(220, 165), spearIcon);
+	sOne_p2 = new Button(glm::vec2(220, 90), bucklerIcon);
+	wTwo_p2 = new Button(glm::vec2(660, 165), spearIcon);
+	sTwo_p2 = new Button(glm::vec2(660, 90), bucklerIcon);
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	Cam = {
-		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, SCREEN_WIDTH, SCREEN_HEIGHT))
+		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
 	};
 
 	ui = {
 		playerOne,
 		playerTwo,
-		new Button(glm::vec2(150, 160), crowdBarMat),
-		new Button(glm::vec2(150, 85), crowdBarMat),
-		new Button(glm::vec2(590, 160), crowdBarMat),
-		new Button(glm::vec2(590, 85), crowdBarMat),
+		new Button(glm::vec2(150, 160), backDropMain),
+		new Button(glm::vec2(150, 85), backDropMain),
+		new Button(glm::vec2(590, 160), backDropMain),
+		new Button(glm::vec2(590, 85), backDropMain), //
+
 		new Button(glm::vec2(100, 10), buttonPlay),
 		new Button(glm::vec2(100, 235), buttonRandom),
-		new Button(glm::vec2(540, 235), buttonRandom)
+		new Button(glm::vec2(540, 235), buttonRandom),
+
+		new Button(glm::vec2(90, 165), backDrop),
+		new Button(glm::vec2(90, 90), backDrop),
+		new Button(glm::vec2(530, 165), backDrop),
+		new Button(glm::vec2(530, 90), backDrop), //
+		new Button(glm::vec2(220, 165), backDrop),
+		new Button(glm::vec2(220, 90), backDrop),
+		new Button(glm::vec2(660, 165), backDrop),
+		new Button(glm::vec2(660, 90), backDrop), //
+		wOne_p1,
+		sOne_p1,
+		wTwo_p1,
+		sTwo_p1,
+		wOne_p2,
+		sOne_p2,
+		wTwo_p2,
+		sTwo_p2,
+
+		wOne,
+		sOne,
+		wTwo,
+		sTwo
 	};
 
 	ui[0]->Resize(70, 70);
@@ -1213,7 +1261,31 @@ void CharacterC::LoadScene()
 	ui[3]->Resize(60, 60);
 	ui[4]->Resize(60, 60);
 	ui[5]->Resize(60, 60);
+
 	ui[6]->Resize(600, 60);
 	ui[7]->Resize(140, 60);
 	ui[8]->Resize(140, 60);
+
+	ui[9]->Resize(50, 50);
+	ui[10]->Resize(50, 50);
+	ui[11]->Resize(50, 50);
+	ui[12]->Resize(50, 50);
+	ui[13]->Resize(50, 50);
+	ui[14]->Resize(50, 50);
+	ui[15]->Resize(50, 50);
+	ui[16]->Resize(50, 50);
+
+	ui[17]->Resize(50, 50);
+	ui[18]->Resize(50, 50);
+	ui[19]->Resize(50, 50);
+	ui[20]->Resize(50, 50);
+	ui[21]->Resize(50, 50);
+	ui[22]->Resize(50, 50);
+	ui[23]->Resize(50, 50);
+	ui[24]->Resize(50, 50);
+
+	ui[25]->Resize(60, 60);
+	ui[26]->Resize(50, 50);
+	ui[27]->Resize(60, 60);
+	ui[28]->Resize(50, 50);
 }

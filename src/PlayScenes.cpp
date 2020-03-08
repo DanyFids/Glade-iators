@@ -1053,7 +1053,7 @@ void MainMenu::Draw()
 	}
 
 
-	//Textcontroller->RenderText(TextRenderer::TEXTSHADER, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -1066,6 +1066,8 @@ void MainMenu::LoadScene()
 
 	MAX_MENU = 0;
 	MIN_MENU = -2;
+	srand(time(NULL));
+	Names[0] = Textcontroller->GenerateName();
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1220,6 +1222,8 @@ void CharacterC::LoadScene()
 
 	MAX_MENU = 10;
 	MIN_MENU = 7;
+
+
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 

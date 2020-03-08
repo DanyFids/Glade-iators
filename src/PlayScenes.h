@@ -87,6 +87,8 @@ class MainMenu : public PlayScene {
 public:
 	MainMenu();
 
+
+	std::string Names[2];
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
 	virtual void Update(float dt) override;

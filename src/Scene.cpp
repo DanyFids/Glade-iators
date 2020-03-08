@@ -112,6 +112,8 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 		Cam[player]->Move(glm::normalize(t), dt);
 }
 
+
+
 void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 {
 	static const float dead_zone = 0.35f;
@@ -188,16 +190,17 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			{
 				if (players[player]->GetStam() >= 15.0f) {
 
-					glm::vec3 p1 = glm::vec3();
-					p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-					p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+					//glm::vec3 p1 = glm::vec3();
+					//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+					//p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
 
 
 
 					//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
 
 					std::cout << "OOF\n";
-					players[player]->dmgSTAM(15.0f);
+					//players[player]->dmgSTAM(15.0f);
+					players[player]->Attack();
 					atk1 = true;
 				}
 			}

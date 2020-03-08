@@ -136,6 +136,10 @@ enum PLAYER_STATE {
 	idle, walking, attacking, blocking, rolling, taunting
 };
 
+enum COLLISION_TYPE {
+	nil, entity, shield
+};
+
 class Weapon;
 
 class Player : public Object {
@@ -185,6 +189,8 @@ public:
 
 	PLAYER_STATE GetState() {return state;}
 	void SetState(PLAYER_STATE s) {state = s;}
+	void SetWeapon(Weapon*& w) { weapon = w; }
+	Weapon* GetWeapon() { return weapon; }
 	bool IsLocked() { return anim_lock; }
 };
 
@@ -193,12 +199,18 @@ private:
 	float damage, stamina_cost;
 
 	std::vector<std::string> attack_anims;
+	
+	bool cooldown = false;
 public:
 	Weapon(Mesh* me, Material* ma, Hitbox* hb, std::vector<std::string> atks, float dmg, float stam);
+	Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, Joint* p = nullptr, SkelMesh* m = nullptr);
 
 	std::string GetAtkAnim(unsigned int c_id = 0);
 	float GetDamage() {return damage;}
 	float GetStaminaCost() { return stamina_cost; }
+
+	void setCooldown(bool c) { cooldown = c; }
+	bool getCooldown() { return cooldown; }
 
 	virtual bool HitDetect(Object* other);
 };

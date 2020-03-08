@@ -25,7 +25,9 @@ public:
 	void SetPosition(glm::vec3 pos) { transform.position = pos; }
 	void SetRotation(glm::vec3 rot) { transform.rotation = rot; }
 	void SetScale(glm::vec3 scl) { transform.scale = scl; }
+	COLLISION_TYPE GetType() { return HitboxType; }
 protected:
+	COLLISION_TYPE HitboxType;
 	Transform parent;
 	Transform transform;
 };
@@ -72,7 +74,7 @@ class SphereHitbox : public Hitbox {
 	static Mesh* node_me;
 	static Material* node_ma;
 public:
-	SphereHitbox(float r) :radius(r) {};
+	SphereHitbox(float r, COLLISION_TYPE type = nil) :radius(r) { HitboxType = type; };
 	static void init();
 	virtual Transform GetTransform() override;
 	virtual void SetTransform(Transform t) override;
@@ -93,13 +95,15 @@ class CapsuleHitbox : public Hitbox {
 	
 	float radius;
 	float height;
+
 	glm::vec3 upperBound, lowerBound;
 public:
 	static void init();
 
-	CapsuleHitbox(float r, float h) :radius(r), height(h) {
+	CapsuleHitbox(float r, float h, COLLISION_TYPE type = nil) :radius(r), height(h) {
 		lowerBound = glm::vec3(0.0f, 0.0f, 0.0f);
 		upperBound = glm::vec3(0.0f, h, 0.0f);
+		HitboxType = type;
 	};
 	
 	float GetRadius() { return radius; }

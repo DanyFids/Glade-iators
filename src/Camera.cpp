@@ -20,7 +20,7 @@ Camera::Camera(glm::vec3 pos, glm::vec4 s_dim)
 	yaw = (direction.x + direction.z) * 90;
 
 	lookAt = glm::lookAt(position, target, u);
-	project = glm::perspective(glm::radians(45.0f), (float)(Game::SCREEN.x / Game::SCREEN.y), 0.1f, 150.0f); // projection Matrix
+	project = glm::perspective(glm::radians(45.0f), (float)(Game::SCREEN.x / Game::SCREEN.y), 0.1f, 300.0f); // projection Matrix
 	screen_dim = s_dim;
 	view_cor = glm::mat4(1.0f);
 	view_cor = glm::scale(view_cor, glm::vec3((float)Game::SCREEN.x / s_dim.z, 1.0f, 1.0f));
@@ -40,7 +40,7 @@ Camera::Camera(glm::vec3 pos, glm::vec3 targ, glm::vec4 s_dim)
 	yaw = (direction.x + direction.z) * 90;
 
 	lookAt = glm::lookAt(position, target, u);
-	project = glm::perspective(glm::radians(45.0f), (float)(s_dim.z / s_dim.w), 0.1f, 150.0f); // projection Matrix
+	project = glm::perspective(glm::radians(45.0f), (float)(s_dim.z / s_dim.w), 0.1f, 300.0f); // projection Matrix
 	screen_dim = s_dim; // Set Screen Position
 
 	view_cor = glm::mat4(1.0f);
@@ -144,10 +144,10 @@ void Camera::TogglePerspective()
 {
 	view_p = !view_p;
 	if (view_p) {
-		project = glm::perspective(glm::radians(45.0f), (float)(screen_dim.z / screen_dim.w), 0.1f, 150.0f);
+		project = glm::perspective(glm::radians(45.0f), (float)(screen_dim.z / screen_dim.w), 0.1f, 300.0f);
 	}
 	else {
-		project = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, 0.0f, 150.0f);
+		project = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, 0.0f, 300.0f);
 	}
 }
 
@@ -155,7 +155,7 @@ void Camera::UpdateScreen(glm::vec4 s_dim)
 {
 	screen_dim = s_dim;
 
-	project = glm::perspective(glm::radians(45.0f), (screen_dim.z / screen_dim.w), 0.1f, 150.0f); // projection Matrix
+	project = glm::perspective(glm::radians(45.0f), (screen_dim.z / screen_dim.w), 0.1f, 300.0f); // projection Matrix
 	view_cor = glm::mat4(1.0f);
 	view_cor = glm::scale(view_cor, glm::vec3((float)Game::SCREEN.x / s_dim.z, 1.0f, 1.0f));
 }

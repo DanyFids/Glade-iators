@@ -339,8 +339,8 @@ void OnePlayer::LoadScene()
 	Hitbox* basicCubeHB2 = new CubeHitbox(1.0, 1.0f, 1.0f);
 
 	//Capsule testing
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f,4.0f); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,4.0f);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f,4.0f,entity); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,4.0f, entity);
 	Hitbox* basicCapsuleHB3 = new CapsuleHitbox(0.2,4.0);
 	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.09f, 12.8f);
 	//Capsule Testing
@@ -589,6 +589,14 @@ void TwoPlayer::Update(float dt)
 				if (players[c]->HitDetect(players[p])) {
 					std::cout << "Welp\n";
 				}
+
+				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
+					if(players[p]->hitbox->GetType() == entity)
+					std::cout << "Hit!\n";
+
+					players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
+					players[c]->GetWeapon()->setCooldown(true);
+				}
 			}
 		}
 
@@ -698,14 +706,18 @@ void TwoPlayer::Draw()
 
 		RenderScene(shaderObj, skelShader);
 		Cam[c]->SetupCam(morphShader);
-		morphyBoi->Draw(morphShader, Cam);
+		//morphyBoi->Draw(morphShader, Cam);
 
 		glDisable(GL_DEPTH_TEST);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		
 		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
 		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
-		//	players[1]->hitbox->Draw(shaderObj);
+			//players[1]->hitbox->Draw(shaderObj);
 
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_DEPTH_TEST);
+
 	}
 
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -738,14 +750,15 @@ void TwoPlayer::LoadScene()
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
 	Material* defaultTex = new Material("default-texture.png", "default-normal.png");
 
-	Material* arenaTex = new Material("wood_texture.png");
+	Material* arenaTex = new Material("CaulitreeumTexture.png");
+	Material* floorTex = new Material("ArenaFloorTexture.png");
 
 	Material* hpBarMat = new Material("yuck.png");
 	Material* stamBarMat = new Material("blue.png");
 	Material* crowdBarMat = new Material("white.png");
 	Material* blackBarMat = new Material("black.png");
 
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 155.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.4f, 0.7f, 0.9f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
@@ -772,8 +785,9 @@ void TwoPlayer::LoadScene()
 	Mesh* Square = new Mesh("d6.obj");
 	Mesh* d20 = new Mesh("d20.obj");
 	Mesh* boi = new Mesh("gladiator.obj");
+	
 
-	Mesh* arena = new Mesh("ColitreeumV2.obj");
+	Mesh* arena = new Mesh("Caulitreeum.obj");
 
 	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "bone_t.bvh");
 	SkelMesh* P1_MESH = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
@@ -783,9 +797,10 @@ void TwoPlayer::LoadScene()
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
-	//Capsule testing
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.3f, 2.0f); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.3f, 2.0f);
+	//Capsule testing ********* PLAYER HITBOXES
+
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.3f, 5.2f, entity); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.3f, 5.2f, entity);
 
 	players.push_back(new Player(P1_MESH, defaultTex, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
 	players[PLAYER_1]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
@@ -807,19 +822,21 @@ void TwoPlayer::LoadScene()
 
 	Object* die = new Object(Square, DiceTex, basicCubeHB);
 	die->Move({ 8.0f, 1.0f, 19.0f });
-	terrain.push_back(die);
+	//terrain.push_back(die);
 
-	Object* floor = new Object(Square, defaultTex, basicCubeHB);
-	floor->Move({ 0.0f, -1.5f, 0.0f });
-	floor->Scale({ 30.0f, 0.5f, 30.0f });
+	Object* Arenafloor = new Object(Game::QUAD, floorTex, basicCubeHB);
+	Arenafloor->Move({ 0.0f, -0.65, 0.0f });
+	Arenafloor->Scale({ 80.0, 80.0f, 80.0f });
+	Arenafloor->Rotate({ -90,0,0 }); 
 
-	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0, -2, 0));
+	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0, 0.45, 0));
 
-	Colitreeum->Scale(glm::vec3(2.5, 2.5, 2.5));
+	Colitreeum->Scale(glm::vec3(1.0, 1.0, 1.0));
 
 	terrain.push_back(Colitreeum);
 
-	//terrain.push_back(floor);
+	terrain.push_back(Arenafloor);
+
 
 	Mesh* SwordMesh = new Mesh("Weapons/Sword.obj");
 	Mesh* ShieldMesh = new Mesh("Weapons/Circle_Shield.obj");
@@ -828,11 +845,22 @@ void TwoPlayer::LoadScene()
 	Hitbox* shieldSphereHB = new SphereHitbox(1.0f);
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
 
+	std::vector<std::string> OneHand_LC = {"sword_1"};
+
 	Object* P1_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P1_MESH);
 	Object* P2_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P2_MESH);
 
 	Object* P1_shield = new Object(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f }, gladiatorSkel->Find("l_hand"), P1_MESH);
 	Object* P2_shield = new Object(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f }, gladiatorSkel->Find("l_hand"), P2_MESH);
+
+	Weapon* Hurt_Sword = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 10.0f, gladiatorSkel->Find("r_hand"), P1_MESH);
+	Weapon* Hurt_Sword2 = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 10.0f, gladiatorSkel->Find("r_hand"), P2_MESH);
+
+	Hurt_Sword->Scale({ 0.9f, 0.9f, 0.9f });
+	Hurt_Sword->SetRotation({ 0.0f, 90.0f, 90.0f });
+
+	Hurt_Sword2->Scale({ 0.9f, 0.9f, 0.9f });
+	Hurt_Sword2->SetRotation({ 0.0f, 90.0f, 90.0f });
 
 	P1_sword->Scale({ 0.9f, 0.9f, 0.9f });
 	P1_sword->SetRotation({ 0.0f, 90.0f, 90.0f });
@@ -845,11 +873,14 @@ void TwoPlayer::LoadScene()
 
 	P2_shield->Scale({ 0.8f, 0.8f, 0.8f });
 	P2_shield->SetRotation({ 0.0f, 0.0f, 270.0f });
+		
+	players[PLAYER_1]->SetWeapon(Hurt_Sword);
+	players[PLAYER_2]->SetWeapon(Hurt_Sword2);
 
-	players[PLAYER_1]->addChild(P1_sword);
+	players[PLAYER_1]->addChild(Hurt_Sword);
 	players[PLAYER_1]->addChild(P1_shield);
 
-	players[PLAYER_2]->addChild(P2_sword);
+	players[PLAYER_2]->addChild(Hurt_Sword2);
 	players[PLAYER_2]->addChild(P2_shield);
 
 
@@ -880,8 +911,7 @@ void TwoPlayer::LoadScene()
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(15.0f, 1.0f, 2.0f));
 
-	players[PLAYER_1]->dmgHP(40);
-	players[PLAYER_2]->dmgHP(60);
+	
 }
 
 MainMenu::MainMenu()

@@ -342,6 +342,18 @@ void Player::Idle()
 		PlayAnim("idle");
 		_mesh->SetIntensity(1, 0.0f);
 		state = idle;
+		weapon->setCooldown(false);
+	}
+}
+
+void Player::Attack()
+{
+	if (state != attacking) {
+		anim_lock = true;
+		PlayAnim(this->weapon->GetAtkAnim(0));
+		_mesh->SetIntensity(1, 0.0f);
+		this->dmgSTAM(weapon->GetStaminaCost());
+		state = attacking;
 	}
 }
 
@@ -495,16 +507,40 @@ Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, std::vector<std::string> atks
 	stamina_cost = stam;
 }
 
+Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, Joint* p, SkelMesh* m) //Mesh, Material, Hitbox, Position, Anim_Names, Damage, Stamina Cost, Parent_joint, SkelMesh
+{
+	attack_anims = atks;
+	damage = dmg;
+	stamina_cost = stam;
+
+	mesh = me;
+	material = ma;
+	hitbox = hb;
+
+	transform.position = pos;
+	transform.scale = glm::vec3(1.0f);
+	transform.rotation = glm::vec3();
+
+	parent_joint = p;
+	parent_Mesh = m;
+}
+
 std::string Weapon::GetAtkAnim(unsigned int c_id)
 {
 	if (c_id < attack_anims.size()) {
 		return attack_anims[c_id];
 	}
 
+	
 	return "";
 }
 
 bool Weapon::HitDetect(Object* other)
 {
+	if (other->hitbox->HitDetect(other, (CapsuleHitbox*)this->hitbox, this))
+	{
+		return true;
+	}
+	else
 	return false;
 }

@@ -71,7 +71,46 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		m += glm::vec3(1.0f, 0.0f, 0.0f);
 	
+	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS && CgradeIDown[0] == false)
+	{
+		if (CgradeI == 1)
+		{
+			CgradeI = 0;
+		}
+		else
+			CgradeI = 1;
 
+	}
+	if (glfwGetKey(window, GLFW_KEY_8) != GLFW_PRESS)
+	{
+		CgradeIDown[0] == false;
+	}
+	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS && CgradeIDown[1] == false)
+	{								
+		if (CgradeI == 2)
+		{
+			CgradeI = 0;
+		}
+		else
+			CgradeI = 2;
+	}								
+	if (glfwGetKey(window, GLFW_KEY_9) != GLFW_PRESS)
+	{
+		CgradeIDown[1] == false;
+	}
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS && CgradeIDown[2] == false)
+	{
+		if (CgradeI == 3)
+		{
+			CgradeI = 0;
+		}
+		else
+			CgradeI = 3;
+	}
+	if (glfwGetKey(window, GLFW_KEY_0) != GLFW_PRESS)
+	{
+		CgradeIDown[2] = false;
+	}
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 	{
 		//attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));

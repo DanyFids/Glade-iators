@@ -164,8 +164,9 @@ void Game::Initialize()
 		curScene = MainMenuScn;
 	}
 	else {
-		//curScene = OnePlayerScn;
-		curScene = MainMenuScn;
+		OnePlayerScn = new OnePlayer();
+		curScene = OnePlayerScn;
+		//curScene = MainMenuScn;
 	}
 }
 

@@ -25,6 +25,7 @@ class OnePlayer: public PlayScene {
 
 	Mesh* DebugQuad;
 
+	float deathtimer = 4;
 	
 	Player* test_player;
 

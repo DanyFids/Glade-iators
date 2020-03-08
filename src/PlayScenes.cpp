@@ -1,27 +1,28 @@
 #include "PlayScenes.h"
 #include <glad/glad.h>
-#include<GLFW/glfw3.h>
-#include<GLM/glm.hpp>
+#include <GLFW/glfw3.h>
+#include <GLM/glm.hpp>
 #include <iostream>
 #include <sstream>
 #include <typeinfo>
 #include <random>
 #include <thread>
 #include <queue>
+#include <florp/app/timing.h>
 
-#include"Mesh.h"
-#include"Shader.h"
-#include"Texture.h"
-#include"Camera.h"
-#include"Light.h"
-#include"Object.h"
-#include"Mesh.h"
-#include"Constants.h"
-#include"Test_Primitives.h"
-#include"Hitbox.h"
-#include"UI.h"
-#include"Skeleton.h"
-#include"Lerp.h"
+#include "Mesh.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "Camera.h"
+#include "Light.h"
+#include "Object.h"
+#include "Mesh.h"
+#include "Constants.h"
+#include "Test_Primitives.h"
+#include "Hitbox.h"
+#include "UI.h"
+#include "Skeleton.h"
+#include "Lerp.h"
 #include "Sound.h"
 #include "Game.h"
 #include "PostProcess.h"
@@ -66,6 +67,17 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void OnePlayer::Update(float dt)
 {
+
+	if (players[0]->GetHP() <= 0 || players[1]->GetHP() <= 0)
+	{
+		deathtimer -= dt;
+		if (deathtimer <= 0)
+		{
+			Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			//setScene(MainMenu);
+
+		}
+	}
 
 	audioEngine.Update();
 	for (int c = 0; c < players.size(); c++) {
@@ -227,9 +239,60 @@ void OnePlayer::Draw()
 		glEnable(GL_DEPTH_TEST);
 	}
 
+
+
+	if (CgradeI == 1)
+	{
+		if (lutloaded != 1 && lutloaded != 0)
+		{
+			lutloaded = 1;
+			post_pass.back() = new LutColorCorrection(new LUT("LUTs/Bluedabadee.cube"), main_pass->GetOutput());
+		}
+		else if (lutloaded == 0)
+		{
+			lutloaded = 1;
+			post_pass.push_back(new LutColorCorrection(new LUT("LUTs/Bluedabadee.cube"), main_pass->GetOutput()));
+		}
+	}
+	else if (CgradeI == 2)
+	{
+		if (lutloaded != 2 && lutloaded != 0)
+		{
+			lutloaded = 2;
+			post_pass.back() = new LutColorCorrection(new LUT("LUTs/EdgeLord.cube"), main_pass->GetOutput());
+		}
+		else if (lutloaded == 0)
+		{
+	
+			lutloaded = 2;
+			post_pass.push_back(new LutColorCorrection(new LUT("LUTs/EdgeLord.cube"), main_pass->GetOutput()));
+		}
+	}	
+	else if (CgradeI == 3)
+	{
+		if (lutloaded != 3 && lutloaded != 0)
+		{
+			lutloaded = 3;
+			post_pass.back() = new LutColorCorrection(new LUT("LUTs/ThatsHotBBY.cube"), main_pass->GetOutput());
+		}
+		else if (lutloaded == 0)
+		{
+			lutloaded = 3;
+			post_pass.push_back(new LutColorCorrection(new LUT("LUTs/ThatsHotBBY.cube"), main_pass->GetOutput()));
+		}
+		
+	}
+	else if (lutloaded > 0)
+	{
+		post_pass.pop_back();
+		lutloaded = 0;
+	}
+
 	for (int c = 0; c < post_pass.size(); c++) {
 		post_pass[c]->Draw();
 	}
+
+	//SCREEN_WIDTH, SCREEN_HEIGHT
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glActiveTexture(GL_TEXTURE0);
@@ -248,8 +311,25 @@ void OnePlayer::Draw()
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
+
+	if (players[0]->GetHP() <= 0 && players[1]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Draw", SCREEN_HEIGHT /2.f, SCREEN_WIDTH /2.f, 1.0f, glm::vec3(1.f, 0.f, 0.f));
+		//deathtimer -= 
+	}
+	else if (players[0]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 1 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
+
+	}
+	else if (players[1]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 2 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
+
+	}
 	glEnable(GL_DEPTH_TEST);
 
+	
 	glViewport(0, 0, Game::SCREEN.x, Game::SCREEN.y);
 }
 
@@ -261,6 +341,8 @@ void OnePlayer::LoadScene()
 	
 	Material* LUT_TEST = new Material("LUTs/LUT_TEST.png");
 
+	//Textcontroller();
+
 	highlightshader = new Shader("Shaders/PostProcess/PostProcess.vert","Shaders/PostProcess/Highlights.frag");
 
 	vergausshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/GausBlur.frag");
@@ -270,15 +352,19 @@ void OnePlayer::LoadScene()
 
 	bloomshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Bloom.frag");
 	pixelshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Pixelation.frag");
+
+
 	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
-	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/Winterfell Extra 2.cube"), main_pass->GetOutput()));
-	// Sampler2d INPUT  
+	
+	// Sampler2d INPUT
 	   
 	post_pass.push_back(new PostProcess({main_pass->GetOutput()}, highlightshader)); 
 	post_pass.push_back(new PostProcess({post_pass.at(0)->buff->GetOutput()}, horgausshader));
 	post_pass.push_back(new PostProcess({ post_pass.at(1)->buff->GetOutput() }, vergausshader));
 	post_pass.push_back(new PostProcess({ post_pass.at(2)->buff->GetOutput(),main_pass->GetOutput() }, bloomshader));
 	post_pass.push_back(new PostProcess({ post_pass.at(3)->buff->GetOutput() }, pixelshader));
+
+	
 
 	isMenu = false; 
 	ChangingScn = false;
@@ -967,7 +1053,7 @@ void MainMenu::Draw()
 	}
 
 
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	//Textcontroller->RenderText(TextRenderer::TEXTSHADER, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 
 	glEnable(GL_DEPTH_TEST);
 

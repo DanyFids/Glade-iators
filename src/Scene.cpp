@@ -591,6 +591,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 	menu_time[controller] -= dt;
 }
 
+bool PlayScene::loaded = false;
 
 void PlayScene::RenderScene(Shader* shader, Shader* playerShader)
 {

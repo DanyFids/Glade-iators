@@ -717,7 +717,7 @@ void TwoPlayer::Draw()
 		glEnable(GL_DEPTH_TEST);
 	}
 
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	glViewport(0, 0, Game::SCREEN.x, Game::SCREEN.y);
 
 	glDisable(GL_DEPTH_TEST);
 
@@ -1020,14 +1020,13 @@ void MainMenu::LoadScene()
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
 	
-
-	//Material* hpBarMat = new Material("yuck.png");
-	//Material* stamBarMat = new Material("blue.png");
-	//Material* crowdBarMat = new Material("white.png");
 	Material* blackBarMat = new Material("black.png");
+
+	Material* gladeiatorsTitle = new Material("Title.png");
+
 	Material* firstPlayer = new Material("redPlayer.png");
 	Material* secondPlayer = new Material("bluePlayer.png");
-	Material* buttonPlay = new Material("playButton.png");
+	Material* buttonPlay = new Material("playButton.png"); 
 	Material* buttonSettings = new Material("settingsButton.png");
 	Material* buttonExit = new Material("exitButton.png");
 	Material* buttonBlank = new Material("blankButton.png");
@@ -1050,8 +1049,13 @@ void MainMenu::LoadScene()
 		//playerTwo,
 		new Button(glm::vec2(5, 280), buttonPlay), 
 		new Button(glm::vec2(5, 180), buttonSettings),
-		new Button(glm::vec2(5, 80), buttonExit)
+		new Button(glm::vec2(5, 80), buttonExit),
 	};
+
+	if (!loaded) {
+		UI* spaget = new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), gladeiatorsTitle);
+		spaget->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
+	}
 }
 
 CharacterC::CharacterC()

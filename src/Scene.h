@@ -56,6 +56,7 @@ protected:
 	int shield[2]{ 0, 0 };
 	bool changeW[2]{ false, false };
 	bool changeS[2]{ false, false };
+	static bool loaded;
 
 	Material* swordIcon = new Material("iconSword.png");
 	Material* spearIcon = new Material("iconSpear.png");

@@ -836,9 +836,9 @@ void SkelMesh::DrawSkeleton(glm::mat4 global, Shader* shdr)
 	skeleton->DrawSkeleton(global, anim[0], curFrame[0], shdr);
 }
 
-FrameStates SkelMesh::GetFrameCode()
+FrameStates SkelMesh::GetFrameCode(unsigned int chnl)
 {
-	return skeleton->AnimStates[anim[0]][curFrame[0]];
+	return skeleton->AnimStates[anim[chnl]][curFrame[chnl]];
 }
 
 glm::vec3 SkelMesh::GetRootMv()

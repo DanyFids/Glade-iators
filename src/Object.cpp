@@ -193,8 +193,9 @@ glm::mat4 Object::TransformTo()
 const float Player::MAX_HEALTH = 100.0f;
 const float Player::MAX_STAMINA = 100.0f;
 const float Player::STAM_DECAY = 30.0f;
-const float Player::STAM_RECOV = 20.0f;
+const float Player::STAM_RECOV = 40.0f;
 const float Player::RECOV_TIME = 2.0f;
+const float Player::RECOV_DELAY_TIME = 0.85f;
 
 Player::Player() {
 	health = MAX_HEALTH;
@@ -249,7 +250,7 @@ void Player::Update(float dt)
 	if (run) {
 		if (stamina > 0.0f && glm::length(phys.move) != 0.0f) {
 			phys.move *= 2.0f;
-			stamina -= STAM_DECAY * dt;
+			dmgSTAM(STAM_DECAY * dt);
 		}
 		else {
 			run = false;
@@ -257,11 +258,22 @@ void Player::Update(float dt)
 		}
 	}
 	else {
-		if (stamina < MAX_STAMINA) {
-			stamina += STAM_RECOV * dt;
+		if (state != blocking) {
+			if (recov_delay <= 0.0f) {
+				if (stamina < MAX_STAMINA) {
+					stamina += STAM_RECOV * dt;
 
-			stamina = glm::min(stamina, MAX_STAMINA); 
+					stamina = glm::min(stamina, MAX_STAMINA);
+				}
+			}
+			else {
+				recov_delay -= dt;
+			}
 		}
+	}
+
+	if (state == PLAYER_STATE::attacking && anim_lock && GetFrameState() == FrameStates::Attack) {
+		anim_lock = false;
 	}
 
 	_mesh->Update(dt);
@@ -305,6 +317,18 @@ bool Player::HitDetect(Object* other)
 	}
 
 	return false;
+}
+
+void Player::dmgHP(float _dmg)
+{
+	if(GetFrameState() != FrameStates::Roll)
+		health -= _dmg;
+}
+
+void Player::dmgSTAM(float _dmg)
+{
+	stamina -= _dmg;
+	recov_delay = RECOV_DELAY_TIME;
 }
 
 void Player::PlayAnim(std::string n, unsigned int c, float i, float s)
@@ -351,12 +375,22 @@ void Player::Idle()
 
 void Player::Attack()
 {
-	if (state != attacking && state != blocking) {
+	if (state != attacking) {
 		anim_lock = true;
-		PlayAnim(this->weapon->GetAtkAnim(0), 0, 1.0f, 2.0f);
+		atk_combo = 0;
+		PlayAnim(this->weapon->GetAtkAnim(atk_combo), 0, 1.0f, 2.5f);
 		_mesh->SetIntensity(1, 0.0f);
 		this->dmgSTAM(weapon->GetStaminaCost());
 		state = attacking;
+	}
+	else if(GetFrameState() == FrameStates::Neutral && !anim_lock){
+		if (atk_combo < this->weapon->GetNumLightAttacks()) {
+			weapon->setCooldown(false);
+			atk_combo++;
+			anim_lock = true;
+			PlayAnim(this->weapon->GetAtkAnim(atk_combo), 0, 1.0f, 2.5f);
+			this->dmgSTAM(weapon->GetStaminaCost());
+		}
 	}
 }
 
@@ -367,6 +401,11 @@ void Player::Block()
 		PlayAnim("block",1,1,1.0f);
 		state = blocking;
 	}
+}
+
+FrameStates Player::GetFrameState(unsigned int chnl)
+{
+	return _mesh->GetFrameCode();
 }
 
 

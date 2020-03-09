@@ -968,7 +968,7 @@ void TwoPlayer::Update(float dt)
 					}
 				}
 
-				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
+				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
 
 					if (players[p]->hitbox->GetType() == entity) {
 						std::cout << "Hit!\n";
@@ -1258,7 +1258,7 @@ void TwoPlayer::LoadScene()
 	Hitbox* shieldSphereHB = new SphereHitbox(1.0f, COLLISION_TYPE::shield);
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
 
-	std::vector<std::string> OneHand_LC = {"sword_1"};
+	std::vector<std::string> OneHand_LC = {"sword_1", "sword_2"};
 
 	Object* P1_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P1_MESH);
 	Object* P2_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P2_MESH);
@@ -1266,8 +1266,8 @@ void TwoPlayer::LoadScene()
 	Shield* P1_shield = new Shield(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f },0.6f, 0.25f, gladiatorSkel->Find("l_hand"), P1_MESH);
 	Shield* P2_shield = new Shield(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f },0.6f, 0.25f, gladiatorSkel->Find("l_hand"), P2_MESH);
 
-	Weapon* Hurt_Sword = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 10.0f, gladiatorSkel->Find("r_hand"), P1_MESH);
-	Weapon* Hurt_Sword2 = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 10.0f, gladiatorSkel->Find("r_hand"), P2_MESH);
+	Weapon* Hurt_Sword = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 20.0f, 30.0f, gladiatorSkel->Find("r_hand"), P1_MESH);
+	Weapon* Hurt_Sword2 = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 20.0f, 30.0f, gladiatorSkel->Find("r_hand"), P2_MESH);
 
 	weapons.push_back(Hurt_Sword);
 	weapons.push_back(Hurt_Sword2);

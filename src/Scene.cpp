@@ -71,72 +71,72 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		m += glm::vec3(1.0f, 0.0f, 0.0f);
 	
-	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS && CgradeIDown[0] == false)
-	{
-		if (CgradeI == 1)
-		{
-			CgradeI = 0;
-		}
-		else
-			CgradeI = 1;
-
-	}
-	if (glfwGetKey(window, GLFW_KEY_8) != GLFW_PRESS)
-	{
-		CgradeIDown[0] == false;
-	}
-	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS && CgradeIDown[1] == false)
-	{								
-		if (CgradeI == 2)
-		{
-			CgradeI = 0;
-		}
-		else
-			CgradeI = 2;
-	}								
-	if (glfwGetKey(window, GLFW_KEY_9) != GLFW_PRESS)
-	{
-		CgradeIDown[1] == false;
-	}
-	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS && CgradeIDown[2] == false)
-	{
-		if (CgradeI == 3)
-		{
-			CgradeI = 0;
-		}
-		else
-			CgradeI = 3;
-	}
-	if (glfwGetKey(window, GLFW_KEY_0) != GLFW_PRESS)
-	{
-		CgradeIDown[2] = false;
-	}
-	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
-	{
-		//attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));
-		//glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
-		//p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
-		//p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));
-		//p1.y = players[0]->GetPosition().y;
-		//attacks.back()->SetPosition(p1);
-		//attacks.back()->ABox->SetPosition(glm::vec3(0,2,4));
-	}
-	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && dodge1 == false)
-	{
-		players[player]->phys.move = m * (PLAYER_SPEED * 2) * dt;
-		dodge1 = false;
-		dodge1t = 3;
-	}
-	else if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f)
-	{
-		players[player]->phys.move = m * PLAYER_SPEED * dt;
-	}
-		
-	if (dodge1t <= 0)
-	{
-		dodge1 = true;
-	}
-
+	//if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS && CgradeIDown[0] == false)
+	//{
+	//	if (CgradeI == 1)
+	//	{
+	//		CgradeI = 0;
+	//	}
+	//	else
+	//		CgradeI = 1;
+	//
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_8) != GLFW_PRESS)
+	//{
+	//	CgradeIDown[0] == false;
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS && CgradeIDown[1] == false)
+	//{								
+	//	if (CgradeI == 2)
+	//	{
+	//		CgradeI = 0;
+	//	}
+	//	else
+	//		CgradeI = 2;
+	//}								
+	//if (glfwGetKey(window, GLFW_KEY_9) != GLFW_PRESS)
+	//{
+	//	CgradeIDown[1] == false;
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS && CgradeIDown[2] == false)
+	//{
+	//	if (CgradeI == 3)
+	//	{
+	//		CgradeI = 0;
+	//	}
+	//	else
+	//		CgradeI = 3;
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_0) != GLFW_PRESS)
+	//{
+	//	CgradeIDown[2] = false;
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+	//{
+	//	//attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));
+	//	//glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
+	//	//p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
+	//	//p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));
+	//	//p1.y = players[0]->GetPosition().y;
+	//	//attacks.back()->SetPosition(p1);
+	//	//attacks.back()->ABox->SetPosition(glm::vec3(0,2,4));
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && dodge1 == false)
+	//{
+	//	players[player]->phys.move = m * (PLAYER_SPEED * 2) * dt;
+	//	dodge1 = false;
+	//	dodge1t = 3;
+	//}
+	//else if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f)
+	//{
+	//	players[player]->phys.move = m * PLAYER_SPEED * dt;
+	//}
+	//	
+	//if (dodge1t <= 0)
+	//{
+	//	dodge1 = true;
+	//}
+	//
 
 	glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -189,11 +189,13 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 			if (glm::length(axisPos) > dead_zone)
 			{
-				t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-				//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-				t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+				if (players[player]->GetFrameState() == FrameStates::Neutral || players[player]->GetFrameState() == FrameStates::Block) {
+					t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+					//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+					t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+				}
 				//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-				if (players[player]->GetState() != PLAYER_STATE::walking && !players[player]->IsLocked()) {
+				if (players[player]->GetState() != PLAYER_STATE::walking && players[player]->GetFrameState() == FrameStates::Neutral && !players[player]->IsLocked()) {
 					players[player]->PlayAnim("walk", 0, glm::length(axisPos));
 					//players[player]->PlayAnim("idle", 1, 1.0f - glm::length(axisPos));
 					players[player]->SetState(walking);

@@ -284,9 +284,22 @@ void Game::InputHandle(float dt)
 	}
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_RELEASE)
 		w_pressed = false;
-
-	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_RELEASE)
-		f2_pressed = false;
+	
+	if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS && !f11_pressed) {
+		if (Game::SCREEN.x == 800) {
+			Game::SCREEN.x = 1920;
+			Game::SCREEN.y = 1080;
+			glfwSetWindowMonitor(window, NULL, 0, 0, 1920, 1080, 60);
+		}
+		else {
+			Game::SCREEN.x = SCREEN_WIDTH;
+			Game::SCREEN.y = SCREEN_HEIGHT;
+			glfwSetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
+		}
+		f11_pressed = true;
+	}
+	if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_RELEASE)
+		f11_pressed = false;
 
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !space_pressed) {
 		curScene->GetCams()[0]->TogglePerspective();

@@ -78,6 +78,13 @@ void FrameBuffer::AddComponent()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, ID);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + OUT.size(), GL_TEXTURE_2D, t, 0);
+
+	OUT.push_back(t);
+
+	std::vector<GLenum> attachments;
+	for (int c = 0; c < OUT.size(); c++) attachments.push_back(GL_COLOR_ATTACHMENT0 + attachments.size());
+
+	glDrawBuffers(attachments.size(), attachments.data());
 }
 
 void FrameBuffer::Resize()
@@ -102,7 +109,8 @@ void PostProcess::Draw()
 	effect->Use();
 
 	for (int c = 0; c < IN.size(); c++) {
-		glBindTexture(GL_TEXTURE0 + c, IN[c]);
+		glActiveTexture(GL_TEXTURE0 + c);
+		glBindTexture(GL_TEXTURE_2D, IN[c]);
 		effect->SetI("INPUT_" + std::to_string(c), c);
 	}
 

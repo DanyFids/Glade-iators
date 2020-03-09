@@ -4,7 +4,11 @@
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 #include<GLM/gtc/matrix_transform.hpp>
+#include <GLM/gtc/type_ptr.hpp>
 #include "Constants.h"
+#include "Mesh.h"
+#include "Texture.h"
+#include "Object.h"
 
 void Light::SetupOccRender()
 {
@@ -191,29 +195,44 @@ void PointLight::SetupCubeMap()
 	lightTransforms.push_back(lightProjection * glm::lookAt(position, position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
 }
 
+void PointLight::INIT()
+{
+	VOLUME = new Mesh("Sphere.obj");
+	VOL_MAT = new Material("default-texture.png");
+}
+
 PointLight::PointLight(glm::vec3 pos):Light(pos, false) 
 {
+	constant = 1.0;
 	linear = 0.7f;
 	quadratic = 1.8f;
+	radius = (-linear + sqrt(linear * linear - 4 * quadratic * (constant - 1.0 * (256/5) ))) / (2 * quadratic);
 
 	SetupCubeMap();
 }
 
-PointLight::PointLight(glm::vec3 pos, glm::vec3 color, float a, float d, float s, float l, float q): Light(pos, color, a, d,s, false)
+PointLight::PointLight(glm::vec3 pos, glm::vec3 color, float a, float d, float s, float l, float q, float c): Light(pos, color, a, d,s, false)
 {
+	constant = c;
 	linear = l;
 	quadratic = q;
+	radius = (-linear + sqrt(linear * linear - 4 * quadratic * (constant - 1.0 * (256 / 5)))) / (2 * quadratic);
 
 	SetupCubeMap();
 }
 
-PointLight::PointLight(glm::vec3 pos, glm::vec3 ambi, glm::vec3 diff, glm::vec3 spec, float a, float d, float s, float l, float q):Light(pos, ambi, diff, spec, a, d, s, false)
+PointLight::PointLight(glm::vec3 pos, glm::vec3 ambi, glm::vec3 diff, glm::vec3 spec, float a, float d, float s, float l, float q, float c):Light(pos, ambi, diff, spec, a, d, s, false)
 {
+	constant = c;
 	linear = l;
 	quadratic = q;
+	radius = (-linear + sqrt(linear * linear - 4 * quadratic * (constant - 1.0 * (256 / 5)))) / (2 * quadratic);
 
 	SetupCubeMap();
 }
+
+Mesh* PointLight::VOLUME = nullptr;
+Material* PointLight::VOL_MAT = nullptr;
 
 void PointLight::SetupLight(Shader* shader)
 {
@@ -262,6 +281,42 @@ void PointLight::SetupDepthShader(Shader* shader)
 	}
 	shader->SetVec3("lightPos", position);
 	shader->SetF("far_plane", far_plane);
+}
+
+void PointLight::Draw(Shader* shader)
+{
+	if (VOLUME == nullptr) {
+		INIT();
+	}
+
+	shader->Use();
+	shader->SetI("material.diffuse", 0);
+	shader->SetI("material.normal", 1);
+	shader->SetI("material.specular", 2);
+
+	Transform transform;
+	transform.position = position;
+	transform.scale = glm::vec3(radius);
+
+
+	glm::mat4 model = transform.GetWorldTransform();
+
+	unsigned int modelLoc = glGetUniformLocation(shader->ID, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	glm::mat3 normMat = glm::mat3(glm::transpose(glm::inverse(model)));
+
+	shader->SetMat3("normMat", normMat);
+
+	shader->SetF("material.shine", VOL_MAT->shine);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, VOL_MAT->DIFF);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, VOL_MAT->NORM);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, VOL_MAT->SPEC);
+
+	VOLUME->Draw(shader);
 }
 
 void PointLight::SetIntensity(float l, float q)

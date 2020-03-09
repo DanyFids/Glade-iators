@@ -36,6 +36,7 @@ public:
 	void SetupDepthPerspective(bool ortho);
 
 	void Move(glm::vec3 dir) { position += dir; }
+	void SetPos(glm::vec3 d) { position = d; }
 
 	unsigned int GetFrameBuffer() { return depthMapFBO; };
 	unsigned int GetDepthMap() { return depthMap; }
@@ -56,22 +57,33 @@ public:
 	virtual void SetupLight(Shader* shader) override;
 };
 
+class Mesh;
+class Material;
+
 class PointLight : public Light {
 protected:
+	static Mesh* VOLUME;
+	static Material* VOL_MAT;
+
+	float constant;
 	float linear;
 	float quadratic;
+	float radius;
 
 	std::vector<glm::mat4> lightTransforms;
 
 	void SetupCubeMap();
 public:
+	static void INIT();
+
 	PointLight(glm::vec3 pos);
-	PointLight(glm::vec3 pos, glm::vec3 color, float a, float d, float s, float l,float q);
-	PointLight(glm::vec3 pos, glm::vec3 ambi, glm::vec3 diff, glm::vec3 spec, float a, float d, float s, float l, float q);
+	PointLight(glm::vec3 pos, glm::vec3 color, float a, float d, float s, float l,float q, float c = 1.0f);
+	PointLight(glm::vec3 pos, glm::vec3 ambi, glm::vec3 diff, glm::vec3 spec, float a, float d, float s, float l, float q, float c = 1.0f);
 
 	virtual void SetupLight(Shader* shader);
 	void SetupLight(Shader* shader, int num);
 	virtual void SetupDepthShader(Shader* shader);
+	virtual void Draw(Shader*);
 
 	void SetIntensity(float l, float q);
 };

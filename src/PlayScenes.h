@@ -15,6 +15,12 @@ class OnePlayer: public PlayScene {
 	Shader* skelShader;
 	Shader* skelDepth;
 	Shader* morphShader;
+	Shader* lightPass;
+
+	FrameBuffer* light_buff;
+	int prev_num_l = 0;
+	const int MAX_LIGHTS = 25;
+	int active_lights = 1;
 
 	Shader* DebugShader;
 	Mesh* DebugQuad;
@@ -23,6 +29,11 @@ class OnePlayer: public PlayScene {
 
 	Player* test_bones;
 
+	enum CG_TOGGLE {
+		CG_OUTPUT, CG_COLOR, CG_NORMALS, CG_DEPTH, CG_LIGHTS
+	} toggle = CG_OUTPUT;
+
+	bool show_volumes = true;
 	bool debug = false;
 	bool f3_pressed;
 	int disp_depth = 0;
@@ -44,6 +55,8 @@ public:
 	virtual void Update(float dt) override;
 	virtual void Draw() override;
 	virtual void LoadScene() override;
+
+	void Load_Lights_From_File(std::string f);
 
 	virtual void ResizeCams();
 

@@ -49,6 +49,7 @@ public:
 
 	unsigned int GetBuffer() { return ID; }
 	unsigned int GetOutput(int c = 0) { return OUT[c]; }
+	unsigned int GetDepth() { return DEPTH; }
 	void AddComponent();
 
 	void Resize();

@@ -1356,17 +1356,17 @@ void MainMenu::Update(float dt)
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
 	if (spaget != nullptr) {
-		if (time <= 0) {
+		if (menu_time <= 0) {
 			if (!displayed) {
 				displayed = true;
-				time = MAX_TIME;
+				menu_time = MAX_TIME;
 			}
 		}
 		else {
-			time -= dt;
+			menu_time -= dt;
 		}
 		if (displayed) {
-			spaget->setOpacity(time / MAX_TIME);
+			spaget->setOpacity(menu_time / MAX_TIME);
 		}
 	}
 

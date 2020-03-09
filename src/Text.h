@@ -7,6 +7,7 @@
 #include <map>
 #include "Game.h"
 #include "Shader.h"
+#include <stdlib.h> 
 
 struct Char {
 	GLint TextureID;  // ID handle of the glyph texture

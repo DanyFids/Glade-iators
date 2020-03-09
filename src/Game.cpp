@@ -158,6 +158,7 @@ void Game::Initialize()
 	//Attack Init(0);
 	//Init.init();
 
+	MainMenuScn = new MainMenu();
 
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) && 
 		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {

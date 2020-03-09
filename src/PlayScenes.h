@@ -110,7 +110,7 @@ class MainMenu : public PlayScene {
 	UI* spaget;
 
 	const float MAX_TIME = 3.0f;
-	float time = MAX_TIME;
+	float menu_time = MAX_TIME;
 
 	bool displayed = false;
 public:

@@ -1,7 +1,7 @@
 #include "Text.h"
 #include <glad\glad.h>
 #include "Game.h"
-#include <stdlib.h> 
+
 
 TextRenderer::TextRenderer()
 {

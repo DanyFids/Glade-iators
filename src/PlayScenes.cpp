@@ -53,14 +53,14 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 		f3_pressed = false;
 
 	//this is test shit
-	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && time <= 0) {
+	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && menu_time <= 0) {
 		players[PLAYER_1]->dmgHP(10.0f);
-		time = MAX_TIME;
+		menu_time = MAX_TIME;
 	}
 	//
 
-	if (time > 0) {
-		time -= dt;
+	if (menu_time > 0) {
+		menu_time -= dt;
 	}
 }
 

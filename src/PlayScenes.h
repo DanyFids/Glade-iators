@@ -33,7 +33,7 @@ class OnePlayer: public PlayScene {
 	Object* staticBoi;
 	Sound audioEngine;
 
-	float time = 0.0f;
+	float menu_time = 0.0f;
 	float MAX_TIME = 0.2f;
 
 public:

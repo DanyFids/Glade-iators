@@ -23,6 +23,8 @@ class TextRenderer
 public:
 	TextRenderer();
 
+	std::string GenerateTitle();
+	std::string GenerateSuffix();
 	std::string GenerateName();
 
 	static Shader* TEXTSHADER;

@@ -136,7 +136,8 @@ class CharacterC : public PlayScene {
 public:
 	CharacterC();
 
-	std::string Names[2];
+	std::string Name1[3];
+	std::string Name2[3];
 
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;

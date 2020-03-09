@@ -66,12 +66,31 @@ TextRenderer::TextRenderer()
 	//Chars = Chars;
 }
 
+std::string TextRenderer::GenerateTitle()
+{
+	
+	std::string Titles[21] = { "Weeping", "r/", "Looks", "Sir","Lord","Lady","Dr.","Sapling","Pinecone","Twig","Maple","Lorax", "Sonofabirch", "Nut", "Punished", "Sage", "Your",
+		"God Emperor", " Grand Champion", "It Was I", "Seasoned" };
+	int Title = rand() % 20;
+
+	std::string Yeet = Titles[Title];
+	return Yeet;
+}
+
+std::string TextRenderer::GenerateSuffix()
+{
+	std::string Suffixs[23] = { " I", " II", " III", " IV", " V", " VI", " VII", " VIII", " The Broken", " The Unburnt",
+		" The Chipped"," The Breaker of Branches"," The Mothertrunker", " The Fertilizer"," The Woodcutter", " Lord of Ashes", " The Dude", " Speaks for the trees", " The Damned",
+		" The Nut", " The Spicy", " The Abyss Watcher", " The Dragontree Born" };
+
+	int Suffix = rand() % 22;
+
+	std::string Yeet = Suffixs[Suffix];
+	return Yeet;
+}
+
 std::string TextRenderer::GenerateName()
 {
-
-	std::string Titles[21] = { "Weeping", "r/", "Looks", "Sir","Lord","Lady","Dr.","Sapling","Pinecone","Twig","Maple","Lorax", "Sonofabirch", "Nut", "Punished", "Sage", "Your", 
-		"God Emperor", " Grand Champion", "It Was I,", "Seasoned" };
-
 	std::string FirstNames[47] = { " Oberon", " Titania", " Fern", " Woody", " Spruce", " Willow", " Chris", " Chestnut", " Walnut",
 		" Pistachio", " Nice", " Gavin", " Hoity", " James", " Hoguey", " Dimitree", " Herbert"," Birchrude", " Leaf"," Cherry", " Paper", " Sugar", " Cedarella", " Arbor", 
 		" Craig", " Dylan", " Maija", " Tia", " Dan", " Anthony", " Elm-o", " Douglas", " Laurel", " Nut", " Keanu", " Poison", " Oaky", " Worst", " Buckeye", " Treebeard", 
@@ -80,29 +99,13 @@ std::string TextRenderer::GenerateName()
 	std::string LastNames[51] = { " Oakborn", " Barkley", " Barkwell", " Elderwood", " Springstein", " Aspin", " Guys", " Baby", " Hogue", " McOak", " Oaksson",
 		" Robb", " Gottem", " Birch", " Ball", " Nut", " Pine", " Cottonwood", " Cane", " Sassafras", " Leafsson", " Soil", " Root", " Rootsson", " Greenheart", " Wisteria", 
 		" Needle", " Leafs", " Sugar", " Enemy", " Rowan", " Asher", " Cassia", " Flora", " Peachy",  " Elmore", " Hazelton", " Speedwagon", " Gladed", " Foliage", " Flowers", 
-		" Peppervine", " Honeysuckle", " Peppercorn", " Doe", " Tarragon", " Wana", " Chervil", " Vera", " Catnip", "Rhubarb" };
+		" Peppervine", " Honeysuckle", " Peppercorn", " Doe", " Tarragon", " Wana", " Chervil", " Vera", " Catnip", " Rhubarb" };
 
-	std::string Suffixs[23] = { " I", " II", " III", " IV", " V", " VI", " VII", " VIII", " The Broken", " The Unburnt",
-		" The Chipped"," The Breaker of Branches"," The Mothertrunker", " The Fertilizer"," The Woodcutter", " Lord of Ashes", " The Dude", " Speaks for the trees", " The Damned", 
-		" The Nut", " The Spicy", " The Abyss Watcher", " The Dragontree Born" };
-	
-
-	int Title = rand() % 20;
 	int FirstName = rand() % 46;
 	int LastName = rand() % 50;
-	int Suffix = rand() % 22;
 
-	std::string NAME = Titles[Title];
-	NAME += FirstNames[FirstName];
+	std::string NAME = FirstNames[FirstName];
 	NAME += LastNames[LastName];
-	NAME += Suffixs[Suffix];
-
-
-
-	//std::string NAME = Titles[Title];
-	//NAME.append(FirstNames[FirstName]);
-	//NAME.append(LastNames[LastName]);
-	//NAME.append(Suffixs[Suffix]);
 
 	return NAME;
 }

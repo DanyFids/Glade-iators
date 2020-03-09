@@ -143,16 +143,22 @@ enum COLLISION_TYPE {
 class Weapon;
 class Shield;
 
+enum FrameStates;
+
 class Player : public Object {
 	static const float STAM_DECAY;
 	static const float STAM_RECOV;
 	static const float RECOV_TIME;
+	static const float RECOV_DELAY_TIME;
 
 	bool run = false;
 	bool anim_lock = false;
 	float health;
 	float stamina;
 	float recov_timer = 0.0f;
+	float recov_delay = 0.0f;
+
+	unsigned int atk_combo = 0;
 
 	SkelMesh* _mesh;
 
@@ -162,6 +168,8 @@ class Player : public Object {
 	Shield* shield;
 
 	glm::vec3 last_root_pos = glm::vec3(0.0f);
+
+	bool camera_lock = false;
 
 public:
 	static const float MAX_HEALTH;
@@ -175,12 +183,15 @@ public:
 	virtual bool HitDetect(Object* other);
 
 	float GetHP() { return health; }
-	void dmgHP(float _dmg) { health -= _dmg; }
-	void dmgSTAM(float _dmg) { stamina -= _dmg; }
+	void dmgHP(float _dmg);
+	void dmgSTAM(float _dmg);
 	float GetStam() { return stamina; }
 	bool CanRun() { return recov_timer <= 0.0f; }
 
 	void PlayAnim(std::string n, unsigned int c = 0, float i = 1.0f, float s = 1.0f);
+
+	void ToggleCamLock() { camera_lock = !camera_lock; }
+	bool GetCamLock() { return camera_lock; }
 
 	void Run();
 	void StopRun();
@@ -196,6 +207,7 @@ public:
 	void SetShield(Shield*& s) { shield = s; }
 	Shield* GetShield() { return shield; }
 	Weapon* GetWeapon() { return weapon; }
+	FrameStates GetFrameState(unsigned int chnl = 0);
 	bool IsLocked() { return anim_lock; }
 };
 
@@ -211,6 +223,7 @@ public:
 	Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, Joint* p = nullptr, SkelMesh* m = nullptr);
 
 	std::string GetAtkAnim(unsigned int c_id = 0);
+	unsigned int GetNumLightAttacks() {return attack_anims.size();}
 	
 	float GetDamage() { return damage; }
 	float GetStaminaCost() { return stamina_cost; }

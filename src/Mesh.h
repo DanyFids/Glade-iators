@@ -151,7 +151,7 @@ public:
 	int GetFrame() { return curFrame[0]; }
 	void DrawSkeleton(glm::mat4 global, Shader* shdr);
 
-	FrameStates GetFrameCode();
+	FrameStates GetFrameCode(unsigned int chnl = 0);
 
 	Skeleton* GetSkeleton() { return skeleton; }
 

@@ -71,7 +71,46 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		m += glm::vec3(1.0f, 0.0f, 0.0f);
 	
+	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS && CgradeIDown[0] == false)
+	{
+		if (CgradeI == 1)
+		{
+			CgradeI = 0;
+		}
+		else
+			CgradeI = 1;
 
+	}
+	if (glfwGetKey(window, GLFW_KEY_8) != GLFW_PRESS)
+	{
+		CgradeIDown[0] == false;
+	}
+	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS && CgradeIDown[1] == false)
+	{								
+		if (CgradeI == 2)
+		{
+			CgradeI = 0;
+		}
+		else
+			CgradeI = 2;
+	}								
+	if (glfwGetKey(window, GLFW_KEY_9) != GLFW_PRESS)
+	{
+		CgradeIDown[1] == false;
+	}
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS && CgradeIDown[2] == false)
+	{
+		if (CgradeI == 3)
+		{
+			CgradeI = 0;
+		}
+		else
+			CgradeI = 3;
+	}
+	if (glfwGetKey(window, GLFW_KEY_0) != GLFW_PRESS)
+	{
+		CgradeIDown[2] = false;
+	}
 	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
 	{
 		//attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));
@@ -112,9 +151,15 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 		Cam[player]->Move(glm::normalize(t), dt);
 }
 
+
+
 void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 {
 	static const float dead_zone = 0.35f;
+
+	static bool guardButton1 = false;
+	static bool guardButton2 = false;
+
 
 	GLFWgamepadstate state;
 	if (glfwGetGamepadState(controller, &state)) {
@@ -188,16 +233,17 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			{
 				if (players[player]->GetStam() >= 15.0f) {
 
-					glm::vec3 p1 = glm::vec3();
-					p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-					p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+					//glm::vec3 p1 = glm::vec3();
+					//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+					//p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
 
 
 
 					//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
 
 					std::cout << "OOF\n";
-					players[player]->dmgSTAM(15.0f);
+					//players[player]->dmgSTAM(15.0f);
+					players[player]->Attack();
 					atk1 = true;
 				}
 			}
@@ -216,17 +262,46 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			}
 
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
-				std::cout << "Parry God\n";
-				block1 = true;
-				glm::vec3 p1 = glm::vec3();
-				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+				
+				//block1 = true;
+
+				//glm::vec3 p1 = glm::vec3();
+				//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+				//p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
 
 				//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
+				players[player]->Block();
+				
+				switch (player) {
+				case 0:
+					guardButton1 = true;
+					break;
+				case 1:
+					guardButton2 = true;
+					break;
+				}
+				//std::cout << "Parry God\n";
 			}
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE) {
 
-				block1 = false;
+
+				switch (player) {
+				case 0:
+					if (guardButton1) {
+						players[player]->Idle();
+						//players[player]->SetState();
+						guardButton1 = false;
+					}
+					break;
+				case 1:
+					if (guardButton2) {
+						players[player]->Idle();
+						//players[player]->SetState();
+						guardButton2 = false;
+					}
+					break;
+				}
+
 				//players[player]->DestroyChild(0);
 			}
 		}

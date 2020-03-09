@@ -7,6 +7,7 @@
 #include <map>
 #include "Game.h"
 #include "Shader.h"
+#include <stdlib.h> 
 
 struct Char {
 	GLint TextureID;  // ID handle of the glyph texture
@@ -21,6 +22,8 @@ class TextRenderer
 {
 public:
 	TextRenderer();
+
+	std::string GenerateName();
 
 	static Shader* TEXTSHADER;
 	std::map<GLchar, Char> Chars;

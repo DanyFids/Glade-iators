@@ -136,7 +136,12 @@ enum PLAYER_STATE {
 	idle, walking, attacking, blocking, rolling, taunting
 };
 
+enum COLLISION_TYPE {
+	nil, entity, shield
+};
+
 class Weapon;
+class Shield;
 
 class Player : public Object {
 	static const float STAM_DECAY;
@@ -154,6 +159,7 @@ class Player : public Object {
 	PLAYER_STATE state;
 
 	Weapon* weapon;
+	Shield* shield;
 
 	glm::vec3 last_root_pos = glm::vec3(0.0f);
 
@@ -182,9 +188,14 @@ public:
 	void Roll();
 	void Idle();
 	void Attack();
+	void Block();
 
 	PLAYER_STATE GetState() {return state;}
 	void SetState(PLAYER_STATE s) {state = s;}
+	void SetWeapon(Weapon*& w) { weapon = w; }
+	void SetShield(Shield*& s) { shield = s; }
+	Shield* GetShield() { return shield; }
+	Weapon* GetWeapon() { return weapon; }
 	bool IsLocked() { return anim_lock; }
 };
 
@@ -193,12 +204,19 @@ private:
 	float damage, stamina_cost;
 
 	std::vector<std::string> attack_anims;
+	
+	bool cooldown = false;
 public:
 	Weapon(Mesh* me, Material* ma, Hitbox* hb, std::vector<std::string> atks, float dmg, float stam);
+	Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, Joint* p = nullptr, SkelMesh* m = nullptr);
 
 	std::string GetAtkAnim(unsigned int c_id = 0);
-	float GetDamage() {return damage;}
+	
+	float GetDamage() { return damage; }
 	float GetStaminaCost() { return stamina_cost; }
+
+	void setCooldown(bool c) { cooldown = c; }
+	bool getCooldown() { return cooldown; }
 
 	virtual bool HitDetect(Object* other);
 };
@@ -225,18 +243,25 @@ public:
 
 class Shield : public Object
 {
+	// Shield reduces damage to HP and Stamina by a percent.
+	// I.E incoming damage = 100. DR = 0.6 and StamCost = 0.25
+	// 40 HP , 75 stam
 private:
+	float dmgReduction, stamina_cost;
 
+	bool ParryCooldown = false;
 public:
-	virtual void Update(float dt);
+	Shield(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, float dmgRdc, float stam, Joint* p = nullptr, SkelMesh* m = nullptr);
+
+
 	virtual bool HitDetect(Object* other);
+	float GetReduction() { return dmgReduction; }
+	float GetStaminaCost() { return stamina_cost; }
 
-	//static Object* ABox;
-	int player;
+	void setCooldown(bool c) { ParryCooldown = c; }
+	bool getCooldown() { return ParryCooldown; }
 
-	Shield(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P);
 
-	//void init();
 };
 
 class SplineMan : public Object

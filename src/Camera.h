@@ -32,6 +32,7 @@ public:
 	void Spin(glm::vec2 dir);
 	void UpdateCam();
 	void SetupCam(Shader*);
+	void SetupPostLight(Shader*, int id);
 
 	void TogglePerspective();
 

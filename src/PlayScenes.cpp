@@ -1287,19 +1287,19 @@ void TwoPlayer::LoadScene()
 		new Camera(glm::vec3(2.0f, 0.0f, -4.0f), glm::vec4(Game::SCREEN.x / 2,0, Game::SCREEN.x / 2, Game::SCREEN.y)) // Cam 2
 	};
 
-	UI* hpBG = new UI(260, 10, { 55.0f, 555.0f, -1.0f }, blackBarMat);
-	UI* stamBG = new UI(260, 10, { 55.0f, 535.0f, -1.0f }, blackBarMat);
+	UI* hpBG = new UI(260, 10, { 55.0f, 554.5f, -1.0f }, blackBarMat);
+	UI* stamBG = new UI(260, 10, { 55.0f, 534.50f, -1.0f }, blackBarMat);
 	UI* crowdBG = new UI(185, 30, { 55.0f, 545.0f, -1.0f }, blackBarMat);
 
-	UI* hpBG2 = new UI(260, 10, { 487.5f, 555.0f, -1.0f }, blackBarMat);
-	UI* stamBG2 = new UI(260, 10, { 487.5f, 535.0f, -1.0f }, blackBarMat);
+	UI* hpBG2 = new UI(260, 10, { 487.5f, 554.5f, -1.0f }, blackBarMat);
+	UI* stamBG2 = new UI(260, 10, { 487.5f, 534.5f, -1.0f }, blackBarMat);
 
 
 	ui = {
-		new UI(885, 100, glm::vec3(0.0f, 500.0f, 0.0f), mainUI),
-		new HealthBar((Player*)players[PLAYER_1], glm::vec2(60, 557.5), hpBarMat, hpBG),
-		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(60, 537.5), stamBarMat, stamBG),
-		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
+		new UI(801.5, 100, glm::vec3(0.0f, 500.0f, 0.0f), mainUI),
+		new HealthBar((Player*)players[PLAYER_1], glm::vec2(60, 557), hpBarMat, hpBG),
+		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(60, 537), stamBarMat, stamBG),
+		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG), 
 
 		new HealthBar((Player*)players[PLAYER_2], glm::vec2(492.5, 557.5), hpBarMat, hpBG2),
 		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(492.5, 537.5), stamBarMat, stamBG2)

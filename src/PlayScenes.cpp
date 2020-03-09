@@ -601,7 +601,7 @@ void TwoPlayer::Update(float dt)
 
 				//problem -> weapon hitdetect is not seeing the shield
 				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) && !players[c]->GetWeapon()->getCooldown()) {
-					if (players[p]->GetShield()->hitbox->GetType() == shield) {
+					if (players[p]->GetShield()->hitbox->GetType() == COLLISION_TYPE::shield) {
 						std::cout << "Blocked!\n";
 
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
@@ -871,7 +871,7 @@ void TwoPlayer::LoadScene()
 	Mesh* ShieldMesh = new Mesh("Weapons/Circle_Shield.obj");
 
 	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.09f, 12.8f);
-	Hitbox* shieldSphereHB = new SphereHitbox(1.0f,shield);
+	Hitbox* shieldSphereHB = new SphereHitbox(1.0f, COLLISION_TYPE::shield);
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
 
 	std::vector<std::string> OneHand_LC = {"sword_1"};

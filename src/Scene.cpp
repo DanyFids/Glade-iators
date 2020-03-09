@@ -232,7 +232,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 				//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
 				players[player]->Block();
-
+				
 				switch (player) {
 				case 0:
 					guardButton1 = true;

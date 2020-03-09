@@ -1622,8 +1622,9 @@ void CharacterC::Draw()
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[1], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 260.0f, 570.0f, 0.35f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "VS", 370.0f, 530.0f, 0.75f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[1], 260.0f, 490.0f, 0.35f, glm::vec3(1.f, 1.f, 1.f));
 	glEnable(GL_DEPTH_TEST);
 
 }

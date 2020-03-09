@@ -72,9 +72,9 @@ std::string TextRenderer::GenerateName()
 	std::string Titles[21] = { "Weeping", "r/", "Looks", "Sir","Lord","Lady","Dr.","Sapling","Pinecone","Twig","Maple","Lorax", "Sonofabirch", "Nut", "Punished", "Sage", "Your", 
 		"God Emperor", " Grand Champion", "It Was I,", "Seasoned" };
 
-	std::string FirstNames[47] = { " Oberon", " Titania", " Fern", " Woody", " Spruce", " Willow", " Chris", " Chest", " Wal",
+	std::string FirstNames[47] = { " Oberon", " Titania", " Fern", " Woody", " Spruce", " Willow", " Chris", " Chestnut", " Walnut",
 		" Pistachio", " Nice", " Gavin", " Hoity", " James", " Hoguey", " Dimitree", " Herbert"," Birchrude", " Leaf"," Cherry", " Paper", " Sugar", " Cedarella", " Arbor", 
-		" Craig", " Dylan", " Maija", " Tia", " Dan", " Anthony", " Elm-o", " Douglas", " Laurel", " Nut", "Keanu", " Poison", " Oaky", " Worst", " Buckeye", " Treebeard", 
+		" Craig", " Dylan", " Maija", " Tia", " Dan", " Anthony", " Elm-o", " Douglas", " Laurel", " Nut", " Keanu", " Poison", " Oaky", " Worst", " Buckeye", " Treebeard", 
 		" Olive", " Holly", " Iris", " Dill", " Mint", " Mary", " Aloe"   };
 
 	std::string LastNames[51] = { " Oakborn", " Barkley", " Barkwell", " Elderwood", " Springstein", " Aspin", " Guys", " Baby", " Hogue", " McOak", " Oaksson",

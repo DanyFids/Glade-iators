@@ -6,12 +6,14 @@
 FrameBuffer::FrameBuffer()
 {
 	// Generate Buffers
+	unsigned int t;
+
 	glGenFramebuffers(1, &ID);
-	glGenTextures(1, &OUT);
+	glGenTextures(1, &t);
 	glGenTextures(1, &DEPTH);
 
 	//Setup Main Color Output
-	glBindTexture(GL_TEXTURE_2D, OUT);
+	glBindTexture(GL_TEXTURE_2D, t);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Game::SCREEN.x, Game::SCREEN.y, 0, GL_RGBA, GL_FLOAT, NULL);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -33,15 +35,19 @@ FrameBuffer::FrameBuffer()
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, ID);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, OUT, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, t, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, DEPTH, 0);
+
+	OUT.push_back(t);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 FrameBuffer::~FrameBuffer() {
 	glDeleteFramebuffers(1, &ID);
-	glDeleteTextures(1, &OUT);
+	for (int c = 0; c < OUT.size(); c++) {
+		glDeleteTextures(1, &OUT[c]);
+	}
 }
 
 void FrameBuffer::Use()
@@ -55,10 +61,33 @@ void FrameBuffer::Clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void FrameBuffer::AddComponent()
+{
+	unsigned int t;
+	glGenTextures(1, &t);
+
+	glBindTexture(GL_TEXTURE_2D, t);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Game::SCREEN.x, Game::SCREEN.y, 0, GL_RGBA, GL_FLOAT, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, ID);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + OUT.size(), GL_TEXTURE_2D, t, 0);
+}
+
 void FrameBuffer::Resize()
 {
-	glBindTexture(GL_TEXTURE_2D, OUT);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Game::SCREEN.x, Game::SCREEN.y, 0, GL_RGBA, GL_FLOAT, NULL);
+	for (int c = 0; c < OUT.size(); c++) {
+		glBindTexture(GL_TEXTURE_2D, OUT[c]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Game::SCREEN.x, Game::SCREEN.y, 0, GL_RGBA, GL_FLOAT, NULL);
+	}
+	glBindTexture(GL_TEXTURE_2D, DEPTH);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, Game::SCREEN.x, Game::SCREEN.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 }
 
 PostProcess::PostProcess(std::vector<unsigned int> inputs, Shader* effect)

@@ -32,7 +32,9 @@ public:
 
 	UI(int width, int height, glm::vec3 pos, Material* ma);
 	int scaleX(int _x);
+	void setOpacity(float o) { opacity = o;  }
 	void Resize(int x, int y);
+	void ChangeTex(Material* mat);
 	virtual void Draw(glm::vec2 scrn);
 	virtual void Update(float dt) {};
 };

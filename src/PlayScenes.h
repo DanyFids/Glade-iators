@@ -45,6 +45,8 @@ public:
 	virtual void Draw() override;
 	virtual void LoadScene() override;
 
+	virtual void ResizeCams();
+
 	Player* GetPlayer(int i) { return (Player*) players[i]; }
 	Player* GetTestPlayer() { return test_player; }
 
@@ -77,6 +79,12 @@ class MainMenu : public PlayScene {
 	Shader* morphShader;
 	Shader* sunShader;
 	Shader* skelDepth;
+	UI* spaget;
+
+	const float MAX_TIME = 3.0f;
+	float time = MAX_TIME;
+
+	bool displayed = false;
 public:
 	MainMenu();
 

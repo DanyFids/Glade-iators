@@ -1,4 +1,4 @@
-#version 450 core
+#version 330 core
 out vec4 FragColor;
 in VERT_OUT{
 	vec3 fragPos;

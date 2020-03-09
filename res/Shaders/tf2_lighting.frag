@@ -1,4 +1,4 @@
-#version 450 core
+#version 330 core
 // TF2 Lighting Shader by Daniel Findleton.
 
 out vec4 FragColor;

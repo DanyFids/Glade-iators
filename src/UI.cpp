@@ -78,8 +78,8 @@ Mesh* UI::QUAD = nullptr;
 Shader* UI::SHADER = nullptr;
 glm::mat4 UI::projection = glm::mat4(1.0f);
 
-const int StaminaBar::MAX_WIDTH = 150;
-const int StaminaBar::HEIGHT = 20;
+const int StaminaBar::MAX_WIDTH = 250;
+const int StaminaBar::HEIGHT = 5;
 
 StaminaBar::StaminaBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg): UI(MAX_WIDTH, HEIGHT, glm::vec3(pos, 0), ma)
 {
@@ -101,8 +101,8 @@ void StaminaBar::Draw(glm::vec2 scrn)
 	UI::Draw(scrn);
 }
 
-const int HealthBar::MAX_WIDTH = 200;
-const int HealthBar::HEIGHT = 20;
+const int HealthBar::MAX_WIDTH = 250;
+const int HealthBar::HEIGHT = 5;
 
 HealthBar::HealthBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg) : UI(MAX_WIDTH, HEIGHT, glm::vec3(pos, 0), ma)
 {

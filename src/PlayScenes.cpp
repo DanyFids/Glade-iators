@@ -1166,6 +1166,7 @@ void TwoPlayer::LoadScene()
 	Material* arenaTex = new Material("CaulitreeumTexture.png");
 	Material* floorTex = new Material("ArenaFloorTexture.png");
 
+	Material* mainUI = new Material("hpbarcool.png");
 	Material* hpBarMat = new Material("yuck.png");
 	Material* stamBarMat = new Material("blue.png");
 	Material* crowdBarMat = new Material("white.png");
@@ -1311,23 +1312,22 @@ void TwoPlayer::LoadScene()
 		new Camera(glm::vec3(2.0f, 0.0f, -4.0f), glm::vec4(Game::SCREEN.x / 2,0, Game::SCREEN.x / 2, Game::SCREEN.y)) // Cam 2
 	};
 
-	UI* hpBG = new UI(210, 30, { 5.0f, 545.0f, -1.0f }, blackBarMat);
-	UI* stamBG = new UI(160, 30, { 5.0f, 495.0f, -1.0f }, blackBarMat);
-	UI* crowdBG = new UI(185, 30, { 220.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* hpBG = new UI(260, 10, { 55.0f, 555.0f, -1.0f }, blackBarMat);
+	UI* stamBG = new UI(260, 10, { 55.0f, 535.0f, -1.0f }, blackBarMat);
+	UI* crowdBG = new UI(185, 30, { 55.0f, 545.0f, -1.0f }, blackBarMat);
 
-	UI* hpBG2 = new UI(210, 30, { 585.0f, 545.0f, -1.0f }, blackBarMat);
-	UI* stamBG2 = new UI(160, 30, { 635.0f, 495.0f, -1.0f }, blackBarMat);
-	UI* crowdBG2 = new UI(185, 30, { 395.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* hpBG2 = new UI(260, 10, { 487.5f, 555.0f, -1.0f }, blackBarMat);
+	UI* stamBG2 = new UI(260, 10, { 487.5f, 535.0f, -1.0f }, blackBarMat);
 
 
 	ui = {
-		new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
-		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
-		new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
+		new UI(885, 100, glm::vec3(0.0f, 500.0f, 0.0f), mainUI),
+		new HealthBar((Player*)players[PLAYER_1], glm::vec2(60, 557.5), hpBarMat, hpBG),
+		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(60, 537.5), stamBarMat, stamBG),
+		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
 
-		new HealthBar((Player*)players[PLAYER_2], glm::vec2(590, 550), hpBarMat, hpBG2),
-		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(640, 500), stamBarMat, stamBG2),
-		new CrowdBar((Player*)players[PLAYER_2], glm::vec2(395, 550), crowdBarMat, crowdBG2)
+		new HealthBar((Player*)players[PLAYER_2], glm::vec2(492.5, 557.5), hpBarMat, hpBG2),
+		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(492.5, 537.5), stamBarMat, stamBG2)
 	};
 
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
@@ -1730,6 +1730,8 @@ void CharacterC::LoadScene()
 		sOne,
 		wTwo,
 		sTwo,
+
+		new Button(glm::vec2(0, 305), blackBarMat),
 		new Button(glm::vec2(80, 310), tree1),
 		new Button(glm::vec2(520, 310), tree2)
 	};
@@ -1768,6 +1770,7 @@ void CharacterC::LoadScene()
 	ui[28]->Resize(60, 60);
 	ui[29]->Resize(50, 50);
 
-	ui[30]->Resize(180, 280);
+	ui[30]->Resize(800, 400);
 	ui[31]->Resize(180, 280);
+	ui[32]->Resize(180, 280);
 }

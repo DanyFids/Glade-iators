@@ -1036,6 +1036,17 @@ void TwoPlayer::Update(float dt)
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
 	((MorphMesh*)(morphyBoi->GetMesh()))->Update(dt);
+
+	if (players[0]->GetHP() <= 0 || players[1]->GetHP() <= 0)
+	{
+		deathtimer -= dt;
+		if (deathtimer <= 0)
+		{
+			Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			//setScene(MainMenu);
+
+		}
+	}
 }
 
 void TwoPlayer::Draw()
@@ -1117,7 +1128,21 @@ void TwoPlayer::Draw()
 	}
 	glEnable(GL_DEPTH_TEST);
 
+	if (players[0]->GetHP() <= 0 && players[1]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Draw", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0f, glm::vec3(1.f, 0.f, 0.f));
+		//deathtimer -= 
+	}
+	else if (players[0]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 2 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
 
+	}
+	else if (players[1]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 1 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
+
+	}
 	
 }
 

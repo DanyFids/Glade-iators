@@ -151,6 +151,11 @@ void Mesh::LoadMesh(const char* f, std::vector<Vertex>& vertices, unsigned int& 
 {
 	std::ifstream file;
 	file.open(f, std::ios::in);
+	
+	if (!file) {
+		std::cout << "ERROR::MESH::ERROR_LOADING_FILE:: '" << f << "'\n";
+		return;
+	}
 
 	std::vector<glm::vec3> positions = std::vector<glm::vec3>();
 	std::vector<glm::vec3> norms;

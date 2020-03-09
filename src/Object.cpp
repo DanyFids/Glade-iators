@@ -353,7 +353,7 @@ void Player::Attack()
 {
 	if (state != attacking && state != blocking) {
 		anim_lock = true;
-		PlayAnim(this->weapon->GetAtkAnim(0));
+		PlayAnim(this->weapon->GetAtkAnim(0), 0, 1.0f, 2.0f);
 		_mesh->SetIntensity(1, 0.0f);
 		this->dmgSTAM(weapon->GetStaminaCost());
 		state = attacking;

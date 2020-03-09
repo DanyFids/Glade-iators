@@ -282,12 +282,12 @@ void Game::InputHandle(float dt)
 		}
 		w_pressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_RELEASE)
+	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_RELEASE) 
 		w_pressed = false;
 	
 	if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS && !f11_pressed) {
 		if (Game::SCREEN.x == 800) {
-			Game::SCREEN.x = 1920;
+			Game::SCREEN.x = 1920; 
 			Game::SCREEN.y = 1080;
 			glfwSetWindowMonitor(window, NULL, 0, 0, 1920, 1080, 60);
 		}

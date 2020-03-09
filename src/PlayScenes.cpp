@@ -1,7 +1,7 @@
 #include "PlayScenes.h"
 #include <glad/glad.h>
-#include<GLFW/glfw3.h>
-#include<GLM/glm.hpp>
+#include <GLFW/glfw3.h>
+#include <GLM/glm.hpp>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -9,20 +9,21 @@
 #include <random>
 #include <thread>
 #include <queue>
+#include <florp/app/timing.h>
 
-#include"Mesh.h"
-#include"Shader.h"
-#include"Texture.h"
-#include"Camera.h"
-#include"Light.h"
-#include"Object.h"
-#include"Mesh.h"
-#include"Constants.h"
-#include"Test_Primitives.h"
-#include"Hitbox.h"
-#include"UI.h"
-#include"Skeleton.h"
-#include"Lerp.h"
+#include "Mesh.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "Camera.h"
+#include "Light.h"
+#include "Object.h"
+#include "Mesh.h"
+#include "Constants.h"
+#include "Test_Primitives.h"
+#include "Hitbox.h"
+#include "UI.h"
+#include "Skeleton.h"
+#include "Lerp.h"
 #include "Sound.h"
 #include "Game.h"
 #include "PostProcess.h"
@@ -138,6 +139,107 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 		p_6 = false;
 	}
 
+	static bool p_7 = false;
+	if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS && !p_7) {
+		if (PointLight::VOLUME == PointLight::SPHERE)
+			PointLight::VOLUME = PointLight::CUBE;
+		else
+			PointLight::VOLUME = PointLight::SPHERE;
+		p_7 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_7) == GLFW_RELEASE) {
+		p_7 = false;
+	}
+
+	static bool p_8 = false;
+	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS && !p_8) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new LutColorCorrection(lut_hot, post_pass.at(0)->buff->GetOutput()));
+
+		p_8 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_8) == GLFW_RELEASE) {
+		p_8 = false;
+	}
+
+	static bool p_9 = false;
+	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS && !p_9) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new LutColorCorrection(lut_cool, post_pass.at(0)->buff->GetOutput()));
+
+		p_9 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_9) == GLFW_RELEASE) {
+		p_9 = false;
+	}
+
+	static bool p_0 = false;
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS && !p_0) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new LutColorCorrection(lut_custom, post_pass.at(0)->buff->GetOutput()));
+
+		p_0 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_0) == GLFW_RELEASE) {
+		p_0 = false;
+	}
+
+	static bool p_p = false;
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !p_p) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		p_p = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE) {
+		p_p = false;
+	}
+
+	static bool p_lb = false;
+	if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS && !p_lb) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+
+		post_pass.push_back(new PostProcess({ post_pass.at(0)->buff->GetOutput() }, highlightshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(1)->buff->GetOutput() }, horgausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(2)->buff->GetOutput() }, vergausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(3)->buff->GetOutput(),post_pass.at(0)->buff->GetOutput() }, bloomshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(4)->buff->GetOutput() }, highlightshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(5)->buff->GetOutput() }, horgausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(6)->buff->GetOutput() }, vergausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(7)->buff->GetOutput(),post_pass.at(0)->buff->GetOutput() }, bloomshader));
+
+		p_lb = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_RELEASE) {
+		p_lb = false;
+	}
+
+	static bool p_rb = false;
+	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET ) == GLFW_PRESS && !p_rb) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new PostProcess({ post_pass.at(0)->buff->GetOutput() }, pixelshader));
+		p_rb = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_RELEASE) {
+		p_rb = false;
+	}
+
 	if (time > 0) {
 		time -= dt;
 	}
@@ -145,6 +247,17 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void OnePlayer::Update(float dt)
 {
+
+	if (players[0]->GetHP() <= 0 || players[1]->GetHP() <= 0)
+	{
+		deathtimer -= dt;
+		if (deathtimer <= 0)
+		{
+			Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			//setScene(MainMenu);
+
+		}
+	}
 
 	audioEngine.Update();
 	for (int c = 0; c < players.size(); c++) {
@@ -164,7 +277,7 @@ void OnePlayer::Update(float dt)
 			tmp.x = ((((float)(rand() % 2) / 2.0f)) * dt);
 			tmp.z = ((((float)(rand() % 2) / 2.0f)) * dt);
 			
-			lights[l]->Move(tmp);
+			//lights[l]->Move(tmp);
 		}
 
 		if (glfwJoystickPresent(c) && glfwJoystickIsGamepad(c)) {
@@ -336,6 +449,8 @@ void OnePlayer::Draw()
 		post_pass[c]->Draw();
 	}
 
+	//SCREEN_WIDTH, SCREEN_HEIGHT
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glActiveTexture(GL_TEXTURE0);
 
@@ -379,8 +494,24 @@ void OnePlayer::Draw()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
+	if (players[0]->GetHP() <= 0 && players[1]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Draw", SCREEN_HEIGHT /2.f, SCREEN_WIDTH /2.f, 1.0f, glm::vec3(1.f, 0.f, 0.f));
+		//deathtimer -= 
+	}
+	else if (players[0]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 1 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
+
+	}
+	else if (players[1]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 2 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
+
+	}
 	glEnable(GL_DEPTH_TEST);
 
+	
 	glViewport(0, 0, Game::SCREEN.x, Game::SCREEN.y);
 }
 
@@ -392,19 +523,36 @@ void OnePlayer::LoadScene()
 
 	light_buff = new FrameBuffer();
 
-	// Post processing passes
+	//merge_buff = new FrameBuffer();
 
+	// Post processing passes 
+	
 	Material* LUT_TEST = new Material("LUTs/LUT_TEST.png");
 
-	LUT* lut_cool = new LUT("LUTs/Bluedabadee.cube");
-	LUT* lut_hot = new LUT("LUTs/ThatsHotBBY.cube");
-	LUT* lut_custom = new LUT("LUTs/EdgeLord.cube");
-
-	post_pass.push_back(new PostProcess({main_pass->GetOutput(), light_buff->GetOutput()}, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge.frag")));
+	lut_cool = new LUT("LUTs/Bluedabadee.cube");
+	lut_hot = new LUT("LUTs/ThatsHotBBY.cube");
+	lut_custom = new LUT("LUTs/EdgeLord.cube");
 	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
 	//post_pass.push_back(new LutColorCorrection(lut_custom, main_pass->GetOutput()));
+	//Textcontroller();
 
-	isMenu = false;
+	highlightshader = new Shader("Shaders/PostProcess/PostProcess.vert","Shaders/PostProcess/Highlights.frag");
+
+	vergausshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/GausBlur.frag");
+	vergausshader->SetB("isHorizontal", false);
+	horgausshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/GausBlur.frag");
+	horgausshader->SetB("isHorizontal", true);
+
+	bloomshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Bloom.frag");
+	pixelshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Pixelation.frag");
+
+
+	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
+	
+	// Sampler2d INPUT
+	post_pass.push_back(new PostProcess({ main_pass->GetOutput(), light_buff->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge.frag")));
+
+	isMenu = false; 
 	ChangingScn = false;
 
 	Joint::init();
@@ -1200,7 +1348,7 @@ void MainMenu::Draw()
 	}
 
 
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -1213,6 +1361,8 @@ void MainMenu::LoadScene()
 
 	MAX_MENU = 0;
 	MIN_MENU = -2;
+	srand(time(NULL));
+	Names[0] = Textcontroller->GenerateName();
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1367,6 +1517,8 @@ void CharacterC::LoadScene()
 
 	MAX_MENU = 10;
 	MIN_MENU = 7;
+
+
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 

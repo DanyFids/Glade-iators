@@ -22,6 +22,8 @@ class TextRenderer
 public:
 	TextRenderer();
 
+	std::string GenerateName();
+
 	static Shader* TEXTSHADER;
 	std::map<GLchar, Char> Chars;
 	void RenderText(Shader* s, std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color);

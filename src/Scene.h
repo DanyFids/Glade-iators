@@ -122,6 +122,12 @@ protected:
 	bool isMenu;
 	bool ChangingScn = false;
 
+
+	int CgradeI = 0;
+	bool CgradeIDown[3] = { false,false,false };
+	int lutloaded = 0;
+	
+
 	SplineMan* DUUDE;
 
 	Mesh* Amesh = new Mesh("d6.obj");

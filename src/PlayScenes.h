@@ -18,12 +18,26 @@ class OnePlayer: public PlayScene {
 	Shader* lightPass;
 
 	FrameBuffer* light_buff;
+	FrameBuffer* merge_buff;
 	int prev_num_l = 0;
 	const int MAX_LIGHTS = 25;
 	int active_lights = 1;
 
 	Shader* DebugShader;
+	Shader* vergausshader;
+	Shader* horgausshader;
+	Shader* highlightshader;
+	Shader* bloomshader;
+	Shader* pixelshader;
+
+	Shader* LUT_SHADER;
+	LUT* lut_cool;
+	LUT* lut_hot;
+	LUT* lut_custom;
+
 	Mesh* DebugQuad;
+
+	float deathtimer = 4;
 	
 	Player* test_player;
 
@@ -95,6 +109,8 @@ class MainMenu : public PlayScene {
 public:
 	MainMenu();
 
+
+	std::string Names[2];
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
 	virtual void Update(float dt) override;

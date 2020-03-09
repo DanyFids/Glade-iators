@@ -37,12 +37,16 @@ void Game::setScene(SCENES scn)
 {
 	switch (scn) {
 	case MAIN_MENU:
+		MainMenuScn = new MainMenu();
 		curScene = MainMenuScn;
 		break;
 	case PLAY_SCENE:
-		curScene = TwoPlayerScn;
+		OnePlayerScn = new OnePlayer();
+		//TwoPlayerScn = new TwoPlayer();
+		curScene = OnePlayerScn;
 		break;
 	case CHARACTER_SCENE:
+		CharacterScn = new CharacterC();
 		curScene = CharacterScn;
 		break;
 	}
@@ -148,10 +152,9 @@ void Game::Initialize()
 
 	Game::QUAD = new Mesh(quad_prim, 4, quad_index, 6);
 
-	OnePlayerScn = new OnePlayer();
-	TwoPlayerScn = new TwoPlayer();
-	MainMenuScn = new MainMenu();
-	CharacterScn = new CharacterC();
+	//OnePlayerScn = new OnePlayer();
+
+	//CharacterScn = new CharacterC();
 	//Attack Init(0);
 	//Init.init();
 
@@ -159,9 +162,12 @@ void Game::Initialize()
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) && 
 		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
 
-		curScene = MainMenuScn;
+
+		TwoPlayerScn = new TwoPlayer();
+		curScene = TwoPlayerScn;
 	}
 	else {
+		OnePlayerScn = new OnePlayer();
 		curScene = OnePlayerScn;
 		//curScene = MainMenuScn;
 	}

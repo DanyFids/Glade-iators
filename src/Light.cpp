@@ -197,7 +197,9 @@ void PointLight::SetupCubeMap()
 
 void PointLight::INIT()
 {
-	VOLUME = new Mesh("Sphere.obj");
+	SPHERE = new Mesh("Sphere.obj");
+	CUBE = new Mesh("d6.obj");
+	VOLUME = SPHERE;
 	VOL_MAT = new Material("default-texture.png");
 }
 
@@ -232,6 +234,8 @@ PointLight::PointLight(glm::vec3 pos, glm::vec3 ambi, glm::vec3 diff, glm::vec3 
 }
 
 Mesh* PointLight::VOLUME = nullptr;
+Mesh* PointLight::SPHERE = nullptr;
+Mesh* PointLight::CUBE = nullptr;
 Material* PointLight::VOL_MAT = nullptr;
 
 void PointLight::SetupLight(Shader* shader)
@@ -296,8 +300,10 @@ void PointLight::Draw(Shader* shader)
 
 	Transform transform;
 	transform.position = position;
-	transform.scale = glm::vec3(radius);
-
+	if(VOLUME == SPHERE)
+		transform.scale = glm::vec3(radius);
+	else
+		transform.scale = glm::vec3(radius) * 2.0f;
 
 	glm::mat4 model = transform.GetWorldTransform();
 

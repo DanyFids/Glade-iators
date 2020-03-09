@@ -25,6 +25,6 @@ void main()
 	// Determine our luminance, based on perceived brightness of colors    
 	float luminance = dot(sampled, vec3(0.299, 0.587, 0.114));    
 	// Step will return 0 if luminance < threshold, and 1 if otherwise    
-	fragColor.rgb = sampled * step(0.9, luminance);    
+	fragColor.rgb = sampled * step(0.3, luminance);    
 	fragColor.a = 1.0; 
 }

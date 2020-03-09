@@ -62,8 +62,6 @@ class Material;
 
 class PointLight : public Light {
 protected:
-	static Mesh* VOLUME;
-	static Material* VOL_MAT;
 
 	float constant;
 	float linear;
@@ -74,6 +72,12 @@ protected:
 
 	void SetupCubeMap();
 public:
+	static Mesh* SPHERE;
+	static Mesh* CUBE;
+	static Mesh* VOLUME;
+	static Material* VOL_MAT;
+
+
 	static void INIT();
 
 	PointLight(glm::vec3 pos);

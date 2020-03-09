@@ -90,6 +90,7 @@ class TwoPlayer: public PlayScene {
 
 	Shader* sunShader;
 
+	float deathtimer = 4;
 
 	Object* morphyBoi;
 public:

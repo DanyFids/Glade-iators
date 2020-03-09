@@ -117,7 +117,7 @@ public:
 	MainMenu();
 
 
-	std::string Names[2];
+	
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
 	virtual void Update(float dt) override;
@@ -134,6 +134,8 @@ class CharacterC : public PlayScene {
 
 public:
 	CharacterC();
+
+	std::string Names[2];
 
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;

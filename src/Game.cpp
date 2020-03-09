@@ -284,14 +284,7 @@ void Game::InputHandle(float dt)
 	}
 	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_RELEASE)
 		w_pressed = false;
-	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS && !f2_pressed) {
-		if (curScene == OnePlayerScn)
-			curScene = TwoPlayerScn;
-		else
-			curScene = OnePlayerScn;
 
-		f2_pressed = true;
-	}
 	if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_RELEASE)
 		f2_pressed = false;
 

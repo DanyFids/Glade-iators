@@ -64,7 +64,8 @@ private:
 
 	bool wireframe = false;
 	bool w_pressed = false;
-	bool f2_pressed = false;
+	//bool f2_pressed = false;
+	bool f11_pressed = false;
 	bool space_pressed = false;
 
 };

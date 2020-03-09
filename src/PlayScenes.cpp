@@ -1666,6 +1666,7 @@ void CharacterC::LoadScene()
 
 	Material* tree1 = new Material("treeportrait2.png");
 	Material* tree2 = new Material("treeportrait1.png");
+	Material* borderWall = new Material("borderPart1.png");
 
 	Material* stamBarMat = new Material("blue.png");
 	Material* crowdBarMat = new Material("white.png");
@@ -1733,7 +1734,9 @@ void CharacterC::LoadScene()
 
 		new Button(glm::vec2(0, 305), blackBarMat),
 		new Button(glm::vec2(80, 310), tree1),
-		new Button(glm::vec2(520, 310), tree2)
+		new Button(glm::vec2(520, 310), tree2),
+		new Button(glm::vec2(40, 305), borderWall),
+		new Button(glm::vec2(480, 305), borderWall)
 	};
 
 	ui[1]->Resize(70, 70);
@@ -1773,4 +1776,6 @@ void CharacterC::LoadScene()
 	ui[30]->Resize(800, 400);
 	ui[31]->Resize(180, 280);
 	ui[32]->Resize(180, 280);
+	ui[33]->Resize(260, 328);
+	ui[34]->Resize(260, 328);
 }

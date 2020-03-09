@@ -164,8 +164,8 @@ void Game::Initialize()
 		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
 
 
-		TwoPlayerScn = new TwoPlayer();
-		curScene = TwoPlayerScn;
+		//TwoPlayerScn = new TwoPlayer();
+		curScene = MainMenuScn;
 	}
 	else {
 		//curScene = OnePlayerScn;

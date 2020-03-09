@@ -1,7 +1,6 @@
 #include "Text.h"
 #include <glad\glad.h>
 #include "Game.h"
-#include <stdlib.h> 
 
 TextRenderer::TextRenderer()
 {
@@ -68,18 +67,18 @@ TextRenderer::TextRenderer()
 
 std::string TextRenderer::GenerateName()
 {
-	int Title = rand() % 10;
+	int Title = rand() % 11;
 	int FirstName = rand() % 23;
 	int LastName = rand() % 23;
 	int Suffix = rand() % 18;
 
-	std::string Titles[11] = { "Weeping", "r/", "Looks", "Sir","Lord","Lady","Dr.","Sapling","Pinecone","Twig","Maple" };
+	std::string Titles[12] = { "Weeping", "r/", "Looks", "Sir","Lord","Lady","Dr.","Sapling","Pinecone","Twig","Maple","Lorax" };
 	std::string FirstNames[24] = { " Oberon", " Titania", " Fern", " Woody", " Spruce", " Willow", " Chris", " Chest", " Wal",
 		" Pistachio", " Nice", " Gavin", " Hoity", " James", " Hoguey", " Dimitreeus", " Herbert"," Birchrude", " Leaf"," Cherry", " Paper", " Sugar", " Cedarella", " Arbor" };
 	std::string LastNames[24] = { " Oakborn", " Barkley", " Barkwell", " Elderwood", " Springstein", " Aspin", " Guys", " Baby", " Hogue", " McOak", " Oaksson",
 		" Robb", " Gottem", " Birch", " Ball", " Nut", " Pine", " Cottonwood", " Cane", " Sassafras", " Leafsson", " Soil", " Root", " Rootsson" };
-	std::string Suffixs[19] = { " The First", " The Second", " The Third", " The Fourth", " The Fifth", " The Sixth", " The Seventh", " The Eighth", " The Broken", " The Unburnt",
-		" The Chipped"," The Breaker of Branches"," The Mothertrunker", " The Fertilizer"," The Woodcutter", " The Kindling", " The Dude", " Speaks for the trees", " The Damned" };
+	std::string Suffixs[19] = { " I", " II", " III", " IV", " V", " VI", " VII", " VIII", " The Broken", " The Unburnt",
+		" The Chipped"," The Breaker of Branches"," The Mothertrunker", " The Fertilizer"," The Woodcutter", " Lord of Ashes", " The Dude", " Speaks for the trees", " The Damned" };
 	
 	std::string NAME = Titles[Title];
 	NAME.append(FirstNames[FirstName]);

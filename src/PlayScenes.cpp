@@ -743,7 +743,7 @@ void TwoPlayer::Update(float dt)
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
 	}
-
+	
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
 	((MorphMesh*)(morphyBoi->GetMesh()))->Update(dt);
@@ -1053,7 +1053,7 @@ void MainMenu::Draw()
 	}
 
 
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -1066,8 +1066,6 @@ void MainMenu::LoadScene()
 
 	MAX_MENU = 0;
 	MIN_MENU = -2;
-	srand(time(NULL));
-	Names[0] = Textcontroller->GenerateName();
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1211,6 +1209,9 @@ void CharacterC::Draw()
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
+
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[1], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 	glEnable(GL_DEPTH_TEST);
 
 }
@@ -1223,7 +1224,10 @@ void CharacterC::LoadScene()
 	MAX_MENU = 10;
 	MIN_MENU = 7;
 
+	srand(time(NULL));
 
+	Names[0] = Textcontroller->GenerateName();
+	Names[1] = Textcontroller->GenerateName();
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 

@@ -193,6 +193,15 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 		p_0 = false;
 	}
 
+	static bool p_o = false;
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !p_o) {
+		move_lights = !move_lights;
+		p_o = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_O) == GLFW_RELEASE) {
+		p_o = false;
+	}
+
 	static bool p_p = false;
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !p_p) {
 		toggle = CG_OUTPUT;
@@ -272,12 +281,14 @@ void OnePlayer::Update(float dt)
 			}
 		}
 
-		for (int l = 0; l < active_lights && l < lights.size(); l++) {
-			glm::vec3 tmp(0.0f);
-			tmp.x = ((((float)(rand() % 2) / 2.0f)) * dt);
-			tmp.z = ((((float)(rand() % 2) / 2.0f)) * dt);
-			
-			//lights[l]->Move(tmp);
+		if (move_lights) {
+			for (int l = 0; l < active_lights && l < lights.size(); l++) {
+				glm::vec3 tmp(0.0f);
+				tmp.x = ((((float)(rand() % 2) / 2.0f)) * dt);
+				tmp.z = ((((float)(rand() % 2) / 2.0f)) * dt);
+
+				lights[l]->Move(tmp);
+			}
 		}
 
 		if (glfwJoystickPresent(c) && glfwJoystickIsGamepad(c)) {

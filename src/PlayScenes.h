@@ -48,6 +48,7 @@ class OnePlayer: public PlayScene {
 	} toggle = CG_OUTPUT;
 
 	bool show_volumes = true;
+	bool move_lights = false;
 	bool debug = false;
 	bool f3_pressed;
 	int disp_depth = 0;

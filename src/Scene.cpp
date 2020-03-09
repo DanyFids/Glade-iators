@@ -118,6 +118,10 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 {
 	static const float dead_zone = 0.35f;
 
+	static bool guardButton1 = false;
+	static bool guardButton2 = false;
+
+
 	GLFWgamepadstate state;
 	if (glfwGetGamepadState(controller, &state)) {
 		if (isMenu != true && !ChangingScn) {
@@ -219,17 +223,46 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			}
 
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
-				std::cout << "Parry God\n";
-				block1 = true;
-				glm::vec3 p1 = glm::vec3();
-				p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-				p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+				
+				//block1 = true;
+
+				//glm::vec3 p1 = glm::vec3();
+				//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+				//p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
 
 				//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
+				players[player]->Block();
+
+				switch (player) {
+				case 0:
+					guardButton1 = true;
+					break;
+				case 1:
+					guardButton2 = true;
+					break;
+				}
+				//std::cout << "Parry God\n";
 			}
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE) {
 
-				block1 = false;
+
+				switch (player) {
+				case 0:
+					if (guardButton1) {
+						players[player]->Idle();
+						//players[player]->SetState();
+						guardButton1 = false;
+					}
+					break;
+				case 1:
+					if (guardButton2) {
+						players[player]->Idle();
+						//players[player]->SetState();
+						guardButton2 = false;
+					}
+					break;
+				}
+
 				//players[player]->DestroyChild(0);
 			}
 		}

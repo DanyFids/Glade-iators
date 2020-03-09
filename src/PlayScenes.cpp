@@ -590,12 +590,26 @@ void TwoPlayer::Update(float dt)
 					std::cout << "Welp\n";
 				}
 
-				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
-					if(players[p]->hitbox->GetType() == entity)
-					std::cout << "Hit!\n";
+				//problem -> weapon hitdetect is not seeing the shield
+				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) && !players[c]->GetWeapon()->getCooldown()) {
+					if (players[p]->GetShield()->hitbox->GetType() == shield) {
+						std::cout << "Blocked!\n";
 
-					players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
-					players[c]->GetWeapon()->setCooldown(true);
+						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
+						players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+					}
+				}
+
+				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
+
+					if (players[p]->hitbox->GetType() == entity) {
+						std::cout << "Hit!\n";
+
+						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
+						players[c]->GetWeapon()->setCooldown(true);
+					}
+
+					
 				}
 			}
 		}
@@ -709,13 +723,19 @@ void TwoPlayer::Draw()
 		//morphyBoi->Draw(morphShader, Cam);
 
 		glDisable(GL_DEPTH_TEST);
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		
-		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
-			//players[1]->hitbox->Draw(shaderObj);
+		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		
+		weapons[0]->hitbox->Draw(shaderObj, weapons[0]->getParentTransform());
+		weapons[1]->hitbox->Draw(shaderObj, weapons[1]->getParentTransform());
 
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		shields[0]->hitbox->Draw(shaderObj, shields[0]->getParentTransform());
+		shields[1]->hitbox->Draw(shaderObj, shields[1]->getParentTransform());
+
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_DEPTH_TEST);
 
 	}
@@ -842,7 +862,7 @@ void TwoPlayer::LoadScene()
 	Mesh* ShieldMesh = new Mesh("Weapons/Circle_Shield.obj");
 
 	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.09f, 12.8f);
-	Hitbox* shieldSphereHB = new SphereHitbox(1.0f);
+	Hitbox* shieldSphereHB = new SphereHitbox(1.0f,shield);
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
 
 	std::vector<std::string> OneHand_LC = {"sword_1"};
@@ -850,11 +870,17 @@ void TwoPlayer::LoadScene()
 	Object* P1_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P1_MESH);
 	Object* P2_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P2_MESH);
 
-	Object* P1_shield = new Object(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f }, gladiatorSkel->Find("l_hand"), P1_MESH);
-	Object* P2_shield = new Object(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f }, gladiatorSkel->Find("l_hand"), P2_MESH);
+	Shield* P1_shield = new Shield(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f },0.6f, 0.25f, gladiatorSkel->Find("l_hand"), P1_MESH);
+	Shield* P2_shield = new Shield(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f },0.6f, 0.25f, gladiatorSkel->Find("l_hand"), P2_MESH);
 
 	Weapon* Hurt_Sword = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 10.0f, gladiatorSkel->Find("r_hand"), P1_MESH);
 	Weapon* Hurt_Sword2 = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 10.0f, gladiatorSkel->Find("r_hand"), P2_MESH);
+
+	weapons.push_back(Hurt_Sword);
+	weapons.push_back(Hurt_Sword2);
+
+	shields.push_back(P1_shield);
+	shields.push_back(P2_shield);
 
 	Hurt_Sword->Scale({ 0.9f, 0.9f, 0.9f });
 	Hurt_Sword->SetRotation({ 0.0f, 90.0f, 90.0f });
@@ -868,14 +894,17 @@ void TwoPlayer::LoadScene()
 	P2_sword->Scale({ 0.9f, 0.9f, 0.9f });
 	P2_sword->SetRotation({ 0.0f, 90.0f, 90.0f });
 
-	P1_shield->Scale({ 0.8f, 0.8f, 0.8f });
+	P1_shield->Scale({ 1, 1, 1 });
 	P1_shield->SetRotation({ 0.0f, 0.0f, 270.0f });
 
-	P2_shield->Scale({ 0.8f, 0.8f, 0.8f });
+	P2_shield->Scale({ 1, 1, 1 });
 	P2_shield->SetRotation({ 0.0f, 0.0f, 270.0f });
 		
 	players[PLAYER_1]->SetWeapon(Hurt_Sword);
 	players[PLAYER_2]->SetWeapon(Hurt_Sword2);
+
+	players[PLAYER_1]->SetShield(P1_shield);
+	players[PLAYER_2]->SetShield(P2_shield);
 
 	players[PLAYER_1]->addChild(Hurt_Sword);
 	players[PLAYER_1]->addChild(P1_shield);

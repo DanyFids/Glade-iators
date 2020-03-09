@@ -1279,6 +1279,7 @@ void CharacterC::LoadScene()
 		sOne,
 		wTwo,
 		sTwo,
+		new Button(glm::vec2(0, 305), blackBarMat),
 		new Button(glm::vec2(80, 310), tree1),
 		new Button(glm::vec2(520, 310), tree2)
 	};
@@ -1317,6 +1318,7 @@ void CharacterC::LoadScene()
 	ui[28]->Resize(60, 60);
 	ui[29]->Resize(50, 50);
 
-	ui[30]->Resize(180, 280);
+	ui[30]->Resize(800, 400);
 	ui[31]->Resize(180, 280);
+	ui[32]->Resize(180, 280);
 }

@@ -1032,10 +1032,21 @@ void TwoPlayer::Update(float dt)
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
 	}
-
+	
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
 	((MorphMesh*)(morphyBoi->GetMesh()))->Update(dt);
+
+	if (players[0]->GetHP() <= 0 || players[1]->GetHP() <= 0)
+	{
+		deathtimer -= dt;
+		if (deathtimer <= 0)
+		{
+			Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			//setScene(MainMenu);
+
+		}
+	}
 }
 
 void TwoPlayer::Draw()
@@ -1117,7 +1128,21 @@ void TwoPlayer::Draw()
 	}
 	glEnable(GL_DEPTH_TEST);
 
+	if (players[0]->GetHP() <= 0 && players[1]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Draw", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0f, glm::vec3(1.f, 0.f, 0.f));
+		//deathtimer -= 
+	}
+	else if (players[0]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 2 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
 
+	}
+	else if (players[1]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 1 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
+
+	}
 	
 }
 
@@ -1436,7 +1461,7 @@ void MainMenu::Draw()
 		spaget->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -1449,8 +1474,6 @@ void MainMenu::LoadScene()
 
 	MAX_MENU = 0;
 	MIN_MENU = -2;
-	srand(time(NULL));
-	Names[0] = Textcontroller->GenerateName();
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1598,6 +1621,9 @@ void CharacterC::Draw()
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
+
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[1], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 	glEnable(GL_DEPTH_TEST);
 
 }
@@ -1612,7 +1638,10 @@ void CharacterC::LoadScene()
 	menuSpot[1] = 10;
 	MIN_MENU = 7;
 
+	srand(time(NULL));
 
+	Names[0] = Textcontroller->GenerateName();
+	Names[1] = Textcontroller->GenerateName();
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 

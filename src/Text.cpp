@@ -10,7 +10,7 @@ TextRenderer::TextRenderer()
 		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
 
 	FT_Face face;
-	if (FT_New_Face(ft, "Fonts/arial.ttf", 0, &face))
+	if (FT_New_Face(ft, "Fonts/Aetherius.ttf", 0, &face))
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 
 	FT_Set_Pixel_Sizes(face, 0, 48);
@@ -68,23 +68,41 @@ TextRenderer::TextRenderer()
 
 std::string TextRenderer::GenerateName()
 {
-	int Title = rand() % 10;
-	int FirstName = rand() % 23;
-	int LastName = rand() % 23;
-	int Suffix = rand() % 18;
 
-	std::string Titles[11] = { "Weeping", "r/", "Looks", "Sir","Lord","Lady","Dr.","Sapling","Pinecone","Twig","Maple" };
-	std::string FirstNames[24] = { " Oberon", " Titania", " Fern", " Woody", " Spruce", " Willow", " Chris", " Chest", " Wal",
-		" Pistachio", " Nice", " Gavin", " Hoity", " James", " Hoguey", " Dimitreeus", " Herbert"," Birchrude", " Leaf"," Cherry", " Paper", " Sugar", " Cedarella", " Arbor" };
-	std::string LastNames[24] = { " Oakborn", " Barkley", " Barkwell", " Elderwood", " Springstein", " Aspin", " Guys", " Baby", " Hogue", " McOak", " Oaksson",
-		" Robb", " Gottem", " Birch", " Ball", " Nut", " Pine", " Cottonwood", " Cane", " Sassafras", " Leafsson", " Soil", " Root", " Rootsson" };
-	std::string Suffixs[19] = { " The First", " The Second", " The Third", " The Fourth", " The Fifth", " The Sixth", " The Seventh", " The Eighth", " The Broken", " The Unburnt",
-		" The Chipped"," The Breaker of Branches"," The Mothertrunker", " The Fertilizer"," The Woodcutter", " The Kindling", " The Dude", " Speaks for the trees", " The Damned" };
+	std::string Titles[21] = { "Weeping", "r/", "Looks", "Sir","Lord","Lady","Dr.","Sapling","Pinecone","Twig","Maple","Lorax", "Sonofabirch", "Nut", "Punished", "Sage", "Your", 
+		"God Emperor", " Grand Champion", "It Was I,", "Seasoned" };
+
+	std::string FirstNames[47] = { " Oberon", " Titania", " Fern", " Woody", " Spruce", " Willow", " Chris", " Chest", " Wal",
+		" Pistachio", " Nice", " Gavin", " Hoity", " James", " Hoguey", " Dimitree", " Herbert"," Birchrude", " Leaf"," Cherry", " Paper", " Sugar", " Cedarella", " Arbor", 
+		" Craig", " Dylan", " Maija", " Tia", " Dan", " Anthony", " Elm-o", " Douglas", " Laurel", " Nut", "Keanu", " Poison", " Oaky", " Worst", " Buckeye", " Treebeard", 
+		" Olive", " Holly", " Iris", " Dill", " Mint", " Mary", " Aloe"   };
+
+	std::string LastNames[51] = { " Oakborn", " Barkley", " Barkwell", " Elderwood", " Springstein", " Aspin", " Guys", " Baby", " Hogue", " McOak", " Oaksson",
+		" Robb", " Gottem", " Birch", " Ball", " Nut", " Pine", " Cottonwood", " Cane", " Sassafras", " Leafsson", " Soil", " Root", " Rootsson", " Greenheart", " Wisteria", 
+		" Needle", " Leafs", " Sugar", " Enemy", " Rowan", " Asher", " Cassia", " Flora", " Peachy",  " Elmore", " Hazelton", " Speedwagon", " Gladed", " Foliage", " Flowers", 
+		" Peppervine", " Honeysuckle", " Peppercorn", " Doe", " Tarragon", " Wana", " Chervil", " Vera", " Catnip", "Rhubarb" };
+
+	std::string Suffixs[23] = { " I", " II", " III", " IV", " V", " VI", " VII", " VIII", " The Broken", " The Unburnt",
+		" The Chipped"," The Breaker of Branches"," The Mothertrunker", " The Fertilizer"," The Woodcutter", " Lord of Ashes", " The Dude", " Speaks for the trees", " The Damned", 
+		" The Nut", " The Spicy", " The Abyss Watcher", " The Dragontree Born" };
 	
+
+	int Title = rand() % 20;
+	int FirstName = rand() % 46;
+	int LastName = rand() % 50;
+	int Suffix = rand() % 22;
+
 	std::string NAME = Titles[Title];
-	NAME.append(FirstNames[FirstName]);
-	NAME.append(LastNames[LastName]);
-	NAME.append(Suffixs[Suffix]);
+	NAME += FirstNames[FirstName];
+	NAME += LastNames[LastName];
+	NAME += Suffixs[Suffix];
+
+
+
+	//std::string NAME = Titles[Title];
+	//NAME.append(FirstNames[FirstName]);
+	//NAME.append(LastNames[LastName]);
+	//NAME.append(Suffixs[Suffix]);
 
 	return NAME;
 }

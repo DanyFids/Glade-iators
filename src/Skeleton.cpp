@@ -439,18 +439,19 @@ int Skeleton::LoadFromFile(std::string f)
 					if (read.compare("N") == 0)
 					{
 						AnimStates[AnimStates.size() - 1].push_back(Neutral);
-					}else if (read.compare("A") == 0)
-					{
-						AnimStates[AnimStates.size() - 1].push_back(Attack);
-					}
+					} 
 					else if (read.compare("E") == 0) {
 						AnimStates[AnimStates.size() - 1].push_back(End);
+					}
+					else if (read.compare("R") == 0) {
+						AnimStates[AnimStates.size() - 1].push_back(Roll);
 					}
 					else if (read.compare("D") == 0) {
 						AnimStates[AnimStates.size() - 1].push_back(Deflect);
 					}
-					else if (read.compare("R") == 0) {
-						AnimStates[AnimStates.size() - 1].push_back(Roll);
+					else if (read.compare("A") == 0)
+					{
+						AnimStates[AnimStates.size() - 1].push_back(Attack);
 					}
 					else if (read.compare("B") == 0) {
 						AnimStates[AnimStates.size() - 1].push_back(Block);

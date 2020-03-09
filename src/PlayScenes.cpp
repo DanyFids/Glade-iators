@@ -937,6 +937,21 @@ void MainMenu::Update(float dt)
 
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
+	if (spaget != nullptr) {
+		if (time <= 0) {
+			if (!displayed) {
+				displayed = true;
+				time = MAX_TIME;
+			}
+		}
+		else {
+			time -= dt;
+		}
+		if (displayed) {
+			spaget->setOpacity(time / MAX_TIME);
+		}
+	}
+
 }
 
 void MainMenu::Draw()
@@ -999,6 +1014,9 @@ void MainMenu::Draw()
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 
+	if (spaget != nullptr) {
+		spaget->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
+	}
 
 	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 
@@ -1053,8 +1071,7 @@ void MainMenu::LoadScene()
 	};
 
 	if (!loaded) {
-		UI* spaget = new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), gladeiatorsTitle);
-		spaget->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
+		spaget = new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), gladeiatorsTitle);
 	}
 }
 
@@ -1186,6 +1203,7 @@ void CharacterC::LoadScene()
 	Material* buttonPlay = new Material("readyButton.png");
 	Material* buttonRandom = new Material("randomButton.png");
 
+	Material* background = new Material("backgroundWood.png");
 	Material* backDrop = new Material("backdrop.png");
 	Material* backDropMain = new Material("backdrop2.png");
 
@@ -1194,6 +1212,9 @@ void CharacterC::LoadScene()
 	Material* spearIcon = new Material("iconSpear.png");
 	Material* shieldIcon = new Material("iconShield.png");
 	Material* bucklerIcon = new Material("iconBuckler.png");
+
+	Material* tree1 = new Material("treeportrait2.png");
+	Material* tree2 = new Material("treeportrait1.png");
 
 	Material* stamBarMat = new Material("blue.png");
 	Material* crowdBarMat = new Material("white.png");
@@ -1225,6 +1246,7 @@ void CharacterC::LoadScene()
 	};
 
 	ui = {
+		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background),
 		playerOne,
 		playerTwo,
 		new Button(glm::vec2(150, 160), backDropMain),
@@ -1256,21 +1278,22 @@ void CharacterC::LoadScene()
 		wOne,
 		sOne,
 		wTwo,
-		sTwo
+		sTwo,
+		new Button(glm::vec2(80, 310), tree1),
+		new Button(glm::vec2(520, 310), tree2)
 	};
 
-	ui[0]->Resize(70, 70);
 	ui[1]->Resize(70, 70);
-	ui[2]->Resize(60, 60);
+	ui[2]->Resize(70, 70);
 	ui[3]->Resize(60, 60);
 	ui[4]->Resize(60, 60);
 	ui[5]->Resize(60, 60);
+	ui[6]->Resize(60, 60);
 
-	ui[6]->Resize(600, 60);
-	ui[7]->Resize(140, 60);
+	ui[7]->Resize(600, 60);
 	ui[8]->Resize(140, 60);
+	ui[9]->Resize(140, 60);
 
-	ui[9]->Resize(50, 50);
 	ui[10]->Resize(50, 50);
 	ui[11]->Resize(50, 50);
 	ui[12]->Resize(50, 50);
@@ -1278,8 +1301,8 @@ void CharacterC::LoadScene()
 	ui[14]->Resize(50, 50);
 	ui[15]->Resize(50, 50);
 	ui[16]->Resize(50, 50);
-
 	ui[17]->Resize(50, 50);
+
 	ui[18]->Resize(50, 50);
 	ui[19]->Resize(50, 50);
 	ui[20]->Resize(50, 50);
@@ -1287,9 +1310,13 @@ void CharacterC::LoadScene()
 	ui[22]->Resize(50, 50);
 	ui[23]->Resize(50, 50);
 	ui[24]->Resize(50, 50);
+	ui[25]->Resize(50, 50);
 
-	ui[25]->Resize(60, 60);
-	ui[26]->Resize(50, 50);
-	ui[27]->Resize(60, 60);
-	ui[28]->Resize(50, 50);
+	ui[26]->Resize(60, 60);
+	ui[27]->Resize(50, 50);
+	ui[28]->Resize(60, 60);
+	ui[29]->Resize(50, 50);
+
+	ui[30]->Resize(180, 280);
+	ui[31]->Resize(180, 280);
 }

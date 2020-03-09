@@ -79,6 +79,12 @@ class MainMenu : public PlayScene {
 	Shader* morphShader;
 	Shader* sunShader;
 	Shader* skelDepth;
+	UI* spaget;
+
+	const float MAX_TIME = 3.0f;
+	float time = MAX_TIME;
+
+	bool displayed = false;
 public:
 	MainMenu();
 

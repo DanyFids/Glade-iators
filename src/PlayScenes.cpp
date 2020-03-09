@@ -1,27 +1,29 @@
 #include "PlayScenes.h"
 #include <glad/glad.h>
-#include<GLFW/glfw3.h>
-#include<GLM/glm.hpp>
+#include <GLFW/glfw3.h>
+#include <GLM/glm.hpp>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <typeinfo>
 #include <random>
 #include <thread>
 #include <queue>
+#include <florp/app/timing.h>
 
-#include"Mesh.h"
-#include"Shader.h"
-#include"Texture.h"
-#include"Camera.h"
-#include"Light.h"
-#include"Object.h"
-#include"Mesh.h"
-#include"Constants.h"
-#include"Test_Primitives.h"
-#include"Hitbox.h"
-#include"UI.h"
-#include"Skeleton.h"
-#include"Lerp.h"
+#include "Mesh.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "Camera.h"
+#include "Light.h"
+#include "Object.h"
+#include "Mesh.h"
+#include "Constants.h"
+#include "Test_Primitives.h"
+#include "Hitbox.h"
+#include "UI.h"
+#include "Skeleton.h"
+#include "Lerp.h"
 #include "Sound.h"
 #include "Game.h"
 #include "PostProcess.h"
@@ -59,6 +61,194 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 	}
 	//
 
+	// CG INPUTS
+	static bool plus_p = false;
+	if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS && !plus_p) {
+		if (active_lights < MAX_LIGHTS) {
+			active_lights++;
+			plus_p = true;
+		}
+	}
+	else if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_RELEASE) {
+		plus_p = false;
+	}
+	
+	static bool minus_p = false;
+	if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS && !minus_p) {
+		if (active_lights > 1) {
+			active_lights--;
+			minus_p = true;
+		}
+	}
+	else if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_RELEASE) {
+		minus_p = false;
+	}
+
+	static bool p_1 = false;
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !p_1) {
+		active_lights = 1;
+		toggle = CG_OUTPUT;
+		p_1 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE) {
+		p_1 = false;
+	}
+
+	static bool p_2 = false;
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !p_2) {
+		show_volumes = !show_volumes;
+		p_2 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE) {
+		p_2 = false;
+	}
+
+	static bool p_3 = false;
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !p_3) {
+		toggle = CG_DEPTH;
+		p_3 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE) {
+		p_3 = false;
+	}
+
+	static bool p_4 = false;
+	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS && !p_4) {
+		toggle = CG_NORMALS;
+		p_4 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_RELEASE) {
+		p_4 = false;
+	}
+
+	static bool p_5 = false;
+	if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS && !p_5) {
+		toggle = CG_COLOR;
+		p_5 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_RELEASE) {
+		p_5 = false;
+	}
+
+	static bool p_6 = false;
+	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS && !p_6) {
+		toggle = CG_LIGHTS;
+		p_6 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_RELEASE) {
+		p_6 = false;
+	}
+
+	static bool p_7 = false;
+	if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS && !p_7) {
+		if (PointLight::VOLUME == PointLight::SPHERE)
+			PointLight::VOLUME = PointLight::CUBE;
+		else
+			PointLight::VOLUME = PointLight::SPHERE;
+		p_7 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_7) == GLFW_RELEASE) {
+		p_7 = false;
+	}
+
+	static bool p_8 = false;
+	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS && !p_8) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new LutColorCorrection(lut_hot, post_pass.at(0)->buff->GetOutput()));
+
+		p_8 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_8) == GLFW_RELEASE) {
+		p_8 = false;
+	}
+
+	static bool p_9 = false;
+	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS && !p_9) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new LutColorCorrection(lut_cool, post_pass.at(0)->buff->GetOutput()));
+
+		p_9 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_9) == GLFW_RELEASE) {
+		p_9 = false;
+	}
+
+	static bool p_0 = false;
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS && !p_0) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new LutColorCorrection(lut_custom, post_pass.at(0)->buff->GetOutput()));
+
+		p_0 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_0) == GLFW_RELEASE) {
+		p_0 = false;
+	}
+
+	static bool p_o = false;
+	if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && !p_o) {
+		move_lights = !move_lights;
+		p_o = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_O) == GLFW_RELEASE) {
+		p_o = false;
+	}
+
+	static bool p_p = false;
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && !p_p) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		p_p = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_RELEASE) {
+		p_p = false;
+	}
+
+	static bool p_lb = false;
+	if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS && !p_lb) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+
+		post_pass.push_back(new PostProcess({ post_pass.at(0)->buff->GetOutput() }, highlightshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(1)->buff->GetOutput() }, horgausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(2)->buff->GetOutput() }, vergausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(3)->buff->GetOutput(),post_pass.at(0)->buff->GetOutput() }, bloomshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(4)->buff->GetOutput() }, highlightshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(5)->buff->GetOutput() }, horgausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(6)->buff->GetOutput() }, vergausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(7)->buff->GetOutput(),post_pass.at(0)->buff->GetOutput() }, bloomshader));
+
+		p_lb = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_RELEASE) {
+		p_lb = false;
+	}
+
+	static bool p_rb = false;
+	if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET ) == GLFW_PRESS && !p_rb) {
+		toggle = CG_OUTPUT;
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new PostProcess({ post_pass.at(0)->buff->GetOutput() }, pixelshader));
+		p_rb = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_RELEASE) {
+		p_rb = false;
+	}
+
 	if (time > 0) {
 		time -= dt;
 	}
@@ -66,6 +256,17 @@ void OnePlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void OnePlayer::Update(float dt)
 {
+
+	if (players[0]->GetHP() <= 0 || players[1]->GetHP() <= 0)
+	{
+		deathtimer -= dt;
+		if (deathtimer <= 0)
+		{
+			Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			//setScene(MainMenu);
+
+		}
+	}
 
 	audioEngine.Update();
 	for (int c = 0; c < players.size(); c++) {
@@ -80,6 +281,15 @@ void OnePlayer::Update(float dt)
 			}
 		}
 
+		if (move_lights) {
+			for (int l = 0; l < active_lights && l < lights.size(); l++) {
+				glm::vec3 tmp(0.0f);
+				tmp.x = ((((float)(rand() % 2) / 2.0f)) * dt);
+				tmp.z = ((((float)(rand() % 2) / 2.0f)) * dt);
+
+				lights[l]->Move(tmp);
+			}
+		}
 
 		if (glfwJoystickPresent(c) && glfwJoystickIsGamepad(c)) {
 			Cam[c]->Move(players[c]->phys.move, dt);
@@ -139,6 +349,7 @@ void OnePlayer::Update(float dt)
 void OnePlayer::Draw()
 {
 	main_pass->Clear();
+	light_buff->Clear();
 	for (int c = 0; c < post_pass.size(); c++) {
 		post_pass[c]->buff->Clear();
 	}
@@ -156,7 +367,7 @@ void OnePlayer::Draw()
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
 
-	for (int l = 0; l < lights.size(); l++) {
+	for (int l = 0; l < active_lights && l <  lights.size(); l++) {
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
 		glClear(GL_DEPTH_BUFFER_BIT);
@@ -175,14 +386,16 @@ void OnePlayer::Draw()
 	sun->SetupLight(shaderObj);
 	sun->SetupLight(morphShader);
 	sun->SetupLight(skelShader);
-	for (int c = 0; c < lights.size(); c++) {
+	for (int c = 0; c < active_lights && c < lights.size(); c++) {
 		lights[c]->SetupLight(shaderObj, c);
 		lights[c]->SetupLight(morphShader, c);
 		lights[c]->SetupLight(skelShader, c);
+		lights[c]->SetupLight(lightPass, c);
 	}
 	shaderObj->SetI("num_lights", lights.size());
 	morphShader->SetI("num_lights", lights.size());
 	skelShader->SetI("num_lights", lights.size());
+	lightPass->SetI("num_lights", active_lights);
 
 	/*shaderObj->SetB("enable_a", enable_ambient);
 	shaderObj->SetB("enable_d", enable_diffuse);
@@ -202,42 +415,77 @@ void OnePlayer::Draw()
 
 		RenderScene(shaderObj, skelShader);
 		Cam[c]->SetupCam(morphShader);
-		morphyBoi->Draw(morphShader, Cam);
+		//morphyBoi->Draw(morphShader, Cam);
 		test_player->Draw(skelShader, Cam, shaderObj);
 		
-		glDisable(GL_DEPTH_TEST);
+		//glDisable(GL_DEPTH_TEST);
 		//((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
-		glEnable(GL_DEPTH_TEST);
+		//glEnable(GL_DEPTH_TEST);
 
-		glDisable(GL_DEPTH_TEST);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//glDisable(GL_DEPTH_TEST);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		
-		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
-		test_player->hitbox->Draw(shaderObj, test_player->GetTransform().GetWorldTransform());
-
-
-
-		weapons[0]->hitbox->Draw(shaderObj, weapons[0]->getParentTransform());
-		shields[0]->hitbox->Draw(shaderObj, shields[0]->getParentTransform());
+		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		//test_player->hitbox->Draw(shaderObj, test_player->GetTransform().GetWorldTransform());
+		//
+		//weapons[0]->hitbox->Draw(shaderObj, weapons[0]->getParentTransform());
+		//shields[0]->hitbox->Draw(shaderObj, shields[0]->getParentTransform());
 		//players[0]->GetTransform().GetWorldTransform() * weapons[0]->GetTransform().GetWorldTransform();
 		//	players[1]->hitbox->Draw(shaderObj);
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_DEPTH_TEST);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//glEnable(GL_DEPTH_TEST);
+
+		Cam[c]->SetupPostLight(lightPass, c);
 	}
+
+	lightPass->SetI("num_cams", Cam.size());
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, main_pass->GetOutput(1));
+	lightPass->SetI("normals", 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, main_pass->GetDepth());
+	lightPass->SetI("depth", 1);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, main_pass->GetOutput(2));
+	lightPass->SetI("spec", 2);
+
+	light_buff->Use();
+
+	Game::QUAD->Draw(lightPass);
 
 	for (int c = 0; c < post_pass.size(); c++) {
 		post_pass[c]->Draw();
 	}
 
+	//SCREEN_WIDTH, SCREEN_HEIGHT
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glActiveTexture(GL_TEXTURE0);
-	if (post_pass.size() > 0) {
-		glBindTexture(GL_TEXTURE_2D, post_pass.at(post_pass.size() - 1)->buff->GetOutput());
-	}
-	else {
+
+	switch (toggle) {
+	case CG_DEPTH:
+		glBindTexture(GL_TEXTURE_2D, main_pass->GetDepth());
+		break;
+	case CG_LIGHTS:
+		glBindTexture(GL_TEXTURE_2D, light_buff->GetOutput());
+		break;
+	case CG_COLOR:
 		glBindTexture(GL_TEXTURE_2D, main_pass->GetOutput());
+		break;
+	case CG_NORMALS:
+		glBindTexture(GL_TEXTURE_2D, main_pass->GetOutput(1));
+		break;
+	case CG_OUTPUT:
+		if (post_pass.size() > 0) {
+			glBindTexture(GL_TEXTURE_2D, post_pass.at(post_pass.size() - 1)->buff->GetOutput());
+		}
+		else {
+			glBindTexture(GL_TEXTURE_2D, light_buff->GetOutput(0));
+		}
+		break;
 	}
 	POST_OUT->SetI("INPUT", 0);
 
@@ -248,8 +496,33 @@ void OnePlayer::Draw()
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
+
+	if (show_volumes) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		for (int c = 0; c < active_lights && c < lights.size(); c++) {
+			lights[c]->Draw(shaderObj);
+		}
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+
+	if (players[0]->GetHP() <= 0 && players[1]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Draw", SCREEN_HEIGHT /2.f, SCREEN_WIDTH /2.f, 1.0f, glm::vec3(1.f, 0.f, 0.f));
+		//deathtimer -= 
+	}
+	else if (players[0]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 1 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
+
+	}
+	else if (players[1]->GetHP() <= 0)
+	{
+		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 2 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
+
+	}
 	glEnable(GL_DEPTH_TEST);
 
+	
 	glViewport(0, 0, Game::SCREEN.x, Game::SCREEN.y);
 }
 
@@ -257,19 +530,40 @@ void OnePlayer::LoadScene()
 {
 	main_pass = new FrameBuffer();
 	main_pass->AddComponent();
+	main_pass->AddComponent();
 
-	// Post processing passes
+	light_buff = new FrameBuffer();
 
+	//merge_buff = new FrameBuffer();
+
+	// Post processing passes 
+	
 	Material* LUT_TEST = new Material("LUTs/LUT_TEST.png");
 
-	LUT* lut_cool = new LUT("LUTs/Bluedabadee.cube");
-	LUT* lut_hot = new LUT("LUTs/ThatsHotBBY.cube");
-	LUT* lut_custom = new LUT("LUTs/EdgeLord.cube");
-
+	lut_cool = new LUT("LUTs/Bluedabadee.cube");
+	lut_hot = new LUT("LUTs/ThatsHotBBY.cube");
+	lut_custom = new LUT("LUTs/EdgeLord.cube");
 	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
 	//post_pass.push_back(new LutColorCorrection(lut_custom, main_pass->GetOutput()));
+	//Textcontroller();
 
-	isMenu = false;
+	highlightshader = new Shader("Shaders/PostProcess/PostProcess.vert","Shaders/PostProcess/Highlights.frag");
+
+	vergausshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/GausBlur.frag");
+	vergausshader->SetB("isHorizontal", false);
+	horgausshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/GausBlur.frag");
+	horgausshader->SetB("isHorizontal", true);
+
+	bloomshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Bloom.frag");
+	pixelshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Pixelation.frag");
+
+
+	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
+	
+	// Sampler2d INPUT
+	post_pass.push_back(new PostProcess({ main_pass->GetOutput(), light_buff->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge.frag")));
+
+	isMenu = false; 
 	ChangingScn = false;
 
 	Joint::init();
@@ -287,12 +581,13 @@ void OnePlayer::LoadScene()
 	//// Play the event
 	audioEngine.PlayEvent("MenuPlaceholder");
 
-	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
+	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Geo_pass.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
-	skelShader = new Shader("Shaders/skeleton_shader.vert", "Shaders/Basic_Shader.frag");
+	skelShader = new Shader("Shaders/skeleton_shader.vert", "Shaders/Geo_pass.frag");
 	skelDepth = new Shader("Shaders/depth_skel.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
+	lightPass = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/light_pass.frag");
 
 	Material* DiceTex = new Material("dice-texture.png", "d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
@@ -325,8 +620,10 @@ void OnePlayer::LoadScene()
 	//wiggleSkel->Find("bone2")->animations[0][0].scale = glm::vec3(2.0f, 1.0f, 2.0f);
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
-	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
-	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
+	//lights.push_back(new PointLight({ 4.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.5f, 0.7f, 0.1f, 0.014f, 0.0007f));
+	//lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.7f, 0.2f, 0.07f, 0.017f));
+	//lights.push_back(new PointLight({ 4.0, 4.0, 4.0 }, {1.0f, 0.0f, 0.0f}, 0.1, 0.5, 0.8, 0.7, 1.8));
+	Load_Lights_From_File("");
 
 	Mesh* Square = new Mesh("d6.obj");
 	Mesh* d20 = new Mesh("d20.obj");
@@ -552,6 +849,68 @@ void OnePlayer::LoadScene()
 	};
 
 	threadObj = std::thread(console);
+
+	unsigned int tmp_cube;
+	lightPass->Use();
+	glGenTextures(1, &tmp_cube);
+	glActiveTexture(GL_TEXTURE22);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, tmp_cube);
+	for (unsigned int i = 0; i < 6; ++i)
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
+			10, 10, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	for (int z = 0; z < 28; z++)
+		lightPass->SetI("lights[" + std::to_string(z) + "].depthMap", 22);
+}
+
+void OnePlayer::Load_Lights_From_File(std::string f)
+{
+	std::ifstream file("lights_list.li");
+
+	while (!file.eof()) {
+		std::string tmp;
+		std::stringstream line;
+		std::getline(file, tmp);
+
+		line.str(tmp);
+
+		std::string read;
+
+		glm::vec3 pos, color;
+
+		line >> read;
+		pos.x = std::stof(read);
+		line >> read;
+		pos.y = std::stof(read); 
+		line >> read;
+		pos.z = std::stof(read);
+
+		line >> read;
+		color.x = std::stof(read);
+		line >> read;
+		color.y = std::stof(read);
+		line >> read;
+		color.z = std::stof(read);
+
+		line >> read;
+		float a = std::stof(read);
+		line >> read;
+		float d = std::stof(read);
+		line >> read;
+		float s = std::stof(read);
+
+		line >> read;
+		float l = std::stof(read);
+		line >> read;
+		float q = std::stof(read);
+
+		lights.push_back(new PointLight(pos, color, a, d, s, l, q));
+	}
 }
 
 void OnePlayer::ResizeCams()
@@ -1077,7 +1436,7 @@ void MainMenu::Draw()
 		spaget->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -1090,6 +1449,8 @@ void MainMenu::LoadScene()
 
 	MAX_MENU = 0;
 	MIN_MENU = -2;
+	srand(time(NULL));
+	Names[0] = Textcontroller->GenerateName();
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1250,6 +1611,8 @@ void CharacterC::LoadScene()
 	menuSpot[0] = 10;
 	menuSpot[1] = 10;
 	MIN_MENU = 7;
+
+
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 

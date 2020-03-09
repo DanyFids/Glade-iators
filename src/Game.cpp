@@ -153,8 +153,7 @@ void Game::Initialize()
 	Game::QUAD = new Mesh(quad_prim, 4, quad_index, 6);
 
 	//OnePlayerScn = new OnePlayer();
-	//TwoPlayerScn = new TwoPlayer();
-	MainMenuScn = new MainMenu();
+
 	//CharacterScn = new CharacterC();
 	//Attack Init(0);
 	//Init.init();
@@ -163,7 +162,9 @@ void Game::Initialize()
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) && 
 		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
 
-		curScene = MainMenuScn;
+
+		TwoPlayerScn = new TwoPlayer();
+		curScene = TwoPlayerScn;
 	}
 	else {
 		//curScene = OnePlayerScn;

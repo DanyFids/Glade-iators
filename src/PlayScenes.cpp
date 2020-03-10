@@ -1622,9 +1622,13 @@ void CharacterC::Draw()
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 260.0f, 570.0f, 0.35f, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "VS", 370.0f, 530.0f, 0.75f, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[1], 260.0f, 490.0f, 0.35f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name1[0], 385.0f - (Name1[0].length() * 4), 570.0f, 0.45f, glm::vec3(1.f, 0.0f, 0.0f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name1[1], 385.0f - (Name1[1].length() * 4), 540.0f, 0.45f, glm::vec3(1.f, 0.0f, 0.0f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name1[2], 385.0f - (Name1[2].length() * 4), 510.0f, 0.45f, glm::vec3(1.f, 0.0f, 0.0f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "VS", 370.0f, 470.0f, 0.75f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[0], 385.0f - (Name2[0].length() * 4), 430.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[1], 385.0f - (Name2[1].length() * 4), 400.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[2], 385.0f - (Name2[2].length() * 4), 370.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
 	glEnable(GL_DEPTH_TEST);
 
 }
@@ -1641,8 +1645,13 @@ void CharacterC::LoadScene()
 
 	srand(time(NULL));
 
-	Names[0] = Textcontroller->GenerateName();
-	Names[1] = Textcontroller->GenerateName();
+	Name1[0] = Textcontroller->GenerateTitle();
+	Name1[1] = Textcontroller->GenerateName();
+	Name1[2] = Textcontroller->GenerateSuffix();
+
+	Name2[0] = Textcontroller->GenerateTitle();
+	Name2[1] = Textcontroller->GenerateName();
+	Name2[2] = Textcontroller->GenerateSuffix();
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 

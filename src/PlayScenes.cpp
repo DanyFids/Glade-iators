@@ -1032,7 +1032,7 @@ void TwoPlayer::Update(float dt)
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
 	}
-
+	
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
 	((MorphMesh*)(morphyBoi->GetMesh()))->Update(dt);
@@ -1166,6 +1166,7 @@ void TwoPlayer::LoadScene()
 	Material* arenaTex = new Material("CaulitreeumTexture.png");
 	Material* floorTex = new Material("ArenaFloorTexture.png");
 
+	Material* mainUI = new Material("hpbarcool.png");
 	Material* hpBarMat = new Material("yuck.png");
 	Material* stamBarMat = new Material("blue.png");
 	Material* crowdBarMat = new Material("white.png");
@@ -1311,23 +1312,22 @@ void TwoPlayer::LoadScene()
 		new Camera(glm::vec3(2.0f, 0.0f, -4.0f), glm::vec4(Game::SCREEN.x / 2,0, Game::SCREEN.x / 2, Game::SCREEN.y)) // Cam 2
 	};
 
-	UI* hpBG = new UI(210, 30, { 5.0f, 545.0f, -1.0f }, blackBarMat);
-	UI* stamBG = new UI(160, 30, { 5.0f, 495.0f, -1.0f }, blackBarMat);
-	UI* crowdBG = new UI(185, 30, { 220.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* hpBG = new UI(260, 10, { 55.0f, 554.5f, -1.0f }, blackBarMat);
+	UI* stamBG = new UI(260, 10, { 55.0f, 534.50f, -1.0f }, blackBarMat);
+	UI* crowdBG = new UI(185, 30, { 55.0f, 545.0f, -1.0f }, blackBarMat);
 
-	UI* hpBG2 = new UI(210, 30, { 585.0f, 545.0f, -1.0f }, blackBarMat);
-	UI* stamBG2 = new UI(160, 30, { 635.0f, 495.0f, -1.0f }, blackBarMat);
-	UI* crowdBG2 = new UI(185, 30, { 395.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* hpBG2 = new UI(260, 10, { 487.5f, 554.5f, -1.0f }, blackBarMat);
+	UI* stamBG2 = new UI(260, 10, { 487.5f, 534.5f, -1.0f }, blackBarMat);
 
 
 	ui = {
-		new HealthBar((Player*)players[PLAYER_1], glm::vec2(10, 550), hpBarMat, hpBG),
-		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(10, 500), stamBarMat, stamBG),
-		new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG),
+		new UI(801.5, 100, glm::vec3(0.0f, 500.0f, 0.0f), mainUI),
+		new HealthBar((Player*)players[PLAYER_1], glm::vec2(60, 557), hpBarMat, hpBG),
+		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(60, 537), stamBarMat, stamBG),
+		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG), 
 
-		new HealthBar((Player*)players[PLAYER_2], glm::vec2(590, 550), hpBarMat, hpBG2),
-		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(640, 500), stamBarMat, stamBG2),
-		new CrowdBar((Player*)players[PLAYER_2], glm::vec2(395, 550), crowdBarMat, crowdBG2)
+		new HealthBar((Player*)players[PLAYER_2], glm::vec2(492.5, 557.5), hpBarMat, hpBG2),
+		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(492.5, 537.5), stamBarMat, stamBG2)
 	};
 
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
@@ -1461,7 +1461,7 @@ void MainMenu::Draw()
 		spaget->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -1474,8 +1474,6 @@ void MainMenu::LoadScene()
 
 	MAX_MENU = 0;
 	MIN_MENU = -2;
-	srand(time(NULL));
-	Names[0] = Textcontroller->GenerateName();
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1623,6 +1621,10 @@ void CharacterC::Draw()
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
+
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[0], 260.0f, 570.0f, 0.35f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "VS", 370.0f, 530.0f, 0.75f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Names[1], 260.0f, 490.0f, 0.35f, glm::vec3(1.f, 1.f, 1.f));
 	glEnable(GL_DEPTH_TEST);
 
 }
@@ -1637,7 +1639,10 @@ void CharacterC::LoadScene()
 	menuSpot[1] = 10;
 	MIN_MENU = 7;
 
+	srand(time(NULL));
 
+	Names[0] = Textcontroller->GenerateName();
+	Names[1] = Textcontroller->GenerateName();
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1662,6 +1667,7 @@ void CharacterC::LoadScene()
 
 	Material* tree1 = new Material("treeportrait2.png");
 	Material* tree2 = new Material("treeportrait1.png");
+	Material* borderWall = new Material("borderPart1.png");
 
 	Material* stamBarMat = new Material("blue.png");
 	Material* crowdBarMat = new Material("white.png");
@@ -1726,8 +1732,12 @@ void CharacterC::LoadScene()
 		sOne,
 		wTwo,
 		sTwo,
+
+		new Button(glm::vec2(0, 305), blackBarMat),
 		new Button(glm::vec2(80, 310), tree1),
-		new Button(glm::vec2(520, 310), tree2)
+		new Button(glm::vec2(520, 310), tree2),
+		new Button(glm::vec2(40, 305), borderWall),
+		new Button(glm::vec2(480, 305), borderWall)
 	};
 
 	ui[1]->Resize(70, 70);
@@ -1764,6 +1774,9 @@ void CharacterC::LoadScene()
 	ui[28]->Resize(60, 60);
 	ui[29]->Resize(50, 50);
 
-	ui[30]->Resize(180, 280);
+	ui[30]->Resize(800, 400);
 	ui[31]->Resize(180, 280);
+	ui[32]->Resize(180, 280);
+	ui[33]->Resize(260, 328);
+	ui[34]->Resize(260, 328);
 }

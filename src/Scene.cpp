@@ -188,11 +188,11 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			else {
 				unsigned int other = (player == PLAYER_1) ? PLAYER_2 : PLAYER_1;
 
-				glm::vec3 dir = glm::normalize(player_head - players[other]->GetPosition());
 				glm::vec3 mid = lerp(players[player]->GetPosition(), players[other]->GetPosition(), 0.5f) + glm::vec3(0.0f, 1.5f, 0.0f);
+				glm::vec3 dir = glm::normalize((player_head + glm::vec3(0.0f, 1.0f, 0.0f)) - mid);
 
-				Cam[player]->SetPosition(player_head + (dir * Cam[player]->GetRadius()));
-				Cam[player]->SetTarget(mid);
+				Cam[player]->SetPosition(player_head + (dir * Cam[player]->GetRadius()) + glm::vec3(0.0f, 1.0f, 0.0f));
+				Cam[player]->SetTarget(mid + glm::vec3(0.0f, 1.5f, 0.0f));
 			}
 
 			glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -210,7 +210,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 				}
 				//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-				if (players[player]->GetState() != PLAYER_STATE::walking && players[player]->GetFrameState() == FrameStates::Neutral && !players[player]->IsLocked()) {
+				if (players[player]->GetState() < PLAYER_STATE::walking && players[player]->GetFrameState() == FrameStates::Neutral && !players[player]->IsLocked()) {
 					players[player]->PlayAnim("walk", 0, glm::length(axisPos));
 					//players[player]->PlayAnim("idle", 1, 1.0f - glm::length(axisPos));
 					players[player]->SetState(walking);
@@ -246,18 +246,19 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				((Player*)players[player])->StopRun();
 			}
 
-			static bool r_stick_down = false;
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && !r_stick_down) {
+			static bool r_stick_down[2] = { false, false };
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && !r_stick_down[player]) {
 				players[player]->ToggleCamLock();
-				r_stick_down = true;
+				r_stick_down[player] = true;
 			}
 			else if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_RELEASE) {
-				r_stick_down = false;
+				r_stick_down[player] = false;
 			}
 
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS)
+			static bool rb_p[2] = { false, false };
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS && !rb_p[player])
 			{
-				if (players[player]->GetStam() >= 15.0f) {
+				if (players[player]->GetStam() > 0.0f) {
 
 					//glm::vec3 p1 = glm::vec3();
 					//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
@@ -271,16 +272,18 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					//players[player]->dmgSTAM(15.0f);
 					players[player]->Attack();
 					atk1 = true;
+					rb_p[player] = true;
 				}
 			}
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_RELEASE)
 			{
 				atk1 = false;
+				rb_p[player] = false;
 			}
 
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS)
 			{
-				if (players[player]->GetStam() >= 20.0f) {
+				if (players[player]->GetStam() > 0.0f) {
 					players[player]->Roll();
 					dodge1 = false;
 					dodge1t = 0.1;

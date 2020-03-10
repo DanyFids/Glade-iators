@@ -13,7 +13,7 @@ class Camera {
 	glm::mat4 project;
 	glm::mat4 view_cor;
 
-	float radius = 5.0f;
+	float radius = 6.5f;
 	float speed = 10.0f;
 	float rotSpeed = 80.0f;
 	float pitch = 0.0f;

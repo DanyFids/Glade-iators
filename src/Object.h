@@ -162,7 +162,7 @@ class Player : public Object {
 
 	SkelMesh* _mesh;
 
-	PLAYER_STATE state;
+	PLAYER_STATE state = idle;
 
 	Weapon* weapon;
 	Shield* shield;

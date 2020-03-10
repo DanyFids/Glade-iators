@@ -384,7 +384,7 @@ void Player::Attack()
 		state = attacking;
 	}
 	else if(GetFrameState() == FrameStates::Neutral && !anim_lock){
-		if (atk_combo < this->weapon->GetNumLightAttacks()) {
+		if (atk_combo < this->weapon->GetNumLightAttacks() - 1) {
 			weapon->setCooldown(false);
 			atk_combo++;
 			anim_lock = true;

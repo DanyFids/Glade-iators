@@ -10,6 +10,7 @@
 #include "Game.h"
 #include "Skeleton.h"
 #include "Shader.h"
+#include "Lerp.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -165,20 +166,34 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 	if (glfwGetGamepadState(controller, &state)) {
 		if (isMenu != true && !ChangingScn) {
 			glm::vec2 rot = glm::vec2(0.0f, 0.0f);
-			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] < -0.2) {
-				rot.y = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
-			}
-			else {
-				rot.y = 0.0f;
-			}
-			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] < -0.2) {
-				rot.x = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
-			}
-			else {
-				rot.x = 0.0f;
-			}
 
-			Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
+			glm::vec3 player_head = players[player]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f);
+			if (!players[player]->GetCamLock()) {
+				Cam[player]->SetPosition(player_head);
+				if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] < -0.2) {
+					rot.y = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
+				}
+				else {
+					rot.y = 0.0f;
+				}
+				if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] < -0.2) {
+					rot.x = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
+				}
+				else {
+					rot.x = 0.0f;
+				}
+
+				Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
+			}
+			else {
+				unsigned int other = (player == PLAYER_1) ? PLAYER_2 : PLAYER_1;
+
+				glm::vec3 dir = glm::normalize(player_head - players[other]->GetPosition());
+				glm::vec3 mid = lerp(players[player]->GetPosition(), players[other]->GetPosition(), 0.5f) + glm::vec3(0.0f, 1.5f, 0.0f);
+
+				Cam[player]->SetPosition(player_head + (dir * Cam[player]->GetRadius()));
+				Cam[player]->SetTarget(mid);
+			}
 
 			glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -231,7 +246,16 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				((Player*)players[player])->StopRun();
 			}
 
-			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2)
+			static bool r_stick_down = false;
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && !r_stick_down) {
+				players[player]->ToggleCamLock();
+				r_stick_down = true;
+			}
+			else if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_RELEASE) {
+				r_stick_down = false;
+			}
+
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS)
 			{
 				if (players[player]->GetStam() >= 15.0f) {
 
@@ -243,13 +267,13 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 					//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
 
-					std::cout << "OOF\n";
+					//std::cout << "OOF\n";
 					//players[player]->dmgSTAM(15.0f);
 					players[player]->Attack();
 					atk1 = true;
 				}
 			}
-			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2)
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_RELEASE)
 			{
 				atk1 = false;
 			}

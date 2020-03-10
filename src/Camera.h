@@ -33,6 +33,7 @@ public:
 	void UpdateCam();
 	void SetupCam(Shader*);
 	void SetupPostLight(Shader*, int id);
+	float GetRadius() {return radius;}
 
 	void TogglePerspective();
 

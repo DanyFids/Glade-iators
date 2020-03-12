@@ -1473,7 +1473,7 @@ void MainMenu::LoadScene()
 	ChangingScn = false;
 
 	MAX_MENU = 0;
-	MIN_MENU = -2;
+	MIN_MENU = -3;
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1490,7 +1490,7 @@ void MainMenu::LoadScene()
 	Material* buttonPlay = new Material("playButton.png"); 
 	Material* buttonSettings = new Material("settingsButton.png");
 	Material* buttonExit = new Material("exitButton.png");
-	Material* buttonBlank = new Material("blankButton.png");
+	Material* buttonCredits = new Material("creditsButton.png");
 	Material* titleImage = new Material("gladewallpaper.png");
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
@@ -1501,16 +1501,17 @@ void MainMenu::LoadScene()
 		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
 	}; 
 
-	playerOne = new ButtonSelect(0, glm::vec2(0, 275), firstPlayer);
-	playerTwo = new ButtonSelect(1, glm::vec2(0, 275), secondPlayer);
+	playerOne = new UI(210, 80, glm::vec3(0, 435, 0), firstPlayer);
+	//playerTwo = new UI(210, 80, glm::vec3(0, 275, 0), firstPlayer);
 
 	ui = {
 		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), titleImage),
 		playerOne,
 		//playerTwo,
-		new Button(glm::vec2(5, 280), buttonPlay), 
-		new Button(glm::vec2(5, 180), buttonSettings),
-		new Button(glm::vec2(5, 80), buttonExit),
+		new UI(200, 70, glm::vec3(5, 440, 0), buttonPlay),
+		new UI(200, 70, glm::vec3(5, 320, 0), buttonSettings),
+		new UI(200, 70, glm::vec3(5, 200, 0), buttonCredits),
+		new UI(200, 70, glm::vec3(5, 80, 0), buttonExit),
 	};
 
 	if (!loaded) {
@@ -1667,6 +1668,8 @@ void CharacterC::LoadScene()
 	Material* background = new Material("backgroundWood.png");
 	Material* backDrop = new Material("backdrop.png");
 	Material* backDropMain = new Material("backdrop2.png");
+	Material* backDropFade = new Material("backdrop3.png");
+	Material* nothing = new Material("nothing.png");
 
 	Material* swordIcon = new Material("iconSword.png");
 	Material* daggerIcon = new Material("iconDagger.png");
@@ -1678,26 +1681,27 @@ void CharacterC::LoadScene()
 	Material* tree2 = new Material("treeportrait1.png");
 	Material* borderWall = new Material("borderPart1.png");
 
-	Material* stamBarMat = new Material("blue.png");
-	Material* crowdBarMat = new Material("white.png");
 	Material* blackBarMat = new Material("black.png");
+	Material* arrow = new Material("arrow.png");
+	Material* arrow2 = new Material("arrow (1).png");
 
-	playerOne = new ButtonSelect(0, glm::vec2(145, 230), firstPlayer);
-	playerTwo = new ButtonSelect(1, glm::vec2(585, 230), secondPlayer);
-	wOne = new Button(glm::vec2(150, 160), swordIcon);
-	sOne = new Button(glm::vec2(155, 90), shieldIcon);
-	wTwo = new Button(glm::vec2(590, 160), swordIcon);
-	sTwo = new Button(glm::vec2(595, 90), shieldIcon);
+	playerOne = new UI(70, 70, glm::vec3(145, 230, 0), firstPlayer);
+	playerTwo = new UI(70, 70, glm::vec3(585, 230, 0), secondPlayer);
 
-	wOne_p1 = new Button(glm::vec2(90, 165), daggerIcon);
-	sOne_p1 = new Button(glm::vec2(90, 90), backDrop);
-	wTwo_p1 = new Button(glm::vec2(530, 165), daggerIcon);
-	sTwo_p1 = new Button(glm::vec2(530, 90), backDrop);
+	wOne = new UI(60, 60, glm::vec3(150, 160, 0), swordIcon);
+	sOne = new UI(50, 50, glm::vec3(155, 90, 0), shieldIcon);
+	wTwo = new UI(60, 60, glm::vec3(590, 160, 0), swordIcon);
+	sTwo = new UI(50, 50, glm::vec3(595, 90, 0), shieldIcon);
 
-	wOne_p2 = new Button(glm::vec2(220, 165), spearIcon);
-	sOne_p2 = new Button(glm::vec2(220, 90), bucklerIcon);
-	wTwo_p2 = new Button(glm::vec2(660, 165), spearIcon);
-	sTwo_p2 = new Button(glm::vec2(660, 90), bucklerIcon);
+	wOne_p1 = new UI(50, 50, glm::vec3(90, 165, 0), daggerIcon);
+	sOne_p1 = new UI(40, 40, glm::vec3(95, 95, 0), nothing);
+	wTwo_p1 = new UI(50, 50, glm::vec3(530, 165, 0), daggerIcon);
+	sTwo_p1 = new UI(40, 40, glm::vec3(535, 95, 0), nothing);	 
+	wOne_p2 = new UI(50, 50, glm::vec3(220, 165, 0), spearIcon);
+	sOne_p2 = new UI(40, 40, glm::vec3(225, 95, 0), bucklerIcon);
+	wTwo_p2 = new UI(50, 50, glm::vec3(660, 165, 0), spearIcon);
+	sTwo_p2 = new UI(40, 40, glm::vec3(665, 95, 0), bucklerIcon);
+
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
@@ -1711,23 +1715,24 @@ void CharacterC::LoadScene()
 		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background),
 		playerOne,
 		playerTwo,
-		new Button(glm::vec2(150, 160), backDropMain),
-		new Button(glm::vec2(150, 85), backDropMain),
-		new Button(glm::vec2(590, 160), backDropMain),
-		new Button(glm::vec2(590, 85), backDropMain), //
+		new UI(70, 70, glm::vec3(145, 155, 0), backDropMain),
+		new UI(70, 70, glm::vec3(145, 80, 0), backDropMain),
+		new UI(70, 70, glm::vec3(585, 155, 0), backDropMain),
+		new UI(70, 70, glm::vec3(585, 80, 0), backDropMain),
 
-		new Button(glm::vec2(100, 10), buttonPlay),
-		new Button(glm::vec2(100, 235), buttonRandom),
-		new Button(glm::vec2(540, 235), buttonRandom),
+		new UI(600, 60, glm::vec3(100, 10, 0), buttonPlay),
+		new UI(140, 60, glm::vec3(100, 235, 0), buttonRandom),
+		new UI(140, 60, glm::vec3(540, 235, 0), buttonRandom),
 
-		new Button(glm::vec2(90, 165), backDrop),
-		new Button(glm::vec2(90, 90), backDrop),
-		new Button(glm::vec2(530, 165), backDrop),
-		new Button(glm::vec2(530, 90), backDrop), //
-		new Button(glm::vec2(220, 165), backDrop),
-		new Button(glm::vec2(220, 90), backDrop),
-		new Button(glm::vec2(660, 165), backDrop),
-		new Button(glm::vec2(660, 90), backDrop), //
+		new UI(50, 50, glm::vec3(90, 165, 0), backDrop),
+		new UI(50, 50, glm::vec3(90, 90, 0), backDrop),
+		new UI(50, 50, glm::vec3(530, 165, 0), backDrop),
+		new UI(50, 50, glm::vec3(530, 90, 0), backDrop),
+		new UI(50, 50, glm::vec3(220, 165, 0), backDrop),
+		new UI(50, 50, glm::vec3(220, 90, 0), backDrop),
+		new UI(50, 50, glm::vec3(660, 165, 0), backDrop),
+		new UI(50, 50, glm::vec3(660, 90, 0), backDrop),
+
 		wOne_p1,
 		sOne_p1,
 		wTwo_p1,
@@ -1742,50 +1747,38 @@ void CharacterC::LoadScene()
 		wTwo,
 		sTwo,
 
-		new Button(glm::vec2(0, 305), blackBarMat),
-		new Button(glm::vec2(80, 310), tree1),
-		new Button(glm::vec2(520, 310), tree2),
-		new Button(glm::vec2(40, 305), borderWall),
-		new Button(glm::vec2(480, 305), borderWall)
+		new UI(800, 400, glm::vec3(0, 305, 0), blackBarMat),
+		new UI(180, 280, glm::vec3(80, 310, 0), tree1),
+		new UI(180, 280, glm::vec3(520, 310, 0), tree2),
+		new UI(260, 328, glm::vec3(40, 305, 0), borderWall),
+		new UI(260, 328, glm::vec3(480, 305, 0), borderWall),
+
+		new UI(40, 50, glm::vec3(35, 168, 0), arrow),
+		new UI(40, 50, glm::vec3(35, 88, 0), arrow),
+		new UI(40, 50, glm::vec3(285, 168, 0), arrow2),
+		new UI(40, 50, glm::vec3(285, 88, 0), arrow2),
+
+		new UI(40, 50, glm::vec3(475, 168, 0), arrow),
+		new UI(40, 50, glm::vec3(475, 88, 0), arrow),
+		new UI(40, 50, glm::vec3(725, 168, 0), arrow2),
+		new UI(40, 50, glm::vec3(725, 88, 0), arrow2),
+
+		new UI(50, 50, glm::vec3(90, 165, 0), backDropFade),
+		new UI(50, 50, glm::vec3(90, 90, 0), backDropFade),
+		new UI(50, 50, glm::vec3(530, 165, 0), backDropFade),
+		new UI(50, 50, glm::vec3(530, 90, 0), backDropFade),
+		new UI(50, 50, glm::vec3(220, 165, 0), backDropFade),
+		new UI(50, 50, glm::vec3(220, 90, 0), backDropFade),
+		new UI(50, 50, glm::vec3(660, 165, 0), backDropFade),
+		new UI(50, 50, glm::vec3(660, 90, 0), backDropFade),
 	};
 
-	ui[1]->Resize(70, 70);
-	ui[2]->Resize(70, 70);
-	ui[3]->Resize(60, 60);
-	ui[4]->Resize(60, 60);
-	ui[5]->Resize(60, 60);
-	ui[6]->Resize(60, 60);
-
-	ui[7]->Resize(600, 60);
-	ui[8]->Resize(140, 60);
-	ui[9]->Resize(140, 60);
-
-	ui[10]->Resize(50, 50);
-	ui[11]->Resize(50, 50);
-	ui[12]->Resize(50, 50);
-	ui[13]->Resize(50, 50);
-	ui[14]->Resize(50, 50);
-	ui[15]->Resize(50, 50);
-	ui[16]->Resize(50, 50);
-	ui[17]->Resize(50, 50);
-
-	ui[18]->Resize(50, 50);
-	ui[19]->Resize(50, 50);
-	ui[20]->Resize(50, 50);
-	ui[21]->Resize(50, 50);
-	ui[22]->Resize(50, 50);
-	ui[23]->Resize(50, 50);
-	ui[24]->Resize(50, 50);
-	ui[25]->Resize(50, 50);
-
-	ui[26]->Resize(60, 60);
-	ui[27]->Resize(50, 50);
-	ui[28]->Resize(60, 60);
-	ui[29]->Resize(50, 50);
-
-	ui[30]->Resize(800, 400);
-	ui[31]->Resize(180, 280);
-	ui[32]->Resize(180, 280);
-	ui[33]->Resize(260, 328);
-	ui[34]->Resize(260, 328);
+	ui[43]->setOpacity(0.5);
+	ui[44]->setOpacity(0.5);
+	ui[45]->setOpacity(0.5);
+	ui[46]->setOpacity(0.5);
+	ui[47]->setOpacity(0.5);
+	ui[48]->setOpacity(0.5);
+	ui[49]->setOpacity(0.5);
+	ui[50]->setOpacity(0.5);
 }

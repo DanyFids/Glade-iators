@@ -70,23 +70,24 @@ protected:
 
 	TextRenderer* Textcontroller = new TextRenderer();
 
-	ButtonSelect* playerOne;
-	ButtonSelect* playerTwo;
+	UI* playerOne;
+	UI* playerTwo;
 
-	Button* wOne;
-	Button* wTwo;
-	Button* sOne;
-	Button* sTwo;
-
-	Button* wOne_p1;
-	Button* wTwo_p1;
-	Button* sOne_p1;
-	Button* sTwo_p1;
-	Button* wOne_p2;
-	Button* wTwo_p2;
-	Button* sOne_p2;
-	Button* sTwo_p2;
+	UI* wOne;
+	UI* wTwo;
+	UI* sOne;
+	UI* sTwo;
+	UI* wOne_p1;
+	UI* wTwo_p1;
+	UI* sOne_p1;
+	UI* sTwo_p1;
+	UI* wOne_p2;
+	UI* wTwo_p2;
+	UI* sOne_p2;
+	UI* sTwo_p2;
 	
+	std::string WeaponName[2];
+	std::string ShieldName[2];
 
 	// Mouse Vars
 	float m_lastX = 400;

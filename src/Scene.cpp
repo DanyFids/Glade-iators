@@ -343,13 +343,13 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				menuSpot[controller]--;
 				if (controller == 0) {
 					if (MAX_MENU == 0)
-						playerOne->move(0, -100);
+						playerOne->move(0, -120);
 					else
 						playerOne->move(0, -75);
 				}
 				else {
 					if (MAX_MENU == 0)
-						playerTwo->move(0, -100);
+						playerTwo->move(0, -120);
 					else
 						playerTwo->move(0, -75);
 				}
@@ -360,13 +360,13 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				menuSpot[controller]++;
 				if (controller == 0) {
 					if (MAX_MENU == 0)
-						playerOne->move(0, 100);
+						playerOne->move(0, 120);
 					else
 						playerOne->move(0, 75);
 				}
 				else {
 					if (MAX_MENU == 0)
-						playerTwo->move(0, 100);
+						playerTwo->move(0, 120);
 					else
 						playerTwo->move(0, 75);
 				}
@@ -379,24 +379,42 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			if (menuSpot[controller] < MIN_MENU)
 			{
 				menuSpot[controller] = MAX_MENU;
-				if (!ChangingScn) {
-					if (controller == 0) {
-						playerOne->move(0, 300);
+				if (MAX_MENU == 10) {
+					if (!ChangingScn) {
+						if (controller == 0) {
+							playerOne->move(0, 300);
+						}
+						else {
+							playerTwo->move(0, -300);
+						}
 					}
-					else {
-						playerTwo->move(0, 300);
+				}
+				else {
+					if (!ChangingScn) {
+						if (controller == 0) {
+							playerOne->move(0, 480);
+						}
 					}
 				}
 			}
 			else if (menuSpot[controller] > MAX_MENU)
 			{
 				menuSpot[controller] = MIN_MENU;
-				if (!ChangingScn) {
-					if (controller == 0) {
-						playerOne->move(0, -300);
+				if (MAX_MENU == 10) {
+					if (!ChangingScn) {
+						if (controller == 0) {
+							playerOne->move(0, -300);
+						}
+						else {
+							playerTwo->move(0, -300);
+						}
 					}
-					else {
-						playerTwo->move(0, -300);
+				}
+				else {
+					if (!ChangingScn) {
+						if (controller == 0) {
+							playerOne->move(0, -480);
+						}
 					}
 				}
 			}
@@ -471,30 +489,35 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						wOne->ChangeTex(swordIcon);
 						wOne_p1->ChangeTex(daggerIcon);
 						wOne_p2->ChangeTex(spearIcon);
+						WeaponName[controller] = "Sword";
 						changeW[controller] = false;
 						break;
 					case 1:
 						wOne->ChangeTex(spearIcon);
 						wOne_p1->ChangeTex(swordIcon);
 						wOne_p2->ChangeTex(hammerIcon);
+						WeaponName[controller] = "Spear";
 						changeW[controller] = false;
 						break;
 					case 2:
 						wOne->ChangeTex(hammerIcon);
 						wOne_p1->ChangeTex(spearIcon);
 						wOne_p2->ChangeTex(tridentIcon);
+						WeaponName[controller] = "Maul";
 						changeW[controller] = false;
 						break;
 					case 3:
 						wOne->ChangeTex(tridentIcon);
 						wOne_p1->ChangeTex(hammerIcon);
 						wOne_p2->ChangeTex(daggerIcon);
+						WeaponName[controller] = "Trident";
 						changeW[controller] = false;
 						break;
 					case 4:
 						wOne->ChangeTex(daggerIcon);
 						wOne_p1->ChangeTex(tridentIcon);
 						wOne_p2->ChangeTex(swordIcon);
+						WeaponName[controller] = "Dagger";
 						changeW[controller] = false;
 						break;
 					}
@@ -505,18 +528,21 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						sOne->ChangeTex(shieldIcon);
 						sOne_p1->ChangeTex(nothingIcon);
 						sOne_p2->ChangeTex(bucklerIcon);
+						ShieldName[controller] = "Shield";
 						changeS[controller] = false;
 						break;
 					case 1:
 						sOne->ChangeTex(bucklerIcon);
 						sOne_p1->ChangeTex(shieldIcon);
 						sOne_p2->ChangeTex(nothingIcon);
+						ShieldName[controller] = "Buckler";
 						changeS[controller] = false;
 						break;
 					case 2:
 						sOne->ChangeTex(nothingIcon);
 						sOne_p1->ChangeTex(bucklerIcon);
 						sOne_p2->ChangeTex(shieldIcon);
+						ShieldName[controller] = "No Shield";
 						changeS[controller] = false;
 						break;
 					}
@@ -588,30 +614,35 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						wTwo->ChangeTex(swordIcon);
 						wTwo_p1->ChangeTex(daggerIcon);
 						wTwo_p2->ChangeTex(spearIcon);
+						WeaponName[controller] = "Sword";
 						changeW[controller] = false;
 						break;
 					case 1:
 						wTwo->ChangeTex(spearIcon);
 						wTwo_p1->ChangeTex(swordIcon);
 						wTwo_p2->ChangeTex(hammerIcon);
+						WeaponName[controller] = "Spear";
 						changeW[controller] = false;
 						break;
 					case 2:
 						wTwo->ChangeTex(hammerIcon);
 						wTwo_p1->ChangeTex(spearIcon);
 						wTwo_p2->ChangeTex(tridentIcon);
+						WeaponName[controller] = "Maul";
 						changeW[controller] = false;
 						break;
 					case 3:
 						wTwo->ChangeTex(tridentIcon);
 						wTwo_p1->ChangeTex(hammerIcon);
 						wTwo_p2->ChangeTex(daggerIcon);
+						WeaponName[controller] = "Trident";
 						changeW[controller] = false;
 						break;
 					case 4:
 						wTwo->ChangeTex(daggerIcon);
 						wTwo_p1->ChangeTex(tridentIcon);
 						wTwo_p2->ChangeTex(swordIcon);
+						WeaponName[controller] = "Dagger";
 						changeW[controller] = false;
 						break;
 					}
@@ -622,18 +653,21 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						sTwo->ChangeTex(shieldIcon);
 						sTwo_p1->ChangeTex(nothingIcon);
 						sTwo_p2->ChangeTex(bucklerIcon);
+						ShieldName[controller] = "Shield";
 						changeS[controller] = false;
 						break;
 					case 1:
 						sTwo->ChangeTex(bucklerIcon);
 						sTwo_p1->ChangeTex(shieldIcon);
 						sTwo_p2->ChangeTex(nothingIcon);
+						ShieldName[controller] = "Buckler";
 						changeS[controller] = false;
 						break;
 					case 2:
 						sTwo->ChangeTex(nothingIcon);
 						sTwo_p1->ChangeTex(bucklerIcon);
 						sTwo_p2->ChangeTex(shieldIcon);
+						ShieldName[controller] = "No Shield";
 						changeS[controller] = false;
 						break;
 					}
@@ -678,7 +712,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				else if (menuSpot[0] == -1) {
 					//Settings
 				}
-				else if (menuSpot[0] == -2) {
+				else if (menuSpot[0] == -3) {
 					//Exit
 					//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
 					glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);

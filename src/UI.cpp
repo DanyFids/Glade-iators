@@ -39,6 +39,12 @@ UI::UI(int width, int height, glm::vec3 pos, Material* ma)
 	model = glm::scale(model, glm::vec3(width, height, 1.0f));
 }
 
+void UI::move(int _x, int _y)
+{
+	pos.x += _x;
+	pos.y += _y;
+}
+
 int UI::scaleX(int _x)
 {
 	scale.x = _x;
@@ -279,54 +285,5 @@ void CrowdBar::Draw(glm::vec2 scrn)
 {
 	bg->Draw(scrn);
 
-	UI::Draw(scrn);
-}
-
-const int Button::HEIGHT = 70;
-const int Button::MAX_WIDTH = 200;
-Button::Button(glm::vec2 pos, Material* ma) : UI(MAX_WIDTH, HEIGHT, glm::vec3(pos, 0), ma)
-{
-}
-
-//Button::Button(int width, int height, glm::vec2 pos, Material* ma) : UI(width, height, glm::vec3(pos, 0), ma)
-//{
-//}
-
-void Button::Update(float dt)
-{
-}
-
-void Button::Draw(glm::vec2 scrn)
-{
-	UI::Draw(scrn);
-}
-
-const int ButtonSelect::HEIGHT = 80;
-const int ButtonSelect::MAX_WIDTH = 210;
-ButtonSelect::ButtonSelect(int _player, glm::vec2 _pos, Material* ma) : UI(MAX_WIDTH, HEIGHT, glm::vec3(_pos, 0), ma)
-{
-	player = _player;
-	opacity = 0.6;
-}
-
-//ButtonSelect::ButtonSelect(int width, int height, int _player, glm::vec2 pos, Material* ma) : UI(width, height, glm::vec3(pos, 0), ma)
-//{
-//	player = _player;
-//	opacity = 0.6;
-//}
-
-void ButtonSelect::move(int _x, int _y)
-{
-	pos.x += _x;
-	pos.y += _y;
-}
-
-void ButtonSelect::Update(float dt)
-{
-
-}
-
-void ButtonSelect::Draw(glm::vec2 scrn)
-{
 	UI::Draw(scrn);
 }

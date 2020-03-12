@@ -1630,6 +1630,11 @@ void CharacterC::Draw()
 	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[0], 385.0f - (Name2[0].length() * 4), 430.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
 	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[1], 385.0f - (Name2[1].length() * 4), 400.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
 	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[2], 385.0f - (Name2[2].length() * 4), 370.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
+
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, WeaponName[0], 174.0f - (WeaponName[0].length() * 4), 230.0f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, WeaponName[1], 615.0f - (WeaponName[1].length() * 4), 230.0f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, ShieldName[0], 176.0f - (ShieldName[0].length() * 4), 150.0f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, ShieldName[1], 617.0f - (ShieldName[1].length() * 4), 150.0f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
 	glEnable(GL_DEPTH_TEST);
 
 }
@@ -1653,6 +1658,11 @@ void CharacterC::LoadScene()
 	Name2[0] = Textcontroller->GenerateTitle();
 	Name2[1] = Textcontroller->GenerateName();
 	Name2[2] = Textcontroller->GenerateSuffix();
+
+	WeaponName[0] = "Sword";
+	WeaponName[1] = "Sword";
+	ShieldName[0] = "Shield";
+	ShieldName[1] = "Shield";
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 

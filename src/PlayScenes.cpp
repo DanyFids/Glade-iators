@@ -28,6 +28,7 @@
 #include "Game.h"
 #include "PostProcess.h"
 #include "Text.h"
+#include "Particle.h"
 
 OnePlayer::OnePlayer()
 {

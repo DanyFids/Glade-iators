@@ -11,6 +11,7 @@
 #include "Skeleton.h"
 #include "Shader.h"
 #include "Lerp.h"
+#include "Particle.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>

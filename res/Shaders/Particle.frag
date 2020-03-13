@@ -1,12 +1,13 @@
 #version 330 core
 in vec2 TexCoords;
-in vec4 Color;
 
 out vec4 color;
 
-uniform Material tex;
+uniform sampler2D tex;
+uniform ivec2 frame_position;
+uniform ivec2 frame_size;
 
 void main()
 {
-    color = (texture(tex, TexCoords) * Color);
+    color = (texture(tex, TexCoords));
 }  

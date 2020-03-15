@@ -338,7 +338,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		/*****************/
 		/* Menu Movement */
 		/*****************/
-			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 && menu_time[controller] <= 0)
+			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 && menu_time[controller] <= 0 && !arrowUsed)
 			{
 				menuSpot[controller]--;
 				if (controller == 0) {
@@ -355,7 +355,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				}
 				menu_time[controller] = MENU_TIME;
 			}
-			else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2 && menu_time[controller] <= 0)
+			else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2 && menu_time[controller] <= 0 && !arrowUsed)
 			{
 				menuSpot[controller]++;
 				if (controller == 0) {
@@ -423,6 +423,10 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			/* Anthony, Edit Here */
 			/**********************/
 
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
+				_Abutton[controller] = true;
+				menu_time[controller] = MENU_TIME;
+			}
 
 			/************/
 			/* Player 1 */
@@ -431,44 +435,115 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				switch (menuSpot[controller]) {
 				case 10:
 					//Random Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						random1_Button->ChangeTex(buttonRandom2);
+					}
+					else if (menu_time[controller] <= 0) {
+						random1_Button->ChangeTex(buttonRandom);
+					}
 					break;
 				case 9:
+					if (menu_time[controller] <= 0 && arrowUsed) {
+						if (rightArrow) {
+							arrowUsed = false;
+							arrow_Button3->ChangeTex(arrowBack);
+						}
+						else {
+							arrowUsed = false;
+							arrow_Button1->ChangeTex(arrow);
+						}
+					}
 					//Swords
 					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
 						weapon[controller]--;
 						changeW[controller] = true;
+						arrowUsed = true;
+						rightArrow = false;
+						arrow_Button1->ChangeTex(arrow2);
 						menu_time[controller] = MENU_TIME;
 					}
 					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
 						weapon[controller]++;
 						changeW[controller] = true;
+						arrowUsed = true;
+						rightArrow = true;
+						arrow_Button3->ChangeTex(arrowBack2);
 						menu_time[controller] = MENU_TIME;
 					}
 					break;
 				case 8:
+					if (menu_time[controller] <= 0 && arrowUsed) {
+						if (rightArrow) {
+							arrowUsed = false;
+							arrow_Button4->ChangeTex(arrowBack);
+						}
+						else {
+							arrowUsed = false;
+							arrow_Button2->ChangeTex(arrow);
+						}
+					}
 					//Shields
 					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
 						shield[controller]--;
 						changeS[controller] = true;
+						arrowUsed = true;
+						rightArrow = false;
+						arrow_Button2->ChangeTex(arrow2);
 						menu_time[controller] = MENU_TIME;
 					}
 					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
 						shield[controller]++;
 						changeS[controller] = true;
+						arrowUsed = true;
+						rightArrow = true;
+						arrow_Button4->ChangeTex(arrowBack2);
 						menu_time[controller] = MENU_TIME;
 					}
 					break;
 				case 7:
 					//Ready Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						ready_Button->ChangeTex(buttonReady2);
+					}
+					else if (menu_time[controller] <= 0) {
+						ready_Button->ChangeTex(buttonReady);
+					}
 					break;
 				case 0:
 					//Play Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						play_Button->ChangeTex(buttonPlay2);
+					}
+					else if (menu_time[controller] <= 0) {
+						play_Button->ChangeTex(buttonPlay);
+					}
 					break;
 				case -1:
 					//Settings Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						settings_Button->ChangeTex(buttonSettings2);
+					}
+					else if (menu_time[controller] <= 0) {
+						settings_Button->ChangeTex(buttonSettings);
+					}
 					break;
 				case -2:
+					//Credits Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						credits_Button->ChangeTex(buttonCredits2);
+					}
+					else if (menu_time[controller] <= 0) {
+						credits_Button->ChangeTex(buttonCredits);
+					}
+					break;
+				case -3:
 					//Exit Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						exit_Button->ChangeTex(buttonExit2);
+					}
+					else if (menu_time[controller] <= 0) {
+						exit_Button->ChangeTex(buttonExit);
+					}
 					break;
 				}
 				//std::cout << weapon[0] << std::endl;
@@ -556,44 +631,79 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				switch (menuSpot[controller]) {
 				case 10:
 					//Random Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						random2_Button->ChangeTex(buttonRandom2);
+					}
+					else if (menu_time[controller] <= 0) {
+						random2_Button->ChangeTex(buttonRandom);
+					}
 					break;
 				case 9:
+					if (menu_time[controller] <= 0 && arrowUsed) {
+						if (rightArrow) {
+							arrowUsed = false;
+							arrow_Button7->ChangeTex(arrowBack);
+						}
+						else {
+							arrowUsed = false;
+							arrow_Button5->ChangeTex(arrow);
+						}
+					}
 					//Swords
 					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
 						weapon[controller]--;
 						changeW[controller] = true;
+						arrowUsed = true;
+						rightArrow = false;
+						arrow_Button5->ChangeTex(arrow2);
 						menu_time[controller] = MENU_TIME;
 					}
 					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
 						weapon[controller]++;
 						changeW[controller] = true;
+						arrowUsed = true;
+						rightArrow = true;
+						arrow_Button7->ChangeTex(arrowBack2);
 						menu_time[controller] = MENU_TIME;
 					}
 					break;
 				case 8:
+					if (menu_time[controller] <= 0 && arrowUsed) {
+						if (rightArrow) {
+							arrowUsed = false;
+							arrow_Button8->ChangeTex(arrowBack);
+						}
+						else {
+							arrowUsed = false;
+							arrow_Button6->ChangeTex(arrow);
+						}
+					}
 					//Shields
 					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
 						shield[controller]--;
 						changeS[controller] = true;
+						arrowUsed = true;
+						rightArrow = false;
+						arrow_Button6->ChangeTex(arrow2);
 						menu_time[controller] = MENU_TIME;
 					}
 					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
 						shield[controller]++;
 						changeS[controller] = true;
+						arrowUsed = true;
+						rightArrow = true;
+						arrow_Button8->ChangeTex(arrowBack2);
 						menu_time[controller] = MENU_TIME;
 					}
 					break;
 				case 7:
 					//Ready Button
-					break;
-				case 0:
-					//Play Button
-					break;
-				case -1:
-					//Settings Button
-					break;
-				case -2:
-					//Exit Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						ready_Button->ChangeTex(buttonReady2);
+					}
+					else if (menu_time[controller] <= 0) {
+						ready_Button->ChangeTex(buttonReady);
+					}
 					break;
 				}
 
@@ -679,9 +789,6 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			/*         &         */
 			/*  Scene Selection  */
 			/*********************/
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
-				_Abutton[controller] = true;
-			}
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
 				_Bbutton[controller] = true;
 			}

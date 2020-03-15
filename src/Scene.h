@@ -56,7 +56,32 @@ protected:
 	int shield[2]{ 0, 0 };
 	bool changeW[2]{ false, false };
 	bool changeS[2]{ false, false };
+	bool rightArrow = true;
+	bool arrowUsed = false;
+	//bool buttonUsed = false;
 	static bool loaded;
+
+	//MAIN MENU
+	Material* buttonPlay = new Material("playButton.png");
+	Material* buttonSettings = new Material("settingsButton.png");
+	Material* buttonExit = new Material("exitButton.png");
+	Material* buttonCredits = new Material("creditsButton.png");
+	Material* buttonPlay2 = new Material("playButton2.png");
+	Material* buttonSettings2 = new Material("settingsButton2.png");
+	Material* buttonExit2 = new Material("exitButton2.png");
+	Material* buttonCredits2 = new Material("creditsButton2.png");
+
+	//CHARACTER MENU
+	Material* buttonReady = new Material("readyButton.png");
+	Material* buttonRandom = new Material("randomButton.png");
+	Material* buttonReady2 = new Material("readyButton2.png");
+	Material* buttonRandom2 = new Material("randomButton2.png");
+	Material* backDropMain = new Material("backdrop2.png");
+
+	Material* arrow = new Material("arrow.png");
+	Material* arrowBack = new Material("arrow (1).png");
+	Material* arrow2 = new Material("arrow2.png");
+	Material* arrowBack2 = new Material("arrow (1)2.png");
 
 	Material* swordIcon = new Material("iconSword.png");
 	Material* spearIcon = new Material("iconSpear.png");
@@ -70,9 +95,36 @@ protected:
 
 	TextRenderer* Textcontroller = new TextRenderer();
 
+	/******************/
+	/* Menu Variables */
+	/******************/
+
+	//Players
 	UI* playerOne;
 	UI* playerTwo;
-
+	//Menu 1
+	UI* play_Button;
+	UI* settings_Button;
+	UI* credits_Button;
+	UI* exit_Button;
+	//Menu 2
+	UI* random1_Button;
+	UI* random2_Button;
+	UI* weapon1_Button;
+	UI* weapon2_Button;
+	UI* shield1_Button;
+	UI* shield2_Button;
+	UI* ready_Button;
+	//Arrows
+	UI* arrow_Button1;
+	UI* arrow_Button2;
+	UI* arrow_Button3;
+	UI* arrow_Button4;
+	UI* arrow_Button5;
+	UI* arrow_Button6;
+	UI* arrow_Button7;
+	UI* arrow_Button8;
+	//Icons
 	UI* wOne;
 	UI* wTwo;
 	UI* sOne;

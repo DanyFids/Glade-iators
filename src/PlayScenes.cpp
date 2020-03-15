@@ -1503,15 +1503,19 @@ void MainMenu::LoadScene()
 
 	playerOne = new UI(210, 80, glm::vec3(0, 435, 0), firstPlayer);
 	//playerTwo = new UI(210, 80, glm::vec3(0, 275, 0), firstPlayer);
+	play_Button = new UI(200, 70, glm::vec3(5, 440, 0), buttonPlay);
+	settings_Button = new UI(200, 70, glm::vec3(5, 320, 0), buttonSettings);
+	credits_Button = new UI(200, 70, glm::vec3(5, 200, 0), buttonCredits);
+	exit_Button = new UI(200, 70, glm::vec3(5, 80, 0), buttonExit);
 
 	ui = {
 		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), titleImage),
 		playerOne,
 		//playerTwo,
-		new UI(200, 70, glm::vec3(5, 440, 0), buttonPlay),
-		new UI(200, 70, glm::vec3(5, 320, 0), buttonSettings),
-		new UI(200, 70, glm::vec3(5, 200, 0), buttonCredits),
-		new UI(200, 70, glm::vec3(5, 80, 0), buttonExit),
+		play_Button,
+		settings_Button,
+		credits_Button,
+		exit_Button
 	};
 
 	if (!loaded) {
@@ -1672,7 +1676,7 @@ void CharacterC::LoadScene()
 
 	Material* firstPlayer = new Material("redPlayer.png");
 	Material* secondPlayer = new Material("bluePlayer.png");
-	Material* buttonPlay = new Material("readyButton.png");
+	Material* buttonReady = new Material("readyButton.png");
 	Material* buttonRandom = new Material("randomButton.png");
 
 	Material* background = new Material("backgroundWood.png");
@@ -1694,15 +1698,36 @@ void CharacterC::LoadScene()
 	Material* blackBarMat = new Material("black.png");
 	Material* arrow = new Material("arrow.png");
 	Material* arrow2 = new Material("arrow (1).png");
-
+	//PLAYERS
 	playerOne = new UI(70, 70, glm::vec3(145, 230, 0), firstPlayer);
 	playerTwo = new UI(70, 70, glm::vec3(585, 230, 0), secondPlayer);
+	
+	//BUTTONS
+	weapon1_Button = new UI(70, 70, glm::vec3(145, 155, 0), backDropMain);
+	shield1_Button = new UI(70, 70, glm::vec3(145, 80, 0), backDropMain);
+	weapon2_Button = new UI(70, 70, glm::vec3(585, 155, 0), backDropMain);
+	shield2_Button = new UI(70, 70, glm::vec3(585, 80, 0), backDropMain);
 
+	ready_Button = new UI(600, 60, glm::vec3(100, 10, 0), buttonReady);
+	random1_Button = new UI(140, 60, glm::vec3(100, 235, 0), buttonRandom);
+	random2_Button = new UI(140, 60, glm::vec3(540, 235, 0), buttonRandom);
+
+	//ARROWS
+	arrow_Button1 = new UI(40, 50, glm::vec3(35, 168, 0), arrow);
+	arrow_Button2 = new UI(40, 50, glm::vec3(35, 88, 0), arrow);
+	arrow_Button3 = new UI(40, 50, glm::vec3(285, 168, 0), arrow2);
+	arrow_Button4 = new UI(40, 50, glm::vec3(285, 88, 0), arrow2); // PLAYER 1 ARROWS
+	arrow_Button5 = new UI(40, 50, glm::vec3(475, 168, 0), arrow);
+	arrow_Button6 = new UI(40, 50, glm::vec3(475, 88, 0), arrow);
+	arrow_Button7 = new UI(40, 50, glm::vec3(725, 168, 0), arrow2);
+	arrow_Button8 = new UI(40, 50, glm::vec3(725, 88, 0), arrow2); // PLAYER 2 ARROWS
+		
+	//ICONS
 	wOne = new UI(60, 60, glm::vec3(150, 160, 0), swordIcon);
 	sOne = new UI(50, 50, glm::vec3(155, 90, 0), shieldIcon);
 	wTwo = new UI(60, 60, glm::vec3(590, 160, 0), swordIcon);
 	sTwo = new UI(50, 50, glm::vec3(595, 90, 0), shieldIcon);
-
+	//Side Icons
 	wOne_p1 = new UI(50, 50, glm::vec3(90, 165, 0), daggerIcon);
 	sOne_p1 = new UI(40, 40, glm::vec3(95, 95, 0), nothing);
 	wTwo_p1 = new UI(50, 50, glm::vec3(530, 165, 0), daggerIcon);
@@ -1725,32 +1750,33 @@ void CharacterC::LoadScene()
 		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background),
 		playerOne,
 		playerTwo,
-		new UI(70, 70, glm::vec3(145, 155, 0), backDropMain),
-		new UI(70, 70, glm::vec3(145, 80, 0), backDropMain),
-		new UI(70, 70, glm::vec3(585, 155, 0), backDropMain),
-		new UI(70, 70, glm::vec3(585, 80, 0), backDropMain),
 
-		new UI(600, 60, glm::vec3(100, 10, 0), buttonPlay),
-		new UI(140, 60, glm::vec3(100, 235, 0), buttonRandom),
-		new UI(140, 60, glm::vec3(540, 235, 0), buttonRandom),
+		weapon1_Button,
+		shield1_Button,
+		weapon2_Button,
+		shield2_Button,
+
+		ready_Button,
+		random1_Button,
+		random2_Button,
 
 		new UI(50, 50, glm::vec3(90, 165, 0), backDrop),
 		new UI(50, 50, glm::vec3(90, 90, 0), backDrop),
 		new UI(50, 50, glm::vec3(530, 165, 0), backDrop),
-		new UI(50, 50, glm::vec3(530, 90, 0), backDrop),
+		new UI(50, 50, glm::vec3(530, 90, 0), backDrop), //4
 		new UI(50, 50, glm::vec3(220, 165, 0), backDrop),
 		new UI(50, 50, glm::vec3(220, 90, 0), backDrop),
 		new UI(50, 50, glm::vec3(660, 165, 0), backDrop),
-		new UI(50, 50, glm::vec3(660, 90, 0), backDrop),
+		new UI(50, 50, glm::vec3(660, 90, 0), backDrop), //4
 
 		wOne_p1,
 		sOne_p1,
 		wTwo_p1,
-		sTwo_p1,
+		sTwo_p1, //4
 		wOne_p2,
 		sOne_p2,
 		wTwo_p2,
-		sTwo_p2,
+		sTwo_p2, //4
 
 		wOne,
 		sOne,
@@ -1763,26 +1789,25 @@ void CharacterC::LoadScene()
 		new UI(260, 328, glm::vec3(40, 305, 0), borderWall),
 		new UI(260, 328, glm::vec3(480, 305, 0), borderWall),
 
-		new UI(40, 50, glm::vec3(35, 168, 0), arrow),
-		new UI(40, 50, glm::vec3(35, 88, 0), arrow),
-		new UI(40, 50, glm::vec3(285, 168, 0), arrow2),
-		new UI(40, 50, glm::vec3(285, 88, 0), arrow2),
-
-		new UI(40, 50, glm::vec3(475, 168, 0), arrow),
-		new UI(40, 50, glm::vec3(475, 88, 0), arrow),
-		new UI(40, 50, glm::vec3(725, 168, 0), arrow2),
-		new UI(40, 50, glm::vec3(725, 88, 0), arrow2),
+		arrow_Button1,
+		arrow_Button2,
+		arrow_Button3,
+		arrow_Button4,
+		arrow_Button5,
+		arrow_Button6,
+		arrow_Button7,
+		arrow_Button8,
 
 		new UI(50, 50, glm::vec3(90, 165, 0), backDropFade),
 		new UI(50, 50, glm::vec3(90, 90, 0), backDropFade),
 		new UI(50, 50, glm::vec3(530, 165, 0), backDropFade),
-		new UI(50, 50, glm::vec3(530, 90, 0), backDropFade),
+		new UI(50, 50, glm::vec3(530, 90, 0), backDropFade), //4
 		new UI(50, 50, glm::vec3(220, 165, 0), backDropFade),
 		new UI(50, 50, glm::vec3(220, 90, 0), backDropFade),
 		new UI(50, 50, glm::vec3(660, 165, 0), backDropFade),
-		new UI(50, 50, glm::vec3(660, 90, 0), backDropFade),
+		new UI(50, 50, glm::vec3(660, 90, 0), backDropFade), //4
 	};
-
+	//Final Chunck
 	ui[43]->setOpacity(0.5);
 	ui[44]->setOpacity(0.5);
 	ui[45]->setOpacity(0.5);

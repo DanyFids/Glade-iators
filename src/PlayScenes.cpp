@@ -268,7 +268,7 @@ void OnePlayer::Update(float dt)
 		}
 	}
 
-	audioEngine.Update();
+	
 	for (int c = 0; c < players.size(); c++) {
 		players[c]->Update(dt);
 		
@@ -570,16 +570,16 @@ void OnePlayer::LoadScene()
 	//{91f62782-35bd-42df-85a1-8f359308dd0c}
 
 	//// Init AudioEngine (Don't forget to shut down and update)
-	audioEngine.Init();
+	//audioEngine.Init();
 
 	//// Load a bank (Use the flag FMOD_STUDIO_LOAD_BANK_NORMAL)
-	audioEngine.LoadBank("Master", FMOD_STUDIO_LOAD_BANK_NORMAL);
-
-	//// Load an event
-	audioEngine.LoadEvent("MenuPlaceholder", "{91f62782-35bd-42df-85a1-8f359308dd0c}");
-
-	//// Play the event
-	audioEngine.PlayEvent("MenuPlaceholder");
+	//audioEngine.LoadBank("Master", FMOD_STUDIO_LOAD_BANK_NORMAL);
+	//
+	////// Load an event
+	//audioEngine.LoadEvent("MenuPlaceholder", "{91f62782-35bd-42df-85a1-8f359308dd0c}");
+	//
+	////// Play the event
+	//audioEngine.PlayEvent("MenuPlaceholder");
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Geo_pass.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
@@ -962,7 +962,7 @@ void TwoPlayer::Update(float dt)
 				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) && !players[c]->GetWeapon()->getCooldown()) {
 					if (players[p]->GetShield()->hitbox->GetType() == COLLISION_TYPE::shield) {
 						std::cout << "Blocked!\n";
-
+						audioEngine->PlayEvent("Block");
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
 						players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
 					}
@@ -972,7 +972,7 @@ void TwoPlayer::Update(float dt)
 
 					if (players[p]->hitbox->GetType() == entity) {
 						std::cout << "Hit!\n";
-
+						audioEngine->PlayEvent("Hit");
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
 						players[c]->GetWeapon()->setCooldown(true);
 					}
@@ -990,6 +990,8 @@ void TwoPlayer::Update(float dt)
 			Cam[c]->SetTarget(players[c]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f));
 		}
 	}
+
+	
 
 	//for (int a = 0; a < attacks.size(); a++)
 	//{
@@ -1039,15 +1041,40 @@ void TwoPlayer::Update(float dt)
 
 	if (players[0]->GetHP() <= 0 || players[1]->GetHP() <= 0)
 	{
+		if (players[0]->GetHP() <= 0 && winannounce == false)
+		{
+			P2wins++;
+			winannounce = true;
+			audioEngine->PlayEvent("P2 Wins");
+			
+		}
+		if (players[1]->GetHP() <= 0 && winannounce == false)
+		{
+			P1wins++;
+			winannounce = true;
+			audioEngine->PlayEvent("P1 Wins");
+		}
 		deathtimer -= dt;
 		if (deathtimer <= 0)
 		{
-			Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			RoundCount++;
+			if (P2wins >= 3 || P1wins >= 3)
+			{
+				audioEngine->PlayEvent("Glory");
+				RoundCount = 1;
+				P1wins = 0;
+				P2wins = 0;
+			}
+			Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 			//setScene(MainMenu);
 
 		}
 	}
 }
+
+int PlayScene::P2wins = 0;
+int PlayScene::P1wins = 0;
+int PlayScene::RoundCount = 1;
 
 void TwoPlayer::Draw()
 {
@@ -1151,6 +1178,31 @@ void TwoPlayer::LoadScene()
 	isMenu = false;
 	ChangingScn = false;
 
+	//audioEngine.Init();
+
+	switch (RoundCount)
+	{
+	case 1:
+		audioEngine->PlayEvent("Round 1");
+		break;
+	case 2:
+		audioEngine->PlayEvent("Round 2");
+		break;
+	case 3:
+		audioEngine->PlayEvent("Round 3");
+		break;
+	case 4:
+		audioEngine->PlayEvent("Round 4");
+		break;
+	case 5:
+		audioEngine->PlayEvent("Final Round");
+		break;
+
+	}
+
+
+
+
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
@@ -1224,6 +1276,17 @@ void TwoPlayer::LoadScene()
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, -0.6f, 0.0f });
+
+	//////////////////////////////////Audio
+	
+	
+
+
+	//audioEngine.LoadEvent("P1 Wins", "{1251a18c-193c-4301-8578-9d9329038cb4}");
+	//audioEngine.PlayEvent("P2 Wins");
+	//audioEngine.SetEventPosition("P1 Wins", players[1]->GetPosition());
+
+	/////////////////////////////////////
 
 	//terrain.push_back(new Object(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
 	//terrain.b(glm::vec3(1.2f));
@@ -1474,6 +1537,8 @@ void MainMenu::LoadScene()
 
 	MAX_MENU = 0;
 	MIN_MENU = -2;
+
+
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 

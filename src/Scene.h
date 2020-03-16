@@ -9,6 +9,7 @@
 #include "Texture.h"
 #include "Mesh.h"
 #include "Text.h"
+#include "Sound.h"
 
 class Camera;
 class Shader;
@@ -69,6 +70,13 @@ protected:
 	Material* nothingIcon = new Material("nothing.png");
 
 	TextRenderer* Textcontroller = new TextRenderer();
+
+	static int P1wins;
+	static int P2wins;
+	static int RoundCount;
+
+	static Sound* audioEngine;
+	static bool AEinit;
 
 	ButtonSelect* playerOne;
 	ButtonSelect* playerTwo;

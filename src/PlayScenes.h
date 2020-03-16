@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include <thread>
 
-#include "Sound.h"
+
 
 class Light;
 class Mesh;
@@ -57,7 +57,8 @@ class OnePlayer: public PlayScene {
 
 	Object* morphyBoi;
 	Object* staticBoi;
-	Sound audioEngine;
+
+
 
 	float time = 0.0f;
 	float MAX_TIME = 0.2f;
@@ -90,7 +91,11 @@ class TwoPlayer: public PlayScene {
 
 	Shader* sunShader;
 
+
+	//Sound audioEngine;
+
 	float deathtimer = 4;
+	bool winannounce = false;
 
 	Object* morphyBoi;
 public:
@@ -116,6 +121,7 @@ class MainMenu : public PlayScene {
 	bool displayed = false;
 public:
 	MainMenu();
+
 
 
 	

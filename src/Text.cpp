@@ -90,7 +90,7 @@ std::string TextRenderer::GenerateSuffix()
 
 	int Suffix = rand() % 50;
 
-	std::string Yeet = Suffixs[Suffix];
+	std::string Yeet = Suffixs[Suffix];      
 	return Yeet;
 }
 

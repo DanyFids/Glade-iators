@@ -727,18 +727,50 @@ bool CapsuleHitbox::HitDetect(Object* th, SphereHitbox* other, Object* oth)
 {
 	Transform t = th->GetTransform();
 	Transform oT = oth->GetTransform();
-	oT.position += oth->phys.move;
-	t.position += th->phys.move;
+
+	oT.position += oth->phys.move; //Sphere Position
+	t.position += th->phys.move; //Capsule Position
 
 	glm::vec3 tub = convertVec4(t.GetWorldTransform() * transform.GetWorldTransform() * glm::vec4(upperBound.x, upperBound.y, upperBound.z, 1.0f));
 	glm::vec3 tlb = convertVec4(t.GetWorldTransform() * transform.GetWorldTransform() * glm::vec4(lowerBound.x, lowerBound.y, lowerBound.z, 1.0f));
 
 	glm::vec3 op = convertVec4(oT.GetWorldTransform() * other->transform.GetWorldTransform() * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
-	float scalarA = (-1 * glm::dot(tlb - op, tub - tlb)) / glm::pow(glm::distance(tub, tlb), 2);
+	glm::vec3 cpa; //closest point on the line.
 
-	glm::vec3 cpa = tlb + (tub - tlb) * scalarA;
+	{
+		
 
+		glm::vec3 v = tub - tlb; //Upper - lower,  AKA p2 - p1
+		glm::vec3 w = op - tlb; // point - lower, P - p1;
+
+		float c1 = glm::dot(w,v);
+		float c2 = glm::dot(v, v);
+
+		if (c1 <= 0) {  //return lb
+			cpa = tlb;
+		}
+		else if (c2 <= c1) {  //return ub
+			cpa = tub;
+		}
+		else
+		{
+			float b = c1 / c2; // this gives some value 0 - 1 ( I assume )
+
+			glm::vec3 temp = tlb + (b * tub); //This is essentially lerp between along the line for closest point.
+			cpa = temp;
+		}
+
+	}
+
+	// ******* Depreciated as of 3/15/2020
+	//float scalarA = (-1 * glm::dot(tlb - op, tub - tlb)) / glm::pow(glm::distance(tub, tlb), 2);
+	//
+	//glm::vec3 cpa = tlb + (tub - tlb) * scalarA;
+
+
+
+	//Sphere stuff below
 	glm::vec3 dir = cpa - op;
 
 	glm::mat3 invertRotScale = glm::inverse(ConvertFromMat4(oT.GetWorldTransform() * other->transform.GetWorldTransform()));

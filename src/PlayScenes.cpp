@@ -1510,7 +1510,7 @@ void MainMenu::LoadScene()
 
 	ui = {
 		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), titleImage),
-		playerOne,
+		//playerOne,
 		//playerTwo,
 		play_Button,
 		settings_Button,
@@ -1686,7 +1686,7 @@ void CharacterC::LoadScene()
 	Material* nothing = new Material("nothing.png");
 
 	Material* swordIcon = new Material("iconSword.png");
-	Material* daggerIcon = new Material("iconDagger.png");
+	Material* hammerIcon = new Material("iconHammer.png");
 	Material* spearIcon = new Material("iconSpear.png");
 	Material* shieldIcon = new Material("iconShield.png");
 	Material* bucklerIcon = new Material("iconBuckler.png");
@@ -1708,7 +1708,7 @@ void CharacterC::LoadScene()
 	weapon2_Button = new UI(70, 70, glm::vec3(585, 155, 0), backDropMain);
 	shield2_Button = new UI(70, 70, glm::vec3(585, 80, 0), backDropMain);
 
-	ready_Button = new UI(600, 60, glm::vec3(100, 10, 0), buttonReady);
+	ready_Button = new UI(600, 60, glm::vec3(100, 10, 0), buttonReady); 
 	random1_Button = new UI(140, 60, glm::vec3(100, 235, 0), buttonRandom);
 	random2_Button = new UI(140, 60, glm::vec3(540, 235, 0), buttonRandom);
 
@@ -1728,9 +1728,9 @@ void CharacterC::LoadScene()
 	wTwo = new UI(60, 60, glm::vec3(590, 160, 0), swordIcon);
 	sTwo = new UI(50, 50, glm::vec3(595, 90, 0), shieldIcon);
 	//Side Icons
-	wOne_p1 = new UI(50, 50, glm::vec3(90, 165, 0), daggerIcon);
+	wOne_p1 = new UI(50, 50, glm::vec3(90, 165, 0), hammerIcon);
 	sOne_p1 = new UI(40, 40, glm::vec3(95, 95, 0), nothing);
-	wTwo_p1 = new UI(50, 50, glm::vec3(530, 165, 0), daggerIcon);
+	wTwo_p1 = new UI(50, 50, glm::vec3(530, 165, 0), hammerIcon);
 	sTwo_p1 = new UI(40, 40, glm::vec3(535, 95, 0), nothing);	 
 	wOne_p2 = new UI(50, 50, glm::vec3(220, 165, 0), spearIcon);
 	sOne_p2 = new UI(40, 40, glm::vec3(225, 95, 0), bucklerIcon);
@@ -1748,8 +1748,8 @@ void CharacterC::LoadScene()
 
 	ui = {
 		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background),
-		playerOne,
-		playerTwo,
+		//playerOne,
+		//playerTwo,
 
 		weapon1_Button,
 		shield1_Button,
@@ -1808,12 +1808,12 @@ void CharacterC::LoadScene()
 		new UI(50, 50, glm::vec3(660, 90, 0), backDropFade), //4
 	};
 	//Final Chunck
+	ui[41]->setOpacity(0.5);
+	ui[42]->setOpacity(0.5);
 	ui[43]->setOpacity(0.5);
 	ui[44]->setOpacity(0.5);
 	ui[45]->setOpacity(0.5);
 	ui[46]->setOpacity(0.5);
 	ui[47]->setOpacity(0.5);
 	ui[48]->setOpacity(0.5);
-	ui[49]->setOpacity(0.5);
-	ui[50]->setOpacity(0.5);
 }

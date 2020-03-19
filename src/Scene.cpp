@@ -338,37 +338,145 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		/*****************/
 		/* Menu Movement */
 		/*****************/
-			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 && menu_time[controller] <= 0 && !arrowUsed)
+			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 && menu_time[controller] <= 0 && !arrowUsed && !_Abutton[controller])
 			{
 				menuSpot[controller]--;
 				if (controller == 0) {
-					if (MAX_MENU == 0)
-						playerOne->move(0, -120);
-					else
-						playerOne->move(0, -75);
+					switch (menuSpot[controller]) {
+					case -4:
+						play_Button->ChangeTex(buttonPlayRed);
+						exit_Button->ChangeTex(buttonExit);
+						break;
+					case -1:
+						settings_Button->ChangeTex(buttonSettingsRed);
+						play_Button->ChangeTex(buttonPlay);
+						break;
+					case -2:
+						credits_Button->ChangeTex(buttonCreditsRed);
+						settings_Button->ChangeTex(buttonSettings);
+						break;
+					case -3:
+						exit_Button->ChangeTex(buttonExitRed);
+						credits_Button->ChangeTex(buttonCredits);
+						break;
+					case 6:
+						random1_Button->ChangeTex(buttonRandomRed);
+						if (menuSpot[1] == 7) {
+							ready_Button->ChangeTex(buttonReadyBlue);
+						}
+						else {
+							ready_Button->ChangeTex(buttonReady);
+						}
+						break;
+					case 9:
+						weapon1_Button->ChangeTex(backDropRed);
+						random1_Button->ChangeTex(buttonRandom);
+						break;
+					case 8:
+						shield1_Button->ChangeTex(backDropRed);
+						weapon1_Button->ChangeTex(backDropMain);
+						break;
+					case 7:
+						ready_Button->ChangeTex(buttonReadyRed);
+						shield1_Button->ChangeTex(backDropMain);
+						break;
+					}
 				}
 				else {
-					if (MAX_MENU == 0)
-						playerTwo->move(0, -120);
-					else
-						playerTwo->move(0, -75);
+					switch (menuSpot[controller]) {
+					case 6:
+						random2_Button->ChangeTex(buttonRandomBlue);
+						if (menuSpot[0] == 7) {
+							ready_Button->ChangeTex(buttonReadyRed);
+						}
+						else {
+							ready_Button->ChangeTex(buttonReady);
+						}
+						break;
+					case 9:
+						weapon2_Button->ChangeTex(backDropBlue);
+						random2_Button->ChangeTex(buttonRandom);
+						break;
+					case 8:
+						shield2_Button->ChangeTex(backDropBlue);
+						weapon2_Button->ChangeTex(backDropMain);
+						break;
+					case 7:
+						ready_Button->ChangeTex(buttonReadyBlue);
+						shield2_Button->ChangeTex(backDropMain);
+						break;
+					}
 				}
 				menu_time[controller] = MENU_TIME;
 			}
-			else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2 && menu_time[controller] <= 0 && !arrowUsed)
+			else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2 && menu_time[controller] <= 0 && !arrowUsed && !_Abutton[controller])
 			{
 				menuSpot[controller]++;
 				if (controller == 0) {
-					if (MAX_MENU == 0)
-						playerOne->move(0, 120);
-					else
-						playerOne->move(0, 75);
+					switch (menuSpot[controller]) {
+					case 0:
+						play_Button->ChangeTex(buttonPlayRed);
+						settings_Button->ChangeTex(buttonSettings);
+						break;
+					case -1:
+						settings_Button->ChangeTex(buttonSettingsRed);
+						credits_Button->ChangeTex(buttonCredits);
+						break;
+					case -2:
+						credits_Button->ChangeTex(buttonCreditsRed);
+						exit_Button->ChangeTex(buttonExit);
+						break;
+					case 1:
+						exit_Button->ChangeTex(buttonExitRed);
+						play_Button->ChangeTex(buttonPlay);
+						break;
+					case 10:
+						random1_Button->ChangeTex(buttonRandomRed);
+						weapon1_Button->ChangeTex(backDropMain);
+						break;
+					case 9:
+						weapon1_Button->ChangeTex(backDropRed);
+						shield1_Button->ChangeTex(backDropMain);
+						break;
+					case 8:
+						shield1_Button->ChangeTex(backDropRed);
+						if (menuSpot[1] == 7) {
+							ready_Button->ChangeTex(buttonReadyBlue);
+						}
+						else {
+							ready_Button->ChangeTex(buttonReady);
+						}
+						break;
+					case 11:
+						ready_Button->ChangeTex(buttonReadyRed);
+						random1_Button->ChangeTex(buttonRandom);
+						break;
+					}
 				}
 				else {
-					if (MAX_MENU == 0)
-						playerTwo->move(0, 120);
-					else
-						playerTwo->move(0, 75);
+					switch (menuSpot[controller]) {
+					case 10:
+						random2_Button->ChangeTex(buttonRandomBlue);
+						weapon2_Button->ChangeTex(backDropMain);
+						break;
+					case 9:
+						weapon2_Button->ChangeTex(backDropBlue);
+						shield2_Button->ChangeTex(backDropMain);
+						break;
+					case 8:
+						shield2_Button->ChangeTex(backDropBlue);
+						if (menuSpot[0] == 7) {
+							ready_Button->ChangeTex(buttonReadyRed);
+						}
+						else {
+							ready_Button->ChangeTex(buttonReady);
+						}
+						break;
+					case 11:
+						ready_Button->ChangeTex(buttonReadyBlue);
+						random2_Button->ChangeTex(buttonRandom);
+						break;
+					}
 				}
 				menu_time[controller] = MENU_TIME;
 			}
@@ -379,44 +487,10 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			if (menuSpot[controller] < MIN_MENU)
 			{
 				menuSpot[controller] = MAX_MENU;
-				if (MAX_MENU == 10) {
-					if (!ChangingScn) {
-						if (controller == 0) {
-							playerOne->move(0, 300);
-						}
-						else {
-							playerTwo->move(0, -300);
-						}
-					}
-				}
-				else {
-					if (!ChangingScn) {
-						if (controller == 0) {
-							playerOne->move(0, 480);
-						}
-					}
-				}
 			}
 			else if (menuSpot[controller] > MAX_MENU)
 			{
 				menuSpot[controller] = MIN_MENU;
-				if (MAX_MENU == 10) {
-					if (!ChangingScn) {
-						if (controller == 0) {
-							playerOne->move(0, -300);
-						}
-						else {
-							playerTwo->move(0, -300);
-						}
-					}
-				}
-				else {
-					if (!ChangingScn) {
-						if (controller == 0) {
-							playerOne->move(0, -480);
-						}
-					}
-				}
 			}
 
 			/**********************/
@@ -428,9 +502,9 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				menu_time[controller] = MENU_TIME;
 			}
 
-			/************/
+			/************/ 
 			/* Player 1 */
-			/************/
+			/************/ 
 			if (controller == 0) {
 				switch (menuSpot[controller]) {
 				case 10:
@@ -439,7 +513,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						random1_Button->ChangeTex(buttonRandom2);
 					}
 					else if (menu_time[controller] <= 0) {
-						random1_Button->ChangeTex(buttonRandom);
+						random1_Button->ChangeTex(buttonRandomRed);
 					}
 					break;
 				case 9:
@@ -454,11 +528,11 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						}
 					}
 					//Swords
-					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
+					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) { 
 						weapon[controller]--;
 						changeW[controller] = true;
 						arrowUsed = true;
-						rightArrow = false;
+						rightArrow = false; 
 						arrow_Button1->ChangeTex(arrow2);
 						menu_time[controller] = MENU_TIME;
 					}
@@ -506,7 +580,12 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						ready_Button->ChangeTex(buttonReady2);
 					}
 					else if (menu_time[controller] <= 0) {
-						ready_Button->ChangeTex(buttonReady);
+						if (menuSpot[1] == 7) {
+							ready_Button->ChangeTex(buttonReadyPurple);
+						}
+						else {
+							ready_Button->ChangeTex(buttonReadyRed);
+						}
 					}
 					break;
 				case 0:
@@ -515,7 +594,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						play_Button->ChangeTex(buttonPlay2);
 					}
 					else if (menu_time[controller] <= 0) {
-						play_Button->ChangeTex(buttonPlay);
+						play_Button->ChangeTex(buttonPlayRed);
 					}
 					break;
 				case -1:
@@ -524,7 +603,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						settings_Button->ChangeTex(buttonSettings2);
 					}
 					else if (menu_time[controller] <= 0) {
-						settings_Button->ChangeTex(buttonSettings);
+						settings_Button->ChangeTex(buttonSettingsRed);
 					}
 					break;
 				case -2:
@@ -533,7 +612,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						credits_Button->ChangeTex(buttonCredits2);
 					}
 					else if (menu_time[controller] <= 0) {
-						credits_Button->ChangeTex(buttonCredits);
+						credits_Button->ChangeTex(buttonCreditsRed);
 					}
 					break;
 				case -3:
@@ -542,7 +621,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						exit_Button->ChangeTex(buttonExit2);
 					}
 					else if (menu_time[controller] <= 0) {
-						exit_Button->ChangeTex(buttonExit);
+						exit_Button->ChangeTex(buttonExitRed);
 					}
 					break;
 				}
@@ -562,7 +641,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					switch (weapon[controller]) {
 					case 0:
 						wOne->ChangeTex(swordIcon);
-						wOne_p1->ChangeTex(daggerIcon);
+						wOne_p1->ChangeTex(hammerIcon);
 						wOne_p2->ChangeTex(spearIcon);
 						WeaponName[controller] = "Sword";
 						changeW[controller] = false;
@@ -577,24 +656,24 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					case 2:
 						wOne->ChangeTex(hammerIcon);
 						wOne_p1->ChangeTex(spearIcon);
-						wOne_p2->ChangeTex(tridentIcon);
+						wOne_p2->ChangeTex(swordIcon);
 						WeaponName[controller] = "Maul";
 						changeW[controller] = false;
 						break;
-					case 3:
-						wOne->ChangeTex(tridentIcon);
-						wOne_p1->ChangeTex(hammerIcon);
-						wOne_p2->ChangeTex(daggerIcon);
-						WeaponName[controller] = "Trident";
-						changeW[controller] = false;
-						break;
-					case 4:
-						wOne->ChangeTex(daggerIcon);
-						wOne_p1->ChangeTex(tridentIcon);
-						wOne_p2->ChangeTex(swordIcon);
-						WeaponName[controller] = "Dagger";
-						changeW[controller] = false;
-						break;
+				//	case 3:
+				//		wOne->ChangeTex(tridentIcon);
+				//		wOne_p1->ChangeTex(hammerIcon);
+				//		wOne_p2->ChangeTex(daggerIcon);
+				//		WeaponName[controller] = "Trident";
+				//		changeW[controller] = false;
+				//		break;
+				//	case 4:
+				//		wOne->ChangeTex(daggerIcon);
+				//		wOne_p1->ChangeTex(tridentIcon);
+				//		wOne_p2->ChangeTex(swordIcon);
+				//		WeaponName[controller] = "Dagger";
+				//		changeW[controller] = false;
+				//		break;
 					}
 				}
 				if (changeS[controller]) {
@@ -635,7 +714,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						random2_Button->ChangeTex(buttonRandom2);
 					}
 					else if (menu_time[controller] <= 0) {
-						random2_Button->ChangeTex(buttonRandom);
+						random2_Button->ChangeTex(buttonRandomBlue);
 					}
 					break;
 				case 9:
@@ -702,7 +781,12 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						ready_Button->ChangeTex(buttonReady2);
 					}
 					else if (menu_time[controller] <= 0) {
-						ready_Button->ChangeTex(buttonReady);
+						if (menuSpot[0] == 7) {
+							ready_Button->ChangeTex(buttonReadyPurple);
+						}
+						else {
+							ready_Button->ChangeTex(buttonReadyBlue);
+						}
 					}
 					break;
 				}
@@ -722,7 +806,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					switch (weapon[controller]) {
 					case 0:
 						wTwo->ChangeTex(swordIcon);
-						wTwo_p1->ChangeTex(daggerIcon);
+						wTwo_p1->ChangeTex(hammerIcon);
 						wTwo_p2->ChangeTex(spearIcon);
 						WeaponName[controller] = "Sword";
 						changeW[controller] = false;
@@ -737,24 +821,27 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					case 2:
 						wTwo->ChangeTex(hammerIcon);
 						wTwo_p1->ChangeTex(spearIcon);
-						wTwo_p2->ChangeTex(tridentIcon);
+						wTwo_p2->ChangeTex(swordIcon);
 						WeaponName[controller] = "Maul";
 						changeW[controller] = false;
 						break;
-					case 3:
-						wTwo->ChangeTex(tridentIcon);
-						wTwo_p1->ChangeTex(hammerIcon);
-						wTwo_p2->ChangeTex(daggerIcon);
-						WeaponName[controller] = "Trident";
-						changeW[controller] = false;
-						break;
-					case 4:
-						wTwo->ChangeTex(daggerIcon);
-						wTwo_p1->ChangeTex(tridentIcon);
-						wTwo_p2->ChangeTex(swordIcon);
-						WeaponName[controller] = "Dagger";
-						changeW[controller] = false;
-						break;
+						/***************************/
+						/* Will Re-add later maybe */
+						/***************************/
+					//case 3:
+					//	wTwo->ChangeTex(tridentIcon);
+					//	wTwo_p1->ChangeTex(hammerIcon);
+					//	wTwo_p2->ChangeTex(daggerIcon);
+					//	WeaponName[controller] = "Trident";
+					//	changeW[controller] = false;
+					//	break;
+					//case 4:
+					//	wTwo->ChangeTex(daggerIcon);
+					//	wTwo_p1->ChangeTex(tridentIcon);
+					//	wTwo_p2->ChangeTex(swordIcon);
+					//	WeaponName[controller] = "Dagger";
+					//	changeW[controller] = false;
+					//	break;
 					}
 				}
 				if (changeS[controller]) {
@@ -809,20 +896,29 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				}
 				else if (menuSpot[controller] == 10) {
 					//Randomize
+					changeW[controller] = true;
+					changeS[controller] = true;
+					weapon[controller] = (int)rand() % 2;
+					shield[controller] = (int)rand() % 2;
 				}
-				else if (menuSpot[0] == 0) {
-					//Character Scene
-					ChangingScn = true;
-					isMenu = false;
-					Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
-				}
-				else if (menuSpot[0] == -1) {
-					//Settings
-				}
-				else if (menuSpot[0] == -3) {
-					//Exit
-					//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
-					glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
+				else if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && _Abutton[0]) {
+					if (menuSpot[0] == 0) {
+						//Character Scene
+						ChangingScn = true;
+						isMenu = false;
+						Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
+					}
+					else if (menuSpot[0] == -1) {
+						//Settings
+					}
+					else if (menuSpot[0] == -2) {
+						//Credits
+					}
+					else if (menuSpot[0] == -3) {
+						//Exit
+						//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
+						glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
+					}
 				}
 				menu_time[controller] = MENU_TIME;
 			}

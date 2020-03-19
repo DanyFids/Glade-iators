@@ -782,9 +782,9 @@ bool CapsuleHitbox::HitDetect(Object* th, SphereHitbox* other, Object* oth)
 		glm::pow(neutDir.z * other->transform.scale.z, 2));
 
 	float max_dist = or + radius;
-	float currentDist = glm::length(cpa, op);
+	float currentDist = glm::distance(cpa, op);
 
-	if (glm::distance(cpa, op) <= max_dist)
+	if (currentDist <= max_dist)
 		return true;
 	else
 		return false;

@@ -8,7 +8,7 @@
 struct Transform;
 
 class CubeHitbox;
-class SphereHitbox;
+class SphereHitbox;  
 class CapsuleHitbox;
 
 class Hitbox {

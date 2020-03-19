@@ -49,7 +49,7 @@ protected:
 	float menu_time[2];
 	bool _Abutton[2]{ false, false };
 	bool _Bbutton[2]{ false, false };
-	const int MAX_W = 4;
+	const int MAX_W = 2;
 	const int MIN_W = 0;
 	const int MAX_S = 2;
 	const int MIN_S = 0;
@@ -72,12 +72,25 @@ protected:
 	Material* buttonExit2 = new Material("exitButton2.png");
 	Material* buttonCredits2 = new Material("creditsButton2.png");
 
+	Material* buttonPlayRed = new Material("playButtonRed.png");
+	Material* buttonSettingsRed = new Material("settingsButtonRed.png");
+	Material* buttonExitRed = new Material("exitButtonRed.png");
+	Material* buttonCreditsRed = new Material("creditsButtonRed.png");
+
 	//CHARACTER MENU
 	Material* buttonReady = new Material("readyButton.png");
 	Material* buttonRandom = new Material("randomButton.png");
 	Material* buttonReady2 = new Material("readyButton2.png");
 	Material* buttonRandom2 = new Material("randomButton2.png");
 	Material* backDropMain = new Material("backdrop2.png");
+
+	Material* buttonReadyRed = new Material("readyButtonRed.png");
+	Material* buttonReadyBlue = new Material("readyButtonBlue.png");
+	Material* buttonReadyPurple = new Material("readyButtonPurple.png");
+	Material* buttonRandomRed = new Material("randomButtonRed.png");
+	Material* backDropRed = new Material("backdrop2Red.png");
+	Material* buttonRandomBlue = new Material("randomButtonBlue.png");
+	Material* backDropBlue = new Material("backdrop2Blue.png");
 
 	Material* arrow = new Material("arrow.png");
 	Material* arrowBack = new Material("arrow (1).png");

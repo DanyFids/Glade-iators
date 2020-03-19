@@ -589,6 +589,7 @@ Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<st
 
 	parent_joint = p;
 	parent_Mesh = m;
+	
 }
 
 std::string Weapon::GetAtkAnim(unsigned int c_id)

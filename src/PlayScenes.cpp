@@ -959,13 +959,19 @@ void TwoPlayer::Update(float dt)
 				}
 
 				//problem -> weapon hitdetect is not seeing the shield
-				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) && !players[c]->GetWeapon()->getCooldown()) {
-					if (players[p]->GetShield()->hitbox->GetType() == COLLISION_TYPE::shield) {
-						std::cout << "Blocked!\n";
+				if (players[p]->GetShield() != nullptr) {
+					if (players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) ) { // players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield() && players[c]->GetWeapon()->getCooldown() == false)
+							std::cout << "Blocked!\n";
 
-						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
-						players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+							players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
+							players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+						
 					}
+				}
+				else
+				{
+
+					//Weapon blocking
 				}
 
 				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
@@ -1104,8 +1110,8 @@ void TwoPlayer::Draw()
 		glDisable(GL_DEPTH_TEST);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		
-		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
 		
 		weapons[0]->hitbox->Draw(shaderObj, weapons[0]->getParentTransform());
 		weapons[1]->hitbox->Draw(shaderObj, weapons[1]->getParentTransform());
@@ -1213,8 +1219,8 @@ void TwoPlayer::LoadScene()
 
 	//Capsule testing ********* PLAYER HITBOXES
 
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.3f, 5.2f, entity); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.3f, 5.2f, entity);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.25f, 5.2f, entity); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.25f, 5.2f, entity);
 
 	players.push_back(new Player(P1_MESH, defaultTex, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
 	players[PLAYER_1]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
@@ -1299,6 +1305,8 @@ void TwoPlayer::LoadScene()
 
 	players[PLAYER_1]->SetShield(P1_shield);
 	players[PLAYER_2]->SetShield(P2_shield);
+
+	///////////////////////////////////////////
 
 	players[PLAYER_1]->addChild(Hurt_Sword);
 	players[PLAYER_1]->addChild(P1_shield);

@@ -757,7 +757,7 @@ bool CapsuleHitbox::HitDetect(Object* th, SphereHitbox* other, Object* oth)
 		{
 			float b = c1 / c2; // this gives some value 0 - 1 ( I assume )
 
-			glm::vec3 temp = tlb + (b * tub); //This is essentially lerp between along the line for closest point.
+			glm::vec3 temp = tlb + (b * tub); //This is essentially lerp along the line for closest point.
 			cpa = temp;
 		}
 
@@ -782,6 +782,7 @@ bool CapsuleHitbox::HitDetect(Object* th, SphereHitbox* other, Object* oth)
 		glm::pow(neutDir.z * other->transform.scale.z, 2));
 
 	float max_dist = or + radius;
+	float currentDist = glm::length(cpa, op);
 
 	if (glm::distance(cpa, op) <= max_dist)
 		return true;

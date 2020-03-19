@@ -96,12 +96,12 @@ protected:
 
 	TextRenderer* Textcontroller = new TextRenderer();
 
-	//static int P1wins;
-	//static int P2wins;
-	//static int RoundCount;
-	//
-	//static Sound* audioEngine;
-	//static bool AEinit;
+	static int P1wins;
+	static int P2wins;
+	static int RoundCount;
+	
+	static Sound* audioEngine;
+	static bool AEinit;
 	//
 	//ButtonSelect* playerOne;
 	//ButtonSelect* playerTwo;

@@ -1,4 +1,5 @@
-#version 440
+#version 330
+#extension GL_ARB_separate_shader_objects : enable
 uniform bool  isHorizontal;
 const float weights[9] = float[](0.000088	,0.002289,	0.023205,	0.092566,	0.146634,	0.092566,	0.023205,	0.002289,	0.000088);
 

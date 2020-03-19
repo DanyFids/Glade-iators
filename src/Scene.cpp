@@ -10,6 +10,7 @@
 #include "Game.h"
 #include "Skeleton.h"
 #include "Shader.h"
+#include "Lerp.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -71,72 +72,72 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 		m += glm::vec3(1.0f, 0.0f, 0.0f);
 	
-	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS && CgradeIDown[0] == false)
-	{
-		if (CgradeI == 1)
-		{
-			CgradeI = 0;
-		}
-		else
-			CgradeI = 1;
-
-	}
-	if (glfwGetKey(window, GLFW_KEY_8) != GLFW_PRESS)
-	{
-		CgradeIDown[0] == false;
-	}
-	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS && CgradeIDown[1] == false)
-	{								
-		if (CgradeI == 2)
-		{
-			CgradeI = 0;
-		}
-		else
-			CgradeI = 2;
-	}								
-	if (glfwGetKey(window, GLFW_KEY_9) != GLFW_PRESS)
-	{
-		CgradeIDown[1] == false;
-	}
-	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS && CgradeIDown[2] == false)
-	{
-		if (CgradeI == 3)
-		{
-			CgradeI = 0;
-		}
-		else
-			CgradeI = 3;
-	}
-	if (glfwGetKey(window, GLFW_KEY_0) != GLFW_PRESS)
-	{
-		CgradeIDown[2] = false;
-	}
-	if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
-	{
-		//attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));
-		//glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
-		//p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
-		//p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));
-		//p1.y = players[0]->GetPosition().y;
-		//attacks.back()->SetPosition(p1);
-		//attacks.back()->ABox->SetPosition(glm::vec3(0,2,4));
-	}
-	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && dodge1 == false)
-	{
-		players[player]->phys.move = m * (PLAYER_SPEED * 2) * dt;
-		dodge1 = false;
-		dodge1t = 3;
-	}
-	else if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f)
-	{
-		players[player]->phys.move = m * PLAYER_SPEED * dt;
-	}
-		
-	if (dodge1t <= 0)
-	{
-		dodge1 = true;
-	}
-
+	//if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS && CgradeIDown[0] == false)
+	//{
+	//	if (CgradeI == 1)
+	//	{
+	//		CgradeI = 0;
+	//	}
+	//	else
+	//		CgradeI = 1;
+	//
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_8) != GLFW_PRESS)
+	//{
+	//	CgradeIDown[0] == false;
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS && CgradeIDown[1] == false)
+	//{								
+	//	if (CgradeI == 2)
+	//	{
+	//		CgradeI = 0;
+	//	}
+	//	else
+	//		CgradeI = 2;
+	//}								
+	//if (glfwGetKey(window, GLFW_KEY_9) != GLFW_PRESS)
+	//{
+	//	CgradeIDown[1] == false;
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS && CgradeIDown[2] == false)
+	//{
+	//	if (CgradeI == 3)
+	//	{
+	//		CgradeI = 0;
+	//	}
+	//	else
+	//		CgradeI = 3;
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_0) != GLFW_PRESS)
+	//{
+	//	CgradeIDown[2] = false;
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+	//{
+	//	//attacks.push_back(new Attack(Amesh, Amat, basicCubeHB, glm::vec3(0,0,0), player));
+	//	//glm::vec3 p1 = glm::vec3(0.0f, 0.0f, 0.0f);
+	//	//p1.x += 2 * cos(glm::radians((players[0]->GetTransform().rotation.y)));
+	//	//p1.z += 2 * -sin(glm::radians((players[0]->GetTransform().rotation.y)));
+	//	//p1.y = players[0]->GetPosition().y;
+	//	//attacks.back()->SetPosition(p1);
+	//	//attacks.back()->ABox->SetPosition(glm::vec3(0,2,4));
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && dodge1 == false)
+	//{
+	//	players[player]->phys.move = m * (PLAYER_SPEED * 2) * dt;
+	//	dodge1 = false;
+	//	dodge1t = 3;
+	//}
+	//else if (m.x != 0.0f || m.y != 0.0f || m.z != 0.0f)
+	//{
+	//	players[player]->phys.move = m * PLAYER_SPEED * dt;
+	//}
+	//	
+	//if (dodge1t <= 0)
+	//{
+	//	dodge1 = true;
+	//}
+	//
 
 	glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -193,20 +194,34 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 	if (glfwGetGamepadState(controller, &state)) {
 		if (isMenu != true && !ChangingScn) {
 			glm::vec2 rot = glm::vec2(0.0f, 0.0f);
-			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] < -0.2) {
-				rot.y = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
-			}
-			else {
-				rot.y = 0.0f;
-			}
-			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] < -0.2) {
-				rot.x = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
-			}
-			else {
-				rot.x = 0.0f;
-			}
 
-			Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
+			glm::vec3 player_head = players[player]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f);
+			if (!players[player]->GetCamLock()) {
+				Cam[player]->SetPosition(player_head);
+				if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] < -0.2) {
+					rot.y = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
+				}
+				else {
+					rot.y = 0.0f;
+				}
+				if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] < -0.2) {
+					rot.x = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
+				}
+				else {
+					rot.x = 0.0f;
+				}
+
+				Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
+			}
+			else {
+				unsigned int other = (player == PLAYER_1) ? PLAYER_2 : PLAYER_1;
+
+				glm::vec3 dir = glm::normalize(player_head - players[other]->GetPosition());
+				glm::vec3 mid = lerp(players[player]->GetPosition(), players[other]->GetPosition(), 0.5f) + glm::vec3(0.0f, 1.5f, 0.0f);
+
+				Cam[player]->SetPosition(player_head + (dir * Cam[player]->GetRadius()));
+				Cam[player]->SetTarget(mid);
+			}
 
 			glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
 			glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -217,11 +232,13 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 			if (glm::length(axisPos) > dead_zone)
 			{
-				t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-				//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-				t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+				if (players[player]->GetFrameState() == FrameStates::Neutral || players[player]->GetFrameState() == FrameStates::Block) {
+					t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+					//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+					t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
+				}
 				//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-				if (players[player]->GetState() != PLAYER_STATE::walking && !players[player]->IsLocked()) {
+				if (players[player]->GetState() != PLAYER_STATE::walking && players[player]->GetFrameState() == FrameStates::Neutral && !players[player]->IsLocked()) {
 					players[player]->PlayAnim("walk", 0, glm::length(axisPos));
 					//players[player]->PlayAnim("idle", 1, 1.0f - glm::length(axisPos));
 					players[player]->SetState(walking);
@@ -257,7 +274,16 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				((Player*)players[player])->StopRun();
 			}
 
-			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] > 0.2)
+			static bool r_stick_down = false;
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && !r_stick_down) {
+				players[player]->ToggleCamLock();
+				r_stick_down = true;
+			}
+			else if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_RELEASE) {
+				r_stick_down = false;
+			}
+
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS)
 			{
 				if (players[player]->GetStam() >= 15.0f) {
 
@@ -269,13 +295,13 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 					//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
 
-					std::cout << "OOF\n";
+					//std::cout << "OOF\n";
 					//players[player]->dmgSTAM(15.0f);
 					players[player]->Attack();
 					atk1 = true;
 				}
 			}
-			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER] < 0.2)
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_RELEASE)
 			{
 				atk1 = false;
 			}
@@ -341,35 +367,35 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 		/*****************/
 		/* Menu Movement */
 		/*****************/
-			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 && menu_time[controller] <= 0)
+			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 && menu_time[controller] <= 0 && !arrowUsed)
 			{
 				menuSpot[controller]--;
 				if (controller == 0) {
 					if (MAX_MENU == 0)
-						playerOne->move(0, -100);
+						playerOne->move(0, -120);
 					else
 						playerOne->move(0, -75);
 				}
 				else {
 					if (MAX_MENU == 0)
-						playerTwo->move(0, -100);
+						playerTwo->move(0, -120);
 					else
 						playerTwo->move(0, -75);
 				}
 				menu_time[controller] = MENU_TIME;
 			}
-			else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2 && menu_time[controller] <= 0)
+			else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2 && menu_time[controller] <= 0 && !arrowUsed)
 			{
 				menuSpot[controller]++;
 				if (controller == 0) {
 					if (MAX_MENU == 0)
-						playerOne->move(0, 100);
+						playerOne->move(0, 120);
 					else
 						playerOne->move(0, 75);
 				}
 				else {
 					if (MAX_MENU == 0)
-						playerTwo->move(0, 100);
+						playerTwo->move(0, 120);
 					else
 						playerTwo->move(0, 75);
 				}
@@ -382,24 +408,42 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			if (menuSpot[controller] < MIN_MENU)
 			{
 				menuSpot[controller] = MAX_MENU;
-				if (!ChangingScn) {
-					if (controller == 0) {
-						playerOne->move(0, 300);
+				if (MAX_MENU == 10) {
+					if (!ChangingScn) {
+						if (controller == 0) {
+							playerOne->move(0, 300);
+						}
+						else {
+							playerTwo->move(0, -300);
+						}
 					}
-					else {
-						playerTwo->move(0, 300);
+				}
+				else {
+					if (!ChangingScn) {
+						if (controller == 0) {
+							playerOne->move(0, 480);
+						}
 					}
 				}
 			}
 			else if (menuSpot[controller] > MAX_MENU)
 			{
 				menuSpot[controller] = MIN_MENU;
-				if (!ChangingScn) {
-					if (controller == 0) {
-						playerOne->move(0, -300);
+				if (MAX_MENU == 10) {
+					if (!ChangingScn) {
+						if (controller == 0) {
+							playerOne->move(0, -300);
+						}
+						else {
+							playerTwo->move(0, -300);
+						}
 					}
-					else {
-						playerTwo->move(0, -300);
+				}
+				else {
+					if (!ChangingScn) {
+						if (controller == 0) {
+							playerOne->move(0, -480);
+						}
 					}
 				}
 			}
@@ -408,6 +452,10 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			/* Anthony, Edit Here */
 			/**********************/
 
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
+				_Abutton[controller] = true;
+				menu_time[controller] = MENU_TIME;
+			}
 
 			/************/
 			/* Player 1 */
@@ -416,44 +464,115 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				switch (menuSpot[controller]) {
 				case 10:
 					//Random Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						random1_Button->ChangeTex(buttonRandom2);
+					}
+					else if (menu_time[controller] <= 0) {
+						random1_Button->ChangeTex(buttonRandom);
+					}
 					break;
 				case 9:
+					if (menu_time[controller] <= 0 && arrowUsed) {
+						if (rightArrow) {
+							arrowUsed = false;
+							arrow_Button3->ChangeTex(arrowBack);
+						}
+						else {
+							arrowUsed = false;
+							arrow_Button1->ChangeTex(arrow);
+						}
+					}
 					//Swords
 					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
 						weapon[controller]--;
 						changeW[controller] = true;
+						arrowUsed = true;
+						rightArrow = false;
+						arrow_Button1->ChangeTex(arrow2);
 						menu_time[controller] = MENU_TIME;
 					}
 					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
 						weapon[controller]++;
 						changeW[controller] = true;
+						arrowUsed = true;
+						rightArrow = true;
+						arrow_Button3->ChangeTex(arrowBack2);
 						menu_time[controller] = MENU_TIME;
 					}
 					break;
 				case 8:
+					if (menu_time[controller] <= 0 && arrowUsed) {
+						if (rightArrow) {
+							arrowUsed = false;
+							arrow_Button4->ChangeTex(arrowBack);
+						}
+						else {
+							arrowUsed = false;
+							arrow_Button2->ChangeTex(arrow);
+						}
+					}
 					//Shields
 					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
 						shield[controller]--;
 						changeS[controller] = true;
+						arrowUsed = true;
+						rightArrow = false;
+						arrow_Button2->ChangeTex(arrow2);
 						menu_time[controller] = MENU_TIME;
 					}
 					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
 						shield[controller]++;
 						changeS[controller] = true;
+						arrowUsed = true;
+						rightArrow = true;
+						arrow_Button4->ChangeTex(arrowBack2);
 						menu_time[controller] = MENU_TIME;
 					}
 					break;
 				case 7:
 					//Ready Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						ready_Button->ChangeTex(buttonReady2);
+					}
+					else if (menu_time[controller] <= 0) {
+						ready_Button->ChangeTex(buttonReady);
+					}
 					break;
 				case 0:
 					//Play Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						play_Button->ChangeTex(buttonPlay2);
+					}
+					else if (menu_time[controller] <= 0) {
+						play_Button->ChangeTex(buttonPlay);
+					}
 					break;
 				case -1:
 					//Settings Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						settings_Button->ChangeTex(buttonSettings2);
+					}
+					else if (menu_time[controller] <= 0) {
+						settings_Button->ChangeTex(buttonSettings);
+					}
 					break;
 				case -2:
+					//Credits Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						credits_Button->ChangeTex(buttonCredits2);
+					}
+					else if (menu_time[controller] <= 0) {
+						credits_Button->ChangeTex(buttonCredits);
+					}
+					break;
+				case -3:
 					//Exit Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						exit_Button->ChangeTex(buttonExit2);
+					}
+					else if (menu_time[controller] <= 0) {
+						exit_Button->ChangeTex(buttonExit);
+					}
 					break;
 				}
 				//std::cout << weapon[0] << std::endl;
@@ -474,30 +593,35 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						wOne->ChangeTex(swordIcon);
 						wOne_p1->ChangeTex(daggerIcon);
 						wOne_p2->ChangeTex(spearIcon);
+						WeaponName[controller] = "Sword";
 						changeW[controller] = false;
 						break;
 					case 1:
 						wOne->ChangeTex(spearIcon);
 						wOne_p1->ChangeTex(swordIcon);
 						wOne_p2->ChangeTex(hammerIcon);
+						WeaponName[controller] = "Spear";
 						changeW[controller] = false;
 						break;
 					case 2:
 						wOne->ChangeTex(hammerIcon);
 						wOne_p1->ChangeTex(spearIcon);
 						wOne_p2->ChangeTex(tridentIcon);
+						WeaponName[controller] = "Maul";
 						changeW[controller] = false;
 						break;
 					case 3:
 						wOne->ChangeTex(tridentIcon);
 						wOne_p1->ChangeTex(hammerIcon);
 						wOne_p2->ChangeTex(daggerIcon);
+						WeaponName[controller] = "Trident";
 						changeW[controller] = false;
 						break;
 					case 4:
 						wOne->ChangeTex(daggerIcon);
 						wOne_p1->ChangeTex(tridentIcon);
 						wOne_p2->ChangeTex(swordIcon);
+						WeaponName[controller] = "Dagger";
 						changeW[controller] = false;
 						break;
 					}
@@ -508,18 +632,21 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						sOne->ChangeTex(shieldIcon);
 						sOne_p1->ChangeTex(nothingIcon);
 						sOne_p2->ChangeTex(bucklerIcon);
+						ShieldName[controller] = "Shield";
 						changeS[controller] = false;
 						break;
 					case 1:
 						sOne->ChangeTex(bucklerIcon);
 						sOne_p1->ChangeTex(shieldIcon);
 						sOne_p2->ChangeTex(nothingIcon);
+						ShieldName[controller] = "Buckler";
 						changeS[controller] = false;
 						break;
 					case 2:
 						sOne->ChangeTex(nothingIcon);
 						sOne_p1->ChangeTex(bucklerIcon);
 						sOne_p2->ChangeTex(shieldIcon);
+						ShieldName[controller] = "No Shield";
 						changeS[controller] = false;
 						break;
 					}
@@ -533,44 +660,79 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				switch (menuSpot[controller]) {
 				case 10:
 					//Random Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						random2_Button->ChangeTex(buttonRandom2);
+					}
+					else if (menu_time[controller] <= 0) {
+						random2_Button->ChangeTex(buttonRandom);
+					}
 					break;
 				case 9:
+					if (menu_time[controller] <= 0 && arrowUsed) {
+						if (rightArrow) {
+							arrowUsed = false;
+							arrow_Button7->ChangeTex(arrowBack);
+						}
+						else {
+							arrowUsed = false;
+							arrow_Button5->ChangeTex(arrow);
+						}
+					}
 					//Swords
 					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
 						weapon[controller]--;
 						changeW[controller] = true;
+						arrowUsed = true;
+						rightArrow = false;
+						arrow_Button5->ChangeTex(arrow2);
 						menu_time[controller] = MENU_TIME;
 					}
 					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
 						weapon[controller]++;
 						changeW[controller] = true;
+						arrowUsed = true;
+						rightArrow = true;
+						arrow_Button7->ChangeTex(arrowBack2);
 						menu_time[controller] = MENU_TIME;
 					}
 					break;
 				case 8:
+					if (menu_time[controller] <= 0 && arrowUsed) {
+						if (rightArrow) {
+							arrowUsed = false;
+							arrow_Button8->ChangeTex(arrowBack);
+						}
+						else {
+							arrowUsed = false;
+							arrow_Button6->ChangeTex(arrow);
+						}
+					}
 					//Shields
 					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
 						shield[controller]--;
 						changeS[controller] = true;
+						arrowUsed = true;
+						rightArrow = false;
+						arrow_Button6->ChangeTex(arrow2);
 						menu_time[controller] = MENU_TIME;
 					}
 					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
 						shield[controller]++;
 						changeS[controller] = true;
+						arrowUsed = true;
+						rightArrow = true;
+						arrow_Button8->ChangeTex(arrowBack2);
 						menu_time[controller] = MENU_TIME;
 					}
 					break;
 				case 7:
 					//Ready Button
-					break;
-				case 0:
-					//Play Button
-					break;
-				case -1:
-					//Settings Button
-					break;
-				case -2:
-					//Exit Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						ready_Button->ChangeTex(buttonReady2);
+					}
+					else if (menu_time[controller] <= 0) {
+						ready_Button->ChangeTex(buttonReady);
+					}
 					break;
 				}
 
@@ -591,30 +753,35 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						wTwo->ChangeTex(swordIcon);
 						wTwo_p1->ChangeTex(daggerIcon);
 						wTwo_p2->ChangeTex(spearIcon);
+						WeaponName[controller] = "Sword";
 						changeW[controller] = false;
 						break;
 					case 1:
 						wTwo->ChangeTex(spearIcon);
 						wTwo_p1->ChangeTex(swordIcon);
 						wTwo_p2->ChangeTex(hammerIcon);
+						WeaponName[controller] = "Spear";
 						changeW[controller] = false;
 						break;
 					case 2:
 						wTwo->ChangeTex(hammerIcon);
 						wTwo_p1->ChangeTex(spearIcon);
 						wTwo_p2->ChangeTex(tridentIcon);
+						WeaponName[controller] = "Maul";
 						changeW[controller] = false;
 						break;
 					case 3:
 						wTwo->ChangeTex(tridentIcon);
 						wTwo_p1->ChangeTex(hammerIcon);
 						wTwo_p2->ChangeTex(daggerIcon);
+						WeaponName[controller] = "Trident";
 						changeW[controller] = false;
 						break;
 					case 4:
 						wTwo->ChangeTex(daggerIcon);
 						wTwo_p1->ChangeTex(tridentIcon);
 						wTwo_p2->ChangeTex(swordIcon);
+						WeaponName[controller] = "Dagger";
 						changeW[controller] = false;
 						break;
 					}
@@ -625,18 +792,21 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						sTwo->ChangeTex(shieldIcon);
 						sTwo_p1->ChangeTex(nothingIcon);
 						sTwo_p2->ChangeTex(bucklerIcon);
+						ShieldName[controller] = "Shield";
 						changeS[controller] = false;
 						break;
 					case 1:
 						sTwo->ChangeTex(bucklerIcon);
 						sTwo_p1->ChangeTex(shieldIcon);
 						sTwo_p2->ChangeTex(nothingIcon);
+						ShieldName[controller] = "Buckler";
 						changeS[controller] = false;
 						break;
 					case 2:
 						sTwo->ChangeTex(nothingIcon);
 						sTwo_p1->ChangeTex(bucklerIcon);
 						sTwo_p2->ChangeTex(shieldIcon);
+						ShieldName[controller] = "No Shield";
 						changeS[controller] = false;
 						break;
 					}
@@ -648,9 +818,6 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			/*         &         */
 			/*  Scene Selection  */
 			/*********************/
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
-				_Abutton[controller] = true;
-			}
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
 				_Bbutton[controller] = true;
 			}
@@ -681,7 +848,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				else if (menuSpot[0] == -1) {
 					//Settings
 				}
-				else if (menuSpot[0] == -2) {
+				else if (menuSpot[0] == -3) {
 					//Exit
 					//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
 					glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);

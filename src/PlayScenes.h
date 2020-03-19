@@ -132,6 +132,31 @@ public:
 	virtual void LoadScene() override;
 };
 
+class Credits : public PlayScene {
+	Shader* shaderObj;
+	Shader* depthShader;
+	Shader* morphShader;
+	Shader* sunShader;
+	Shader* skelDepth;
+	UI* spaget;
+
+	const float MAX_TIME = 3.0f;
+	float menu_time = MAX_TIME;
+
+	bool displayed = false;
+public:
+	Credits();
+
+
+
+
+	// Inherited via Scene
+	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
+	virtual void Update(float dt) override;
+	virtual void Draw() override;
+	virtual void LoadScene() override;
+};
+
 class CharacterC : public PlayScene {
 	Shader* shaderObj;
 	Shader* depthShader;

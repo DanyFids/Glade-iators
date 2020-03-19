@@ -1849,3 +1849,81 @@ void CharacterC::LoadScene()
 	ui[31]->Resize(180, 280);
 	ui[32]->Resize(180, 280);
 }
+
+Credits::Credits()
+{
+	LoadScene();
+}
+
+void Credits::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
+{
+	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
+		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_2, dt);
+		}
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
+		}
+	}
+	else {
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_1, dt);
+		}
+
+	}
+}
+
+void Credits::Update(float dt)
+{
+}
+
+void Credits::Draw()
+{
+}
+
+void Credits::LoadScene()
+{
+	isMenu = true;
+	ChangingScn = false;
+
+	MAX_MENU = 0;
+	MIN_MENU = -2;
+
+
+
+	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
+
+	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
+	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
+	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
+
+	Material* blackBarMat = new Material("black.png");
+
+	Material* gladeiatorsTitle = new Material("Title.png");
+
+	Material* firstPlayer = new Material("redPlayer.png");
+	Material* secondPlayer = new Material("bluePlayer.png");
+	Material* buttonPlay = new Material("playButton.png");
+	Material* buttonSettings = new Material("settingsButton.png");
+	Material* buttonExit = new Material("exitButton.png");
+	Material* buttonBlank = new Material("blankButton.png");
+	Material* titleImage = new Material("gladewallpaper.png");
+
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
+	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
+
+	Cam = {
+		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
+	};
+}

@@ -10,7 +10,8 @@ class Mesh;
 enum SCENES {
 	MAIN_MENU = 0,
 	PLAY_SCENE = 1,
-	CHARACTER_SCENE = 2
+	CHARACTER_SCENE = 2,
+	CREDITS = 3
 };
 
 class Game {
@@ -61,6 +62,7 @@ private:
 	Scene* TwoPlayerScn;
 	Scene* MainMenuScn;
 	Scene* CharacterScn;
+	Scene* CreditsScn;
 
 	bool wireframe = false;
 	bool w_pressed = false;

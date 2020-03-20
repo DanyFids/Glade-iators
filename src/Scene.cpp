@@ -930,24 +930,24 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					weapon[controller] = (int)rand() % 2;
 					shield[controller] = (int)rand() % 2;
 				}
-				else if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && _Abutton[0]) {
-					if (menuSpot[0] == 0) {
-						//Character Scene
-						ChangingScn = true;
-						isMenu = false;
-						Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
-					}
-					else if (menuSpot[0] == -1) {
-						//Settings
-					}
-					else if (menuSpot[0] == -2) {
-						//Credits
-					}
-					else if (menuSpot[0] == -3) {
-						//Exit
-						//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
-						glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
-					}
+				
+				else if (menuSpot[0] == 0) {
+					//Character Scene
+					ChangingScn = true;
+					isMenu = false;
+					Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
+				}
+				else if (menuSpot[0] == -1) {
+					//Settings
+				}
+				else if (menuSpot[0] == -2) {
+					//Credits
+					Game::CURRENT->setScene(SCENES::CREDITS);
+				}
+				else if (menuSpot[0] == -3) {
+					//Exit
+					//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
+					glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
 				}
 				menu_time[controller] = MENU_TIME;
 			}

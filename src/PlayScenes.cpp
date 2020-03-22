@@ -9,7 +9,7 @@
 #include <random>
 #include <thread>
 #include <queue>
-#include <florp/app/timing.h>
+//#include <florp/app/timing.h>
 
 #include "Mesh.h"
 #include "Shader.h"
@@ -338,6 +338,8 @@ void OnePlayer::Update(float dt)
 
 	//DUUDE->Update(dt);
 
+	fire->Update(dt);
+
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
 	}
@@ -498,6 +500,10 @@ void OnePlayer::Draw()
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 
+	for (int c = 0; c < Cam.size(); c++) {
+		fire->Draw(Cam[c]);
+	}
+
 	if (show_volumes) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (int c = 0; c < active_lights && c < lights.size(); c++) {
@@ -538,7 +544,7 @@ void OnePlayer::LoadScene()
 	//merge_buff = new FrameBuffer();
 
 	// Post processing passes 
-	
+
 	Material* LUT_TEST = new Material("LUTs/LUT_TEST.png");
 
 	lut_cool = new LUT("LUTs/Bluedabadee.cube");
@@ -548,7 +554,7 @@ void OnePlayer::LoadScene()
 	//post_pass.push_back(new LutColorCorrection(lut_custom, main_pass->GetOutput()));
 	//Textcontroller();
 
-	highlightshader = new Shader("Shaders/PostProcess/PostProcess.vert","Shaders/PostProcess/Highlights.frag");
+	highlightshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Highlights.frag");
 
 	vergausshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/GausBlur.frag");
 	vergausshader->SetB("isHorizontal", false);
@@ -560,11 +566,11 @@ void OnePlayer::LoadScene()
 
 
 	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
-	
+
 	// Sampler2d INPUT
 	post_pass.push_back(new PostProcess({ main_pass->GetOutput(), light_buff->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge.frag")));
 
-	isMenu = false; 
+	isMenu = false;
 	ChangingScn = false;
 
 	Joint::init();
@@ -594,7 +600,7 @@ void OnePlayer::LoadScene()
 	Material* D20Tex = new Material("d20-texture.png");
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
 	Material* defaultTex = new Material("default-texture.png");
-	
+
 	Material* GladiatorWM = new Material("WeightMap.png");
 
 	Material* SnekWM = new Material("snek/WeightMap.png"); //Bone tester
@@ -634,13 +640,13 @@ void OnePlayer::LoadScene()
 	Mesh* shield_mesh = new Mesh("Weapons/Circle_Shield.obj");
 
 
-	Hitbox* basicCubeHB = new CubeHitbox(1.2f,3.0f,1.2f);
+	Hitbox* basicCubeHB = new CubeHitbox(1.2f, 3.0f, 1.2f);
 	Hitbox* basicCubeHB2 = new CubeHitbox(1.0, 1.0f, 1.0f);
 
 	//Capsule testing
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f,4.0f,entity); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,4.0f, entity);
-	Hitbox* basicCapsuleHB3 = new CapsuleHitbox(0.2,4.0);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f, 4.0f, entity); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f, 4.0f, entity);
+	Hitbox* basicCapsuleHB3 = new CapsuleHitbox(0.2, 4.0);
 	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.09f, 12.8f);
 	//Capsule Testing
 
@@ -660,7 +666,7 @@ void OnePlayer::LoadScene()
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ -6.0f, 0.0f, 0.0f });
 	//players[PLAYER_2]->Rotate(glm::vec3(45,0,45));
-	
+
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 
 
@@ -668,13 +674,13 @@ void OnePlayer::LoadScene()
 	//test_player->Scale(glm::vec3(1.2f));
 
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
-	weapons.push_back(new Object(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_hand"),P1_mesh));
+	weapons.push_back(new Object(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_hand"), P1_mesh));
 	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("l_hand"), P1_mesh));
 
-	weapons[0]->SetPosition({-0.12f, 0.0f, -0.12f});
-	weapons[0]->Scale({0.9f, 0.9f, 0.9f});
-	weapons[0]->SetRotation({90.0f, 0.0f, 0.0f});
-	
+	weapons[0]->SetPosition({ -0.12f, 0.0f, -0.12f });
+	weapons[0]->Scale({ 0.9f, 0.9f, 0.9f });
+	weapons[0]->SetRotation({ 90.0f, 0.0f, 0.0f });
+
 
 	shields[0]->SetPosition({ 0.095f, 0.115f, 0.0f });
 	shields[0]->Scale({ 0.8f, 0.8f, 0.8f });
@@ -704,22 +710,22 @@ void OnePlayer::LoadScene()
 	//terrain.push_back(SATtest1);
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
-	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0,-2,0));
+	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0, -2, 0));
 
 	Colitreeum->Scale(glm::vec3(2.5, 2.5, 2.5));
 
 	floor->Move({ 0.0f, -0.75f, 0.0f });
 	floor->Scale({ 30.0f, 0.5f, 30.0f });
 
-	
+
 
 	//terrain.push_back(floor);
 	terrain.push_back(Colitreeum);
 
-	beacons.push_back(glm::vec3(glm::vec3(1,1,1)));
-	beacons.push_back(glm::vec3(glm::vec3(1,1,3)));
-	beacons.push_back(glm::vec3(glm::vec3(1,2,5)));
-	beacons.push_back(glm::vec3(glm::vec3(2,1,4)));
+	beacons.push_back(glm::vec3(glm::vec3(1, 1, 1)));
+	beacons.push_back(glm::vec3(glm::vec3(1, 1, 3)));
+	beacons.push_back(glm::vec3(glm::vec3(1, 2, 5)));
+	beacons.push_back(glm::vec3(glm::vec3(2, 1, 4)));
 	beacons.push_back(glm::vec3(glm::vec3(3, 2, 5)));
 	beacons.push_back(glm::vec3(glm::vec3(7, 1, 4)));
 	beacons.push_back(glm::vec3(glm::vec3(9, 2, 5)));
@@ -754,7 +760,8 @@ void OnePlayer::LoadScene()
 		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(640, 500), stamBarMat, stamBG2),
 		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(395, 550), crowdBarMat, crowdBG2)
 	};
- 
+
+	fire = new ParticleEngine({ 1.0f, 0.0f, 1.0f }, {0.5f, 0.5f}, 4, 1.0f, new Material("redPlayer.png"), { ParticleEngine::FireEngineBehavior }, { Particle::FireUpdate });
 
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 

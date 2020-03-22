@@ -1,11 +1,16 @@
 #version 330 core
-layout (location = 0) in vec3 Pos;
-layout (location = 1) in vec2 texUv;
 
-out vec2 texCoords;
+const int MAX_PARTICLES = 512;
+
+layout (location = 0) in vec3 Pos;
+
+uniform vec3[MAX_PARTICLES] pos;
+uniform vec2[MAX_PARTICLES] size;
+
+out vec2 outSize;
 
 void main()
 {
-	texCoords = texUv;
-    gl_Position = vec4(Pos, 1.0);
+    gl_Position = vec4(pos[gl_VertexID], 1.0);
+    outSize = size[gl_VertexID];
 }

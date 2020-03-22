@@ -7,6 +7,7 @@
 class Light;
 class Mesh;
 class Player;
+class ParticleEngine;
 
 class OnePlayer: public PlayScene {
 	Shader* shaderObj;
@@ -34,6 +35,8 @@ class OnePlayer: public PlayScene {
 	LUT* lut_cool;
 	LUT* lut_hot;
 	LUT* lut_custom;
+
+	ParticleEngine* fire;
 
 	Mesh* DebugQuad;
 

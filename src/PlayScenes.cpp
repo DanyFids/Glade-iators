@@ -1635,10 +1635,10 @@ void CharacterC::Draw()
 	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[1], 385.0f - (Name2[1].length() * 4), 400.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
 	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[2], 385.0f - (Name2[2].length() * 4), 370.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
 
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, WeaponName[0], 174.0f - (WeaponName[0].length() * 4), 230.0f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, WeaponName[1], 615.0f - (WeaponName[1].length() * 4), 230.0f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, ShieldName[0], 176.0f - (ShieldName[0].length() * 4), 150.0f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, ShieldName[1], 617.0f - (ShieldName[1].length() * 4), 150.0f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, WeaponName[0], 174.0f - (WeaponName[0].length() * 4), 227.5f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, WeaponName[1], 615.0f - (WeaponName[1].length() * 4), 227.5f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, ShieldName[0], 176.0f - (ShieldName[0].length() * 4), 142.5f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, ShieldName[1], 617.0f - (ShieldName[1].length() * 4), 142.5f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
 	glEnable(GL_DEPTH_TEST);
 
 }
@@ -1698,17 +1698,19 @@ void CharacterC::LoadScene()
 	Material* blackBarMat = new Material("black.png");
 	Material* arrow = new Material("arrow.png");
 	Material* arrow2 = new Material("arrow (1).png");
+
+	Material* ehks = new Material("Ehks.png");
 	//PLAYERS
 	playerOne = new UI(70, 70, glm::vec3(145, 230, 0), firstPlayer);
 	playerTwo = new UI(70, 70, glm::vec3(585, 230, 0), secondPlayer);
 	
 	//BUTTONS
 	weapon1_Button = new UI(70, 70, glm::vec3(145, 155, 0), backDropMain);
-	shield1_Button = new UI(70, 70, glm::vec3(145, 80, 0), backDropMain);
+	shield1_Button = new UI(70, 70, glm::vec3(145, 70, 0), backDropMain);
 	weapon2_Button = new UI(70, 70, glm::vec3(585, 155, 0), backDropMain);
-	shield2_Button = new UI(70, 70, glm::vec3(585, 80, 0), backDropMain);
+	shield2_Button = new UI(70, 70, glm::vec3(585, 70, 0), backDropMain);
 
-	ready_Button = new UI(600, 60, glm::vec3(100, 10, 0), buttonReady); 
+	ready_Button = new UI(580, 60, glm::vec3(110, 10, 0), buttonReady); 
 	random1_Button = new UI(140, 60, glm::vec3(100, 235, 0), buttonRandom);
 	random2_Button = new UI(140, 60, glm::vec3(540, 235, 0), buttonRandom);
 
@@ -1724,18 +1726,20 @@ void CharacterC::LoadScene()
 		
 	//ICONS
 	wOne = new UI(60, 60, glm::vec3(150, 160, 0), swordIcon);
-	sOne = new UI(50, 50, glm::vec3(155, 90, 0), shieldIcon);
+	sOne = new UI(50, 50, glm::vec3(155, 80, 0), shieldIcon);
 	wTwo = new UI(60, 60, glm::vec3(590, 160, 0), swordIcon);
-	sTwo = new UI(50, 50, glm::vec3(595, 90, 0), shieldIcon);
+	sTwo = new UI(50, 50, glm::vec3(595, 80, 0), shieldIcon);
+	p1Ready = new UI(40, 40, glm::vec3(60, 20, 0), ehks);
+	p2Ready = new UI(40, 40, glm::vec3(695, 20, 0), ehks);
 	//Side Icons
 	wOne_p1 = new UI(50, 50, glm::vec3(90, 165, 0), hammerIcon);
-	sOne_p1 = new UI(40, 40, glm::vec3(95, 95, 0), nothing);
+	sOne_p1 = new UI(40, 40, glm::vec3(95, 85, 0), nothing);
 	wTwo_p1 = new UI(50, 50, glm::vec3(530, 165, 0), hammerIcon);
-	sTwo_p1 = new UI(40, 40, glm::vec3(535, 95, 0), nothing);	 
+	sTwo_p1 = new UI(40, 40, glm::vec3(535, 85, 0), nothing);	 
 	wOne_p2 = new UI(50, 50, glm::vec3(220, 165, 0), spearIcon);
-	sOne_p2 = new UI(40, 40, glm::vec3(225, 95, 0), bucklerIcon);
+	sOne_p2 = new UI(40, 40, glm::vec3(225, 85, 0), bucklerIcon);
 	wTwo_p2 = new UI(50, 50, glm::vec3(660, 165, 0), spearIcon);
-	sTwo_p2 = new UI(40, 40, glm::vec3(665, 95, 0), bucklerIcon);
+	sTwo_p2 = new UI(40, 40, glm::vec3(665, 85, 0), bucklerIcon);
 
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
@@ -1761,13 +1765,13 @@ void CharacterC::LoadScene()
 		random2_Button,
 
 		new UI(50, 50, glm::vec3(90, 165, 0), backDrop),
-		new UI(50, 50, glm::vec3(90, 90, 0), backDrop),
+		new UI(50, 50, glm::vec3(90, 80, 0), backDrop),
 		new UI(50, 50, glm::vec3(530, 165, 0), backDrop),
-		new UI(50, 50, glm::vec3(530, 90, 0), backDrop), //4
+		new UI(50, 50, glm::vec3(530, 80, 0), backDrop), //4
 		new UI(50, 50, glm::vec3(220, 165, 0), backDrop),
-		new UI(50, 50, glm::vec3(220, 90, 0), backDrop),
+		new UI(50, 50, glm::vec3(220, 80, 0), backDrop),
 		new UI(50, 50, glm::vec3(660, 165, 0), backDrop),
-		new UI(50, 50, glm::vec3(660, 90, 0), backDrop), //4
+		new UI(50, 50, glm::vec3(660, 80, 0), backDrop), //4
 
 		wOne_p1,
 		sOne_p1,
@@ -1799,13 +1803,16 @@ void CharacterC::LoadScene()
 		arrow_Button8,
 
 		new UI(50, 50, glm::vec3(90, 165, 0), backDropFade),
-		new UI(50, 50, glm::vec3(90, 90, 0), backDropFade),
+		new UI(50, 50, glm::vec3(90, 80, 0), backDropFade),
 		new UI(50, 50, glm::vec3(530, 165, 0), backDropFade),
-		new UI(50, 50, glm::vec3(530, 90, 0), backDropFade), //4
+		new UI(50, 50, glm::vec3(530, 80, 0), backDropFade), //4
 		new UI(50, 50, glm::vec3(220, 165, 0), backDropFade),
-		new UI(50, 50, glm::vec3(220, 90, 0), backDropFade),
+		new UI(50, 50, glm::vec3(220, 80, 0), backDropFade),
 		new UI(50, 50, glm::vec3(660, 165, 0), backDropFade),
-		new UI(50, 50, glm::vec3(660, 90, 0), backDropFade), //4
+		new UI(50, 50, glm::vec3(660, 80, 0), backDropFade), //4
+
+		p1Ready,
+		p2Ready
 	};
 	//Final Chunck
 	ui[41]->setOpacity(0.5);
@@ -1816,4 +1823,158 @@ void CharacterC::LoadScene()
 	ui[46]->setOpacity(0.5);
 	ui[47]->setOpacity(0.5);
 	ui[48]->setOpacity(0.5);
+
+
+}
+
+
+SettingsScene::SettingsScene()
+{
+	LoadScene();
+}
+
+void SettingsScene::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
+{
+	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
+		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_2, dt);
+		}
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
+		}
+	}
+	else {
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_1, dt);
+		}
+
+	}
+}
+
+void SettingsScene::Update(float dt)
+{
+
+	//audioEngine.Update();
+
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Update(dt);
+	}
+
+	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
+
+}
+
+void SettingsScene::Draw()
+{
+	glCullFace(GL_FRONT);
+
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
+	glClear(GL_DEPTH_BUFFER_BIT);
+	sun->SetupDepthShader(sunShader);
+	//sun->SetupDepthShader(skelDepth);
+
+	RenderScene(sunShader, sunShader);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
+
+	for (int l = 0; l < lights.size(); l++) {
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
+		glClear(GL_DEPTH_BUFFER_BIT);
+		lights[l]->SetupDepthShader(depthShader);
+		RenderScene(depthShader, sunShader);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//glViewport(0, 0,  , SCREEN_HEIGHT);
+
+		glActiveTexture(GL_TEXTURE4 + l);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[l]->GetDepthMap());
+	}
+	glCullFace(GL_BACK);
+
+	sun->SetupLight(shaderObj);
+	sun->SetupLight(morphShader);
+
+	for (int c = 0; c < lights.size(); c++) {
+		lights[c]->SetupLight(shaderObj, c);
+		lights[c]->SetupLight(morphShader, c);
+
+	}
+	shaderObj->SetI("num_lights", lights.size());
+	//morphShader->SetI("num_lights", lights.size());
+
+
+	for (int c = 0; c < Cam.size(); c++) {
+		Cam[c]->SetupCam(shaderObj);
+
+		RenderScene(shaderObj, sunShader);
+		Cam[c]->SetupCam(morphShader);
+		//morphyBoi->Draw(morphShader, Cam);
+	}
+
+
+	//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glDisable(GL_DEPTH_TEST);
+
+	for (int u = 0; u < ui.size(); u++) {
+		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
+	}
+
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+
+	glEnable(GL_DEPTH_TEST);
+
+}
+
+void SettingsScene::LoadScene()
+{
+	isMenu = true;
+	ChangingScn = false;
+
+	MAX_MENU = 20;
+	MIN_MENU = 18;
+
+	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
+
+	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
+	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
+	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
+
+	Material* blackBarMat = new Material("black.png");
+	Material* background = new Material("backgroundWood.png");
+
+	Material* gladeiatorsTitle = new Material("Title.png");
+
+	Material* buttonExit = new Material("exitButton.png");
+	Material* titleImage = new Material("gladewallpaper.png");
+
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
+	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
+
+	Cam = {
+		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
+	};
+
+	exit_Button = new UI(200, 70, glm::vec3(5, 80, 0), buttonExit);
+
+	ui = {
+		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background),
+		exit_Button
+	};
+
 }

@@ -41,6 +41,9 @@ private:
 class Scene {
 protected:
 	std::vector<Camera*> Cam;
+	static bool loaded;
+
+	//Menu Variables
 	int menuSpot[2]{ 0, 0 };
 	int MAX_MENU;
 	int MIN_MENU;
@@ -54,12 +57,18 @@ protected:
 	const int MIN_S = 0;
 	int weapon[2]{ 0, 0 };
 	int shield[2]{ 0, 0 };
+	bool ready[2]{ false, false };
+	bool readyChange[2]{ false, false };
 	bool changeW[2]{ false, false };
 	bool changeS[2]{ false, false };
 	bool rightArrow = true;
 	bool arrowUsed = false;
-	//bool buttonUsed = false;
-	static bool loaded;
+
+	int resolution = 0;
+	const int MAX_RES = 4;
+
+	//Cool Settings stuff
+	float sensitivity = 1.0f;
 
 	//MAIN MENU
 	Material* buttonPlay = new Material("playButton.png");
@@ -95,6 +104,8 @@ protected:
 	Material* arrowBack = new Material("arrow (1).png");
 	Material* arrow2 = new Material("arrow2.png");
 	Material* arrowBack2 = new Material("arrow (1)2.png");
+	Material* ehks = new Material("ehks.png");
+	Material* check = new Material("checkmark.png");
 
 	Material* swordIcon = new Material("iconSword.png");
 	Material* spearIcon = new Material("iconSpear.png");
@@ -150,6 +161,8 @@ protected:
 	UI* wTwo_p2;
 	UI* sOne_p2;
 	UI* sTwo_p2;
+	UI* p1Ready;
+	UI* p2Ready;
 	
 	std::string WeaponName[2];
 	std::string ShieldName[2];

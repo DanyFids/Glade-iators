@@ -353,6 +353,7 @@ void OnePlayer::Draw()
 {
 	main_pass->Clear();
 	light_buff->Clear();
+	particle_buff->Clear();
 	for (int c = 0; c < post_pass.size(); c++) {
 		post_pass[c]->buff->Clear();
 	}
@@ -459,6 +460,11 @@ void OnePlayer::Draw()
 
 	Game::QUAD->Draw(lightPass);
 
+	particle_buff->Use();
+	for (int c = 0; c < Cam.size(); c++) {
+		fire->Draw(Cam[c]);
+	}
+
 	for (int c = 0; c < post_pass.size(); c++) {
 		post_pass[c]->Draw();
 	}
@@ -500,10 +506,6 @@ void OnePlayer::Draw()
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 
-	for (int c = 0; c < Cam.size(); c++) {
-		fire->Draw(Cam[c]);
-	}
-
 	if (show_volumes) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		for (int c = 0; c < active_lights && c < lights.size(); c++) {
@@ -541,7 +543,7 @@ void OnePlayer::LoadScene()
 
 	light_buff = new FrameBuffer();
 
-	//merge_buff = new FrameBuffer();
+	particle_buff = new FrameBuffer(main_pass->GetDepth());
 
 	// Post processing passes 
 
@@ -568,7 +570,7 @@ void OnePlayer::LoadScene()
 	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
 
 	// Sampler2d INPUT
-	post_pass.push_back(new PostProcess({ main_pass->GetOutput(), light_buff->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge.frag")));
+	post_pass.push_back(new PostProcess({ main_pass->GetOutput(), light_buff->GetOutput(), particle_buff->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge.frag")));
 
 	isMenu = false;
 	ChangingScn = false;
@@ -1253,7 +1255,7 @@ void TwoPlayer::LoadScene()
 
 	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0, 0.45, 0));
 
-	Colitreeum->Scale(glm::vec3(1.0, 1.0, 1.0));
+	Colitreeum->Scale(glm::vec3(0.65f, 0.65f, 0.65f));
 
 	terrain.push_back(Colitreeum);
 

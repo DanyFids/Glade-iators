@@ -65,7 +65,7 @@ void ParticleEngine::Update(float dt)
 	std::invoke(engine_b.func, dt, *this);
 
 	for (int c = 0; c < particles.size(); c++) {
-		//particles[c].Update(dt);
+		particles[c].Update(dt);
 	}
 }
 

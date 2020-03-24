@@ -1,5 +1,5 @@
-#version 330 core
-in vec2 TexCoords;
+#version 410 core
+layout (location = 1) in vec2 TexCoords;
 
 out vec4 color;
 

@@ -1,5 +1,4 @@
-#version 330 core
-
+#version 410 core
 const int MAX_PARTICLES = 512;
 
 layout (location = 0) in vec3 Pos;
@@ -7,7 +6,7 @@ layout (location = 0) in vec3 Pos;
 uniform vec3[MAX_PARTICLES] pos;
 uniform vec2[MAX_PARTICLES] size;
 
-out vec2 outSize;
+layout (location = 0) out vec2 outSize;
 
 void main()
 {

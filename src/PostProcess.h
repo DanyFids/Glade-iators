@@ -42,6 +42,7 @@ private:
 
 public:
 	FrameBuffer();
+	FrameBuffer(unsigned int d);
 	~FrameBuffer();
 
 	void Use();

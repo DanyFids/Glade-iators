@@ -20,6 +20,7 @@ class OnePlayer: public PlayScene {
 
 	FrameBuffer* light_buff;
 	FrameBuffer* merge_buff;
+	FrameBuffer* particle_buff;
 	int prev_num_l = 0;
 	const int MAX_LIGHTS = 25;
 	int active_lights = 1;

@@ -928,7 +928,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
 					}
 					else if (menuSpot[0] == 20) {
-						if (resolution <= MAX_RES)
+						if (resolution >= MAX_RES)
 							resolution = 0;
 						else
 							resolution++;

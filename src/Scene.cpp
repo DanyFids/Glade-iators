@@ -507,6 +507,33 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			/************/ 
 			if (controller == 0) {
 				switch (menuSpot[controller]) {
+				case 20:
+					if (menu_time[controller] <= 0 && arrowUsed) {
+						if (rightArrow) {
+							arrowUsed = false;
+							arrow_Button3->ChangeTex(arrowBack);
+						}
+						else {
+							arrowUsed = false;
+							arrow_Button1->ChangeTex(arrow);
+						}
+					}
+					//Resolutuion
+					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
+						resolution--;
+						arrowUsed = true;
+						rightArrow = false;
+						arrow_Button1->ChangeTex(arrow2);
+						menu_time[controller] = MENU_TIME;
+					}
+					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
+						resolution++;
+						arrowUsed = true;
+						rightArrow = true;
+						arrow_Button3->ChangeTex(arrowBack2);
+						menu_time[controller] = MENU_TIME;
+					}
+					break;
 				case 10:
 					//Random Button
 					if (_Abutton[controller] && menu_time[controller] > 0) {
@@ -928,11 +955,6 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
 					}
 					else if (menuSpot[0] == 20) {
-						if (resolution >= MAX_RES)
-							resolution = 0;
-						else
-							resolution++;
-
 						switch (resolution) {
 						case 0:
 							Game::CURRENT->setSize(1920, 1080);

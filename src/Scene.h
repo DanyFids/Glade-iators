@@ -131,6 +131,8 @@ protected:
 	UI* settings_Button;
 	UI* credits_Button;
 	UI* exit_Button;
+
+	UI* resolution_Button;
 	//Menu 2
 	UI* random1_Button;
 	UI* random2_Button;

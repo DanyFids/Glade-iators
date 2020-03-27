@@ -414,13 +414,17 @@ FrameStates Player::GetFrameState(unsigned int chnl)
 //FaceDir should be the direction opponent is facing, v2 is vector to player who is hitting
 bool Player::isInfront(glm::vec3 faceDir, glm::vec3 v2)
 {
+
+	//Use vec2's to eliminate any fuckiness with Y values.
 	glm::vec2 dir1 = { faceDir.x,faceDir.z };
 	glm::vec2 dir2 = { v2.x,v2.z };
 
 
 	float angle = 1 / (glm::cos( (glm::dot(dir1, dir2) / (glm::length(dir1) * glm::length(dir2))) ) );
 
-	if (glm::abs(angle) <= blockAngle) { // if our 'angle' is smaller than our blockingAngle (we are within the blockable area
+	//Use the absolute value of 'agle' to catch -angle and +angle;
+	//blockAngle should be 1/2 of the desired cone.
+	if (glm::abs(angle) <= blockAngle) { // if our 'angle' is smaller than our blockingAngle (we are within the blockable area)
 		return true;
 	}
 	else

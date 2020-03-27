@@ -961,25 +961,25 @@ void TwoPlayer::Update(float dt)
 					std::cout << "Welp\n";
 				}
 
-				//problem -> weapon hitdetect is not seeing the shield
-				if (players[p]->GetShield() != nullptr) {
-					if (players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) ) { // players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield() && players[c]->GetWeapon()->getCooldown() == false)
-							std::cout << "Blocked!\n";
-				
-							players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
-							players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
-						
-					}
-				}
-				else
-				{
-				
-					//Weapon blocking
-				}
+				////problem -> weapon hitdetect is not seeing the shield
+				//if (players[p]->GetShield() != nullptr) {
+				//	if (players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) ) { // players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield() && players[c]->GetWeapon()->getCooldown() == false)
+				//			std::cout << "Blocked!\n";
+				//
+				//			players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
+				//			players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+				//		
+				//	}
+				//}
+				//else
+				//{
+				//
+				//	//Weapon blocking
+				//}
 
 				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
 
-					if (players[p]->hitbox->GetType() == entity) { //Makign sure we hit the right hitbox
+					if (players[p]->hitbox->GetType() == entity) { //Making sure we hit the right hitbox
 						std::cout << "Hit!\n";
 
 						if (players[p]->GetFrameState() == FrameStates::Block && players[p]->isInfront(players[p]->getFaceDir(), players[c]->GetPosition() - players[p]->GetPosition())) { //Are we blocking? Are we infront of the enemy?

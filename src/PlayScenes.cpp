@@ -1955,7 +1955,7 @@ void SettingsScene::LoadScene()
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
 
 	Material* blackBarMat = new Material("black.png");
-	Material* background = new Material("black.png");
+	Material* background = new Material("backgroundWood.png");
 
 	Material* gladeiatorsTitle = new Material("Title.png");
 

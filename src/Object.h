@@ -160,6 +160,8 @@ class Player : public Object {
 
 	unsigned int atk_combo = 0;
 
+	const float blockAngle = 75;
+
 	SkelMesh* _mesh;
 
 	PLAYER_STATE state;
@@ -168,6 +170,9 @@ class Player : public Object {
 	Shield* shield;
 
 	glm::vec3 last_root_pos = glm::vec3(0.0f);
+
+	const glm::vec3 baseFaceDir = glm::vec3(0, 0, 1);
+	glm::vec3 current_face_dir = glm::vec3(0,0,1);
 
 	bool camera_lock = false;
 
@@ -209,23 +214,27 @@ public:
 	Weapon* GetWeapon() { return weapon; }
 	FrameStates GetFrameState(unsigned int chnl = 0);
 	bool IsLocked() { return anim_lock; }
+
+	bool isInfront(glm::vec3 faceDir, glm::vec3 v2 );
+	glm::vec3 getFaceDir() { return current_face_dir; };
 };
 
 class Weapon : public Object {
 private:
-	float damage, stamina_cost;
+	float damage, stamina_cost, dmgReduction;
 
 	std::vector<std::string> attack_anims;
 	
 	bool cooldown = false;
 public:
 	Weapon(Mesh* me, Material* ma, Hitbox* hb, std::vector<std::string> atks, float dmg, float stam);
-	Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, Joint* p = nullptr, SkelMesh* m = nullptr);
+	Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, float dmgRdc, Joint* p = nullptr, SkelMesh* m = nullptr);
 
 	std::string GetAtkAnim(unsigned int c_id = 0);
 	unsigned int GetNumLightAttacks() {return attack_anims.size();}
 	
 	float GetDamage() { return damage; }
+	float GetReduction() { return dmgReduction; }
 	float GetStaminaCost() { return stamina_cost; }
 
 	void setCooldown(bool c) { cooldown = c; }

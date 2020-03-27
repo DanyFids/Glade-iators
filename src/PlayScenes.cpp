@@ -954,6 +954,9 @@ void TwoPlayer::Update(float dt)
 
 		for (int p = 0; p < players.size(); p++) {
 			if (players[c] != players[p]) {
+
+
+				//Player Collision
 				if (players[c]->HitDetect(players[p])) {
 					std::cout << "Welp\n";
 				}
@@ -962,7 +965,7 @@ void TwoPlayer::Update(float dt)
 				if (players[p]->GetShield() != nullptr) {
 					if (players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) ) { // players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield() && players[c]->GetWeapon()->getCooldown() == false)
 							std::cout << "Blocked!\n";
-
+				
 							players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
 							players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
 						
@@ -970,17 +973,40 @@ void TwoPlayer::Update(float dt)
 				}
 				else
 				{
-
+				
 					//Weapon blocking
 				}
 
 				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
 
-					if (players[p]->hitbox->GetType() == entity) {
+					if (players[p]->hitbox->GetType() == entity) { //Makign sure we hit the right hitbox
 						std::cout << "Hit!\n";
 
-						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
-						players[c]->GetWeapon()->setCooldown(true);
+						if (players[p]->GetFrameState() == FrameStates::Block && players[p]->isInfront(players[p]->getFaceDir(), players[c]->GetPosition() - players[p]->GetPosition())) { //Are we blocking? Are we infront of the enemy?
+
+							std::cout << "Blocked!\n";
+
+							if (players[p]->GetShield() != nullptr) { //If he has a shield.
+
+								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
+								players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+
+								players[c]->GetWeapon()->setCooldown(true);
+							}
+							else { // Use weapons stuff
+
+								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - ( players[p]->GetWeapon()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
+								players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * ((players[p]->GetWeapon()->GetStaminaCost() + 15.0f) * 0.01f) );
+
+								players[c]->GetWeapon()->setCooldown(true);
+
+							}
+						}
+						else //Clean hit.
+						{
+							players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
+							players[c]->GetWeapon()->setCooldown(true);
+						}
 					}
 
 					
@@ -1273,8 +1299,8 @@ void TwoPlayer::LoadScene()
 	Shield* P1_shield = new Shield(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f },0.6f, 0.25f, gladiatorSkel->Find("l_hand"), P1_MESH);
 	Shield* P2_shield = new Shield(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f },0.6f, 0.25f, gladiatorSkel->Find("l_hand"), P2_MESH);
 
-	Weapon* Hurt_Sword = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), P1_MESH);
-	Weapon* Hurt_Sword2 = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), P2_MESH);
+	Weapon* Hurt_Sword = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), P1_MESH);
+	Weapon* Hurt_Sword2 = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), P2_MESH);
 
 	weapons.push_back(Hurt_Sword);
 	weapons.push_back(Hurt_Sword2);

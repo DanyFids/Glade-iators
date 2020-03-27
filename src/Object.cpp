@@ -247,6 +247,8 @@ void Player::Update(float dt)
 
 	phys.move = glm::mat3(transform.GetRotEul()) * rp;
 
+	current_face_dir = baseFaceDir * glm::mat3( glm::mat3_cast(glm::quat(glm::angleAxis(glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f))) )  );
+
 	if (run) {
 		if (stamina > 0.0f && glm::length(phys.move) != 0.0f) {
 			phys.move *= 2.0f;
@@ -406,6 +408,25 @@ void Player::Block()
 FrameStates Player::GetFrameState(unsigned int chnl)
 {
 	return _mesh->GetFrameCode();
+}
+
+//For Blocking
+//FaceDir should be the direction opponent is facing, v2 is vector to player who is hitting
+bool Player::isInfront(glm::vec3 faceDir, glm::vec3 v2)
+{
+	glm::vec2 dir1 = { faceDir.x,faceDir.z };
+	glm::vec2 dir2 = { v2.x,v2.z };
+
+
+	float angle = 1 / (glm::cos( (glm::dot(dir1, dir2) / (glm::length(dir1) * glm::length(dir2))) ) );
+
+	if (glm::abs(angle) <= blockAngle) { // if our 'angle' is smaller than our blockingAngle (we are within the blockable area
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 
@@ -573,11 +594,12 @@ Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, std::vector<std::string> atks
 	stamina_cost = stam;
 }
 
-Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, Joint* p, SkelMesh* m) //Mesh, Material, Hitbox, Position, Anim_Names, Damage, Stamina Cost, Parent_joint, SkelMesh
+Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, float dmgRdc, Joint* p, SkelMesh* m) //Mesh, Material, Hitbox, Position, Anim_Names, Damage, Stamina Cost, Parent_joint, SkelMesh
 {
 	attack_anims = atks;
 	damage = dmg;
 	stamina_cost = stam;
+	dmgReduction = dmgRdc;
 
 	mesh = me;
 	material = ma;

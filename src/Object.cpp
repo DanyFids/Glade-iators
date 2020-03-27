@@ -416,11 +416,17 @@ bool Player::isInfront(glm::vec3 faceDir, glm::vec3 v2)
 {
 
 	//Use vec2's to eliminate any fuckiness with Y values.
-	glm::vec2 dir1 = { faceDir.x,faceDir.z };
+	glm::vec2 dir1 = { faceDir.x ,faceDir.z };
 	glm::vec2 dir2 = { v2.x,v2.z };
 
+	dir2 = glm::normalize(dir2);
 
-	float angle = 1 / (glm::cos( (glm::dot(dir1, dir2) / (glm::length(dir1) * glm::length(dir2))) ) );
+	//float angle = 1 
+	float tempDot = glm::dot(dir1, dir2);
+
+	float tempCos = (glm::acos( (glm::dot(dir1, dir2))));
+
+	float angle = glm::degrees(tempCos);
 
 	//Use the absolute value of 'agle' to catch -angle and +angle;
 	//blockAngle should be 1/2 of the desired cone.

@@ -150,9 +150,14 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 		t += Cam[player]->GetRight();
 	if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f)
 		Cam[player]->Move(glm::normalize(t), dt);
+
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+		std::cout << "X:" << players[0]->getFaceDir().x << " Z: " << players[0]->getFaceDir().z;
+	if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+		std::cout << players[1]->isInfront(players[0]->getFaceDir(), players[1]->GetPosition() - players[0]->GetPosition());
 }
 
-
+ 
 
 void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 {

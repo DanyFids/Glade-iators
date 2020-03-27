@@ -1250,6 +1250,9 @@ void TwoPlayer::LoadScene()
 
 	players.push_back(new Player(P1_MESH, defaultTex, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
 	players[PLAYER_1]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
+
+	players[PLAYER_1]->Rotate(glm::vec3(0, 0, 0));
+
 	//players[PLAYER_1]->Rotate(glm::vec3(0.0f,90.0f,0.0f));
 	players.push_back(new Player(P2_MESH, defaultTex, basicCapsuleHB2)); // THIS IS PLAYER TWO
 	players[PLAYER_2]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());

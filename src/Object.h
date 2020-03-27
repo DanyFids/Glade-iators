@@ -160,7 +160,7 @@ class Player : public Object {
 
 	unsigned int atk_combo = 0;
 
-	const float blockAngle = 75;
+	const float blockAngle = 55;
 
 	SkelMesh* _mesh;
 
@@ -171,8 +171,8 @@ class Player : public Object {
 
 	glm::vec3 last_root_pos = glm::vec3(0.0f);
 
-	const glm::vec3 baseFaceDir = glm::vec3(0, 0, 1);
-	glm::vec3 current_face_dir = glm::vec3(0,0,1);
+	const glm::vec3 baseFaceDir = glm::vec3(0, 0, -1);
+	glm::vec3 current_face_dir = glm::vec3(1);
 
 	bool camera_lock = false;
 

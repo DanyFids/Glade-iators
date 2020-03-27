@@ -11,7 +11,8 @@ enum SCENES {
 	MAIN_MENU = 0,
 	PLAY_SCENE = 1,
 	CHARACTER_SCENE = 2,
-	CREDITS = 3
+	CREDITS = 4,
+	SETTINGS_SCENE = 3
 };
 
 class Game {
@@ -19,6 +20,7 @@ public:
 	static glm::ivec2 SCREEN;
 	static Game* CURRENT;
 	void setScene(SCENES scn);
+	void setSize(int w, int h);
 	static Mesh* QUAD;
 
 	Game();
@@ -48,6 +50,11 @@ protected:
 	void Update(float deltaTime);
 	void Draw();
 	void DrawGui(float deltaTime);
+
+	//Fun Settings Variables!
+	int widthScreen = 1920;
+	int heightScreen = 1080;
+
 private:
 	// Stores the main window that the game is running in
 	GLFWwindow* window;
@@ -63,6 +70,7 @@ private:
 	Scene* MainMenuScn;
 	Scene* CharacterScn;
 	Scene* CreditsScn;
+	Scene* SettingsScn;
 
 	bool wireframe = false;
 	bool w_pressed = false;

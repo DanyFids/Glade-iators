@@ -192,6 +192,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 	GLFWgamepadstate state;
 	if (glfwGetGamepadState(controller, &state)) {
+		//Checking to see if its actually a menu or a gamescene
 		if (isMenu != true && !ChangingScn) {
 			glm::vec2 rot = glm::vec2(0.0f, 0.0f);
 
@@ -360,7 +361,10 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				//players[player]->DestroyChild(0);
 			}
 		}
-		//MENU STUFF BELOW
+
+		/********************/
+		/* MENU STUFF BELOW */
+		/********************/
 		else
 		{
 
@@ -522,10 +526,6 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				menuSpot[controller] = MIN_MENU;
 			}
 
-			/**********************/
-			/* Anthony, Edit Here */
-			/**********************/
-
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
 				_Abutton[controller] = true;
 				menu_time[controller] = MENU_TIME;
@@ -536,6 +536,48 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			/************/ 
 			if (controller == 0) {
 				switch (menuSpot[controller]) {
+				case 20:
+					if (menu_time[controller] <= 0 && arrowUsed) {
+						if (rightArrow) {
+							arrowUsed = false;
+							arrow_Button3->ChangeTex(arrowBack);
+						}
+						else {
+							arrowUsed = false;
+							arrow_Button1->ChangeTex(arrow);
+						}
+					}
+					//Resolutuion
+					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
+						resolution--;
+						arrowUsed = true;
+						rightArrow = false;
+						arrow_Button1->ChangeTex(arrow2);
+						menu_time[controller] = MENU_TIME;
+					}
+					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
+						resolution++;
+						arrowUsed = true;
+						rightArrow = true;
+						arrow_Button3->ChangeTex(arrowBack2);
+						menu_time[controller] = MENU_TIME;
+					}
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						resolution_Button->ChangeTex(buttonRes2);
+					}
+					else if (menu_time[controller] <= 0) {
+						resolution_Button->ChangeTex(buttonResRed);
+					}
+					break;
+				case 19:
+					//Exit Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						exit_Button->ChangeTex(buttonExit2);
+					}
+					else if (menu_time[controller] <= 0) {
+						exit_Button->ChangeTex(buttonExitRed);
+					}
+					break;
 				case 10:
 					//Random Button
 					if (_Abutton[controller] && menu_time[controller] > 0) {
@@ -689,6 +731,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						WeaponName[controller] = "Maul";
 						changeW[controller] = false;
 						break;
+						//More Weapon Cases
 				//	case 3:
 				//		wOne->ChangeTex(tridentIcon);
 				//		wOne_p1->ChangeTex(hammerIcon);
@@ -908,20 +951,24 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
 				_Bbutton[controller] = true;
 			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && _Bbutton[controller] && !ChangingScn && MAX_MENU == 10) {
-				_Bbutton[controller] = false;
-				ChangingScn = true;
-				isMenu = false;
-				Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && _Bbutton[controller] && !ChangingScn) {
+				if (MAX_MENU == 10 || MAX_MENU == 20) {
+					_Bbutton[controller] = false;
+					ChangingScn = true;
+					isMenu = false;
+					Game::CURRENT->setScene(SCENES::MAIN_MENU);
+				}
 			}
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && _Abutton[controller] && !ChangingScn) {
 				_Abutton[controller] = false;
 				//std::cout << menuSpot[controller] << std::endl;
 				if (menuSpot[controller] == 7) {
 					//Play
-					ChangingScn = true;
-					isMenu = false;
-					Game::CURRENT->setScene(SCENES::PLAY_SCENE);
+					readyChange[controller] = true;
+					if (ready[controller])
+						ready[controller] = false;
+					else
+					ready[controller] = true;
 				}
 				else if (menuSpot[controller] == 10) {
 					//Randomize
@@ -948,6 +995,73 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					//Exit
 					//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
 					glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
+				}
+				else if (controller == 0) {
+					if (menuSpot[0] == 0) {
+						//Character Scene
+						ChangingScn = true;
+						isMenu = false;
+						Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
+					}
+					else if (menuSpot[0] == -1) {
+						//Settings
+						ChangingScn = true;
+						isMenu = false;
+						Game::CURRENT->setScene(SCENES::SETTINGS_SCENE);
+					}
+					else if (menuSpot[0] == -2) {
+						//Credits
+					}
+					else if (menuSpot[0] == -3) {
+						//Exit
+						//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
+						glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
+					}
+					else if (menuSpot[0] == 20) {
+						switch (resolution) {
+						case 0:
+							Game::CURRENT->setSize(1920, 1080);
+							break;
+						case 1:
+							Game::CURRENT->setSize(1600, 900);
+							break;
+						case 2:
+							Game::CURRENT->setSize(1440, 810);
+							break;
+						case 3:
+							Game::CURRENT->setSize(1280, 720);
+							break;
+						case 4:
+							Game::CURRENT->setSize(1024, 576);
+							break;
+						}
+					}
+					else if (menuSpot[0] == 19) {
+						ChangingScn = true;
+						isMenu = false;
+						Game::CURRENT->setScene(SCENES::MAIN_MENU);
+					}
+				}
+
+				if (controller == 0 && readyChange[controller]) {
+					readyChange[controller] = false;
+					if (ready[controller]) 
+						p1Ready->ChangeTex(check);
+					else
+						p1Ready->ChangeTex(ehks);
+				}
+				if (controller == 1 && readyChange[controller]) {
+					readyChange[controller] = false;
+					if (ready[controller])
+						p2Ready->ChangeTex(check);
+					else
+						p2Ready->ChangeTex(ehks);
+				}
+
+				if (ready[0] && ready[1]) {
+					ChangingScn = true;
+					isMenu = false;
+					Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 				}
 				menu_time[controller] = MENU_TIME;
 			}

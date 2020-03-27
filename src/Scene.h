@@ -10,7 +10,7 @@
 #include "Mesh.h"
 #include "Text.h"
 #include "Sound.h"
-
+ 
 class Camera;
 class Shader;
 class Object;
@@ -21,7 +21,7 @@ class Player;
 class Material;
 class Hitbox;
 class Button;
-class ButtonSelect;
+class ButtonSelect; 
 class FrameBuffer;
 class PostProcess;
 
@@ -42,6 +42,9 @@ private:
 class Scene {
 protected:
 	std::vector<Camera*> Cam;
+	static bool loaded;
+
+	//Menu Variables
 	int menuSpot[2]{ 0, 0 };
 	int MAX_MENU;
 	int MIN_MENU;
@@ -55,27 +58,36 @@ protected:
 	const int MIN_S = 0;
 	int weapon[2]{ 0, 0 };
 	int shield[2]{ 0, 0 };
+	bool ready[2]{ false, false };
+	bool readyChange[2]{ false, false };
 	bool changeW[2]{ false, false };
 	bool changeS[2]{ false, false };
 	bool rightArrow = true;
 	bool arrowUsed = false;
-	//bool buttonUsed = false;
-	static bool loaded;
+
+	int resolution = 0;
+	const int MAX_RES = 4;
+
+	//Cool Settings stuff
+	float sensitivity = 1.0f;
 
 	//MAIN MENU
 	Material* buttonPlay = new Material("playButton.png");
 	Material* buttonSettings = new Material("settingsButton.png");
 	Material* buttonExit = new Material("exitButton.png");
 	Material* buttonCredits = new Material("creditsButton.png");
+	Material* buttonRes = new Material("resolutionButton.png");
 	Material* buttonPlay2 = new Material("playButton2.png");
 	Material* buttonSettings2 = new Material("settingsButton2.png");
 	Material* buttonExit2 = new Material("exitButton2.png");
 	Material* buttonCredits2 = new Material("creditsButton2.png");
+	Material* buttonRes2 = new Material("resolutionButton2.png");
 
 	Material* buttonPlayRed = new Material("playButtonRed.png");
 	Material* buttonSettingsRed = new Material("settingsButtonRed.png");
 	Material* buttonExitRed = new Material("exitButtonRed.png");
 	Material* buttonCreditsRed = new Material("creditsButtonRed.png");
+	Material* buttonResRed = new Material("resolutionButtonRed.png");
 
 	//CHARACTER MENU
 	Material* buttonReady = new Material("readyButton.png");
@@ -96,6 +108,8 @@ protected:
 	Material* arrowBack = new Material("arrow (1).png");
 	Material* arrow2 = new Material("arrow2.png");
 	Material* arrowBack2 = new Material("arrow (1)2.png");
+	Material* ehks = new Material("ehks.png");
+	Material* check = new Material("checkmark.png");
 
 	Material* swordIcon = new Material("iconSword.png");
 	Material* spearIcon = new Material("iconSpear.png");
@@ -144,6 +158,8 @@ protected:
 	UI* settings_Button;
 	UI* credits_Button;
 	UI* exit_Button;
+
+	UI* resolution_Button;
 	//Menu 2
 	UI* random1_Button;
 	UI* random2_Button;
@@ -174,6 +190,8 @@ protected:
 	UI* wTwo_p2;
 	UI* sOne_p2;
 	UI* sTwo_p2;
+	UI* p1Ready;
+	UI* p2Ready;
 	
 	std::string WeaponName[2];
 	std::string ShieldName[2];

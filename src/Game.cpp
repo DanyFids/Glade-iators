@@ -53,7 +53,17 @@ void Game::setScene(SCENES scn)
 		CreditsScn = new Credits();
 		curScene = CreditsScn;
 		break;
+	case SETTINGS_SCENE:
+		SettingsScn = new SettingsScene();
+		curScene = SettingsScn;
+		break;
 	}
+}
+
+void Game::setSize(int w, int h)
+{
+	widthScreen = w;
+	heightScreen = h;
 }
 
 Game::Game() :
@@ -172,8 +182,10 @@ void Game::Initialize()
 		curScene = MainMenuScn;
 	}
 	else {
-		//curScene = OnePlayerScn;
+		//OnePlayerScn = new MainMenuPlayer();
+
 		curScene = MainMenuScn;
+		//curScene = MainMenuScn;
 	}
 }
 
@@ -290,16 +302,9 @@ void Game::InputHandle(float dt)
 		w_pressed = false;
 	
 	if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS && !f11_pressed) {
-		if (Game::SCREEN.x == 800) {
-			Game::SCREEN.x = 1920; 
-			Game::SCREEN.y = 1080;
-			glfwSetWindowMonitor(window, NULL, 0, 0, 1920, 1080, 60);
-		}
-		else {
-			Game::SCREEN.x = SCREEN_WIDTH;
-			Game::SCREEN.y = SCREEN_HEIGHT;
-			glfwSetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
-		}
+		Game::SCREEN.x = widthScreen; 
+		Game::SCREEN.y = heightScreen;
+		glfwSetWindowMonitor(window, NULL, 0, 0, widthScreen, heightScreen, 60);
 		f11_pressed = true;
 	}
 	if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_RELEASE)

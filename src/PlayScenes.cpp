@@ -1946,7 +1946,7 @@ void SettingsScene::LoadScene()
 	ChangingScn = false;
 
 	MAX_MENU = 20;
-	MIN_MENU = 18;
+	MIN_MENU = 19;
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1955,11 +1955,12 @@ void SettingsScene::LoadScene()
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
 
 	Material* blackBarMat = new Material("black.png");
-	Material* background = new Material("backgroundWood.png");
+	Material* background = new Material("black.png");
 
 	Material* gladeiatorsTitle = new Material("Title.png");
 
-	Material* buttonExit = new Material("exitButton.png");
+	buttonExit = new Material("exitButton.png");
+	buttonRes = new Material("resolutionButton.png");
 	Material* titleImage = new Material("gladewallpaper.png");
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
@@ -1970,11 +1971,17 @@ void SettingsScene::LoadScene()
 		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
 	};
 
-	exit_Button = new UI(200, 70, glm::vec3(5, 80, 0), buttonExit);
+	exit_Button = new UI(200, 70, glm::vec3(55, 80, 0), buttonExit);
+	resolution_Button = new UI(200, 70, glm::vec3(55, 240, 0), buttonRes);
+	arrow_Button1 = new UI(40, 50, glm::vec3(5, 80, 0), arrow);
+	arrow_Button3 = new UI(40, 50, glm::vec3(260, 80, 0), arrowBack);
 
 	ui = {
 		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background),
-		exit_Button
+		exit_Button,
+		resolution_Button,
+		arrow_Button1,
+		arrow_Button3
 	};
 
 }

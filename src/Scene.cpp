@@ -533,6 +533,21 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						arrow_Button3->ChangeTex(arrowBack2);
 						menu_time[controller] = MENU_TIME;
 					}
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						resolution_Button->ChangeTex(buttonRes2);
+					}
+					else if (menu_time[controller] <= 0) {
+						resolution_Button->ChangeTex(buttonResRed);
+					}
+					break;
+				case 19:
+					//Exit Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						exit_Button->ChangeTex(buttonExit2);
+					}
+					else if (menu_time[controller] <= 0) {
+						exit_Button->ChangeTex(buttonExitRed);
+					}
 					break;
 				case 10:
 					//Random Button
@@ -974,9 +989,6 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						}
 					}
 					else if (menuSpot[0] == 19) {
-
-					}
-					else if (menuSpot[0] == 18) {
 						ChangingScn = true;
 						isMenu = false;
 						Game::CURRENT->setScene(SCENES::MAIN_MENU);

@@ -9,7 +9,7 @@
 #include "Texture.h"
 #include "Mesh.h"
 #include "Text.h"
-
+ 
 class Camera;
 class Shader;
 class Object;
@@ -20,7 +20,7 @@ class Player;
 class Material;
 class Hitbox;
 class Button;
-class ButtonSelect;
+class ButtonSelect; 
 class FrameBuffer;
 class PostProcess;
 
@@ -75,15 +75,18 @@ protected:
 	Material* buttonSettings = new Material("settingsButton.png");
 	Material* buttonExit = new Material("exitButton.png");
 	Material* buttonCredits = new Material("creditsButton.png");
+	Material* buttonRes = new Material("resolutionButton.png");
 	Material* buttonPlay2 = new Material("playButton2.png");
 	Material* buttonSettings2 = new Material("settingsButton2.png");
 	Material* buttonExit2 = new Material("exitButton2.png");
 	Material* buttonCredits2 = new Material("creditsButton2.png");
+	Material* buttonRes2 = new Material("resolutionButton2.png");
 
 	Material* buttonPlayRed = new Material("playButtonRed.png");
 	Material* buttonSettingsRed = new Material("settingsButtonRed.png");
 	Material* buttonExitRed = new Material("exitButtonRed.png");
 	Material* buttonCreditsRed = new Material("creditsButtonRed.png");
+	Material* buttonResRed = new Material("resolutionButtonRed.png");
 
 	//CHARACTER MENU
 	Material* buttonReady = new Material("readyButton.png");

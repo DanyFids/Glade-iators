@@ -50,6 +50,7 @@ protected:
 	const float MENU_TIME = 0.2f;
 	float menu_time[2];
 	bool _Abutton[2]{ false, false };
+	bool rPress[2]{ false, false };
 	bool _Bbutton[2]{ false, false };
 	const int MAX_W = 2;
 	const int MIN_W = 0;
@@ -171,6 +172,7 @@ protected:
 	
 	std::string WeaponName[2];
 	std::string ShieldName[2];
+	std::string ResolutionDisplay;
 
 	// Mouse Vars
 	float m_lastX = 400;

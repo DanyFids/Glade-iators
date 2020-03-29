@@ -108,16 +108,14 @@ class MainMenu : public PlayScene {
 	Shader* morphShader;
 	Shader* sunShader;
 	Shader* skelDepth;
-	UI* spaget;
+	UI* logos;
+	UI* blackBox;
 
-	const float MAX_TIME = 3.0f;
-	float menu_time = MAX_TIME;
+	const float MAX_TIME = 2.0f;
+	float menu_time = 1.0f;
 
-	bool displayed = false;
 public:
 	MainMenu();
-
-
 	
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;

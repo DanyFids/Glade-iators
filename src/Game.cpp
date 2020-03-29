@@ -62,6 +62,13 @@ void Game::setSize(int w, int h)
 	heightScreen = h;
 }
 
+void Game::applyRes()
+{
+	Game::SCREEN.x = widthScreen;
+	Game::SCREEN.y = heightScreen;
+	glfwSetWindowMonitor(window, NULL, 0, 0, widthScreen, heightScreen, 60);
+}
+
 Game::Game() :
 	window(nullptr),
 	windowTitle("Glade-iators"),

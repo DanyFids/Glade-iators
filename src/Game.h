@@ -20,6 +20,7 @@ public:
 	static Game* CURRENT;
 	void setScene(SCENES scn);
 	void setSize(int w, int h);
+	void applyRes();
 	static Mesh* QUAD;
 
 	Game();

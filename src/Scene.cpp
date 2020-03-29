@@ -347,6 +347,14 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				menuSpot[controller]--;
 				if (controller == 0) {
 					switch (menuSpot[controller]) {
+					case 18:
+						resolution_Button->ChangeTex(buttonResRed);
+						exit_Button->ChangeTex(buttonExit);
+						break;
+					case 19:
+						resolution_Button->ChangeTex(buttonRes);
+						exit_Button->ChangeTex(buttonExitRed);
+						break;
 					case -4:
 						play_Button->ChangeTex(buttonPlayRed);
 						exit_Button->ChangeTex(buttonExit);
@@ -412,12 +420,20 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					}
 				}
 				menu_time[controller] = MENU_TIME;
-			}
+			} 
 			else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2 && menu_time[controller] <= 0 && !arrowUsed && !_Abutton[controller])
 			{
 				menuSpot[controller]++;
 				if (controller == 0) {
 					switch (menuSpot[controller]) {
+					case 20:
+						resolution_Button->ChangeTex(buttonResRed);
+						exit_Button->ChangeTex(buttonExit);
+						break; 
+					case 21:
+						resolution_Button->ChangeTex(buttonRes);
+						exit_Button->ChangeTex(buttonExitRed);
+						break;
 					case 0:
 						play_Button->ChangeTex(buttonPlayRed);
 						settings_Button->ChangeTex(buttonSettings);
@@ -620,8 +636,10 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					//Ready Button
 					if (_Abutton[controller] && menu_time[controller] > 0) {
 						ready_Button->ChangeTex(buttonReady2);
+						rPress[controller] = true;
 					}
-					else if (menu_time[controller] <= 0) {
+					else if (menu_time[controller] <= 0 && !rPress[1]) {
+						rPress[controller] = false;
 						if (menuSpot[1] == 7) {
 							ready_Button->ChangeTex(buttonReadyPurple);
 						}
@@ -665,6 +683,34 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					else if (menu_time[controller] <= 0) {
 						exit_Button->ChangeTex(buttonExitRed);
 					}
+					break;
+				}
+
+				if (resolution > MAX_RES)
+					resolution = 0;
+				else if (resolution < 0)
+					resolution = MAX_RES;
+
+				switch (resolution) {
+				case 0:
+					Game::CURRENT->setSize(1920, 1080);
+					ResolutionDisplay = "1920x1080";
+					break;
+				case 1:
+					Game::CURRENT->setSize(1600, 900);
+					ResolutionDisplay = "1600x900";
+					break;
+				case 2:
+					Game::CURRENT->setSize(1440, 810);
+					ResolutionDisplay = "1440x810";
+					break;
+				case 3:
+					Game::CURRENT->setSize(1280, 720);
+					ResolutionDisplay = "1280x720";
+					break;
+				case 4:
+					Game::CURRENT->setSize(1024, 576);
+					ResolutionDisplay = "1024x576";
 					break;
 				}
 				//std::cout << weapon[0] << std::endl;
@@ -822,8 +868,10 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					//Ready Button
 					if (_Abutton[controller] && menu_time[controller] > 0) {
 						ready_Button->ChangeTex(buttonReady2);
+						rPress[controller] = true;
 					}
-					else if (menu_time[controller] <= 0) {
+					else if (menu_time[controller] <= 0 && !rPress[0]) {
+						rPress[controller] = false;
 						if (menuSpot[0] == 7) {
 							ready_Button->ChangeTex(buttonReadyPurple);
 						}
@@ -962,7 +1010,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						Game::CURRENT->setScene(SCENES::SETTINGS_SCENE);
 					}
 					else if (menuSpot[0] == -2) {
-						//Credits
+						//Credits 
 					}
 					else if (menuSpot[0] == -3) {
 						//Exit
@@ -970,23 +1018,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 						glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
 					}
 					else if (menuSpot[0] == 20) {
-						switch (resolution) {
-						case 0:
-							Game::CURRENT->setSize(1920, 1080);
-							break;
-						case 1:
-							Game::CURRENT->setSize(1600, 900);
-							break;
-						case 2:
-							Game::CURRENT->setSize(1440, 810);
-							break;
-						case 3:
-							Game::CURRENT->setSize(1280, 720);
-							break;
-						case 4:
-							Game::CURRENT->setSize(1024, 576);
-							break;
-						}
+						Game::CURRENT->applyRes();
 					}
 					else if (menuSpot[0] == 19) {
 						ChangingScn = true;

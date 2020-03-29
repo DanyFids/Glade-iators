@@ -1372,6 +1372,8 @@ void MainMenu::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 void MainMenu::Update(float dt)
 {
 
+	static bool displayed = false;
+	static bool displayLogo = false;
 	//audioEngine.Update();
 
 	for (int u = 0; u < ui.size(); u++) {
@@ -1380,9 +1382,13 @@ void MainMenu::Update(float dt)
 
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
-	if (spaget != nullptr) {
+	if (logos != nullptr) {
 		if (menu_time <= 0) {
-			if (!displayed) {
+			if (!displayLogo) {
+				displayLogo = true;
+				menu_time = MAX_TIME;
+			}
+			else if (!displayed) {
 				displayed = true;
 				menu_time = MAX_TIME;
 			}
@@ -1390,8 +1396,12 @@ void MainMenu::Update(float dt)
 		else {
 			menu_time -= dt;
 		}
+		if (displayLogo)
+			blackBox->setOpacity(menu_time / MAX_TIME);
 		if (displayed) {
-			spaget->setOpacity(menu_time / MAX_TIME);
+			blackBox->setOpacity(0);
+			logos->setOpacity(menu_time / MAX_TIME);
+			ChangingScn = false;
 		}
 	}
 
@@ -1419,7 +1429,7 @@ void MainMenu::Draw()
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
 		glClear(GL_DEPTH_BUFFER_BIT);
 		lights[l]->SetupDepthShader(depthShader);
-		RenderScene(depthShader, sunShader);
+		RenderScene(depthShader, sunShader); 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		//glViewport(0, 0,  , SCREEN_HEIGHT);
 
@@ -1457,8 +1467,9 @@ void MainMenu::Draw()
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 
-	if (spaget != nullptr) {
-		spaget->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
+	if (logos != nullptr) {
+		logos->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
+		blackBox->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
 
 	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
@@ -1470,8 +1481,7 @@ void MainMenu::Draw()
 void MainMenu::LoadScene()
 {
 	isMenu = true;
-	ChangingScn = false;
-
+	ChangingScn = true;
 	MAX_MENU = 0;
 	MIN_MENU = -3;
 
@@ -1519,7 +1529,8 @@ void MainMenu::LoadScene()
 	};
 
 	if (!loaded) {
-		spaget = new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), gladeiatorsTitle);
+		logos = new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), gladeiatorsTitle);
+		blackBox = new UI(600, 350, glm::vec3(150, 350, 0), blackBarMat);
 	}
 }
 
@@ -1935,6 +1946,7 @@ void SettingsScene::Draw()
 	}
 
 	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, ResolutionDisplay, 450.0f - (ResolutionDisplay.length() * 4), 550.5f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -1956,8 +1968,12 @@ void SettingsScene::LoadScene()
 
 	Material* blackBarMat = new Material("black.png");
 	Material* background = new Material("backgroundWood.png");
+	Material* art = new Material("colitreeums.png");
+	Material* shrup = new Material("shrup.png");
 
 	Material* gladeiatorsTitle = new Material("Title.png");
+
+	ResolutionDisplay = "1920x1080";
 
 	buttonExit = new Material("exitButton.png");
 	buttonRes = new Material("resolutionButton.png");
@@ -1969,15 +1985,18 @@ void SettingsScene::LoadScene()
 
 	Cam = {
 		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
-	};
+	}; 
 
-	exit_Button = new UI(200, 70, glm::vec3(55, 80, 0), buttonExit);
-	resolution_Button = new UI(200, 70, glm::vec3(55, 240, 0), buttonRes);
-	arrow_Button1 = new UI(40, 50, glm::vec3(5, 80, 0), arrow);
-	arrow_Button3 = new UI(40, 50, glm::vec3(260, 80, 0), arrowBack);
+	exit_Button = new UI(200, 70, glm::vec3(55, 430, 0), buttonExit);
+	resolution_Button = new UI(200, 70, glm::vec3(55, 520, 0), buttonRes);
+	arrow_Button1 = new UI(40, 50, glm::vec3(5, 530, 0), arrow);
+	arrow_Button3 = new UI(40, 50, glm::vec3(260, 530, 0), arrowBack);
 
 	ui = {
-		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background),
+		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background), 
+		new UI(SCREEN_WIDTH, 420, glm::vec3(0.0f), blackBarMat),
+		new UI(SCREEN_WIDTH, 400, glm::vec3(0.0f), art),
+		new UI(180, 170, glm::vec3(580, 430, 0), shrup),
 		exit_Button,
 		resolution_Button,
 		arrow_Button1,

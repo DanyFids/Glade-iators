@@ -1548,8 +1548,6 @@ void MainMenu::LoadScene()
 	MAX_MENU = 0;
 	MIN_MENU = -3;
 
-
-
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
@@ -2170,8 +2168,8 @@ void Credits::LoadScene()
 	isMenu = true;
 	ChangingScn = false;
 
-	MAX_MENU = 0;
-	MIN_MENU = -2;
+	MAX_MENU = 17;
+	MIN_MENU = 17;
 
 
 
@@ -2185,8 +2183,6 @@ void Credits::LoadScene()
 
 	Material* gladeiatorsTitle = new Material("Title.png");
 
-	Material* firstPlayer = new Material("redPlayer.png");
-	Material* secondPlayer = new Material("bluePlayer.png");
 	Material* buttonPlay = new Material("playButton.png");
 	Material* buttonSettings = new Material("settingsButton.png");
 	Material* buttonExit = new Material("exitButton.png");

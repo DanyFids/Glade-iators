@@ -11,8 +11,8 @@ enum SCENES {
 	MAIN_MENU = 0,
 	PLAY_SCENE = 1,
 	CHARACTER_SCENE = 2,
-	CREDITS = 4,
-	SETTINGS_SCENE = 3
+	SETTINGS_SCENE = 3,
+	CREDITS = 4
 };
 
 class Game {

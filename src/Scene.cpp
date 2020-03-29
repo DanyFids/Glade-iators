@@ -1000,7 +1000,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				_Bbutton[controller] = true;
 			}
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && _Bbutton[controller] && !ChangingScn) {
-				if (MAX_MENU == 10 || MAX_MENU == 20) {
+				if (MAX_MENU != 0) {
 					_Bbutton[controller] = false;
 					ChangingScn = true;
 					isMenu = false;
@@ -1034,6 +1034,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				}
 				else if (menuSpot[0] == -1) {
 					//Settings
+					Game::CURRENT->setScene(SCENES::SETTINGS_SCENE);
 				}
 				else if (menuSpot[0] == -2) {
 					//Credits

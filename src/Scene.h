@@ -44,6 +44,45 @@ protected:
 	std::vector<Camera*> Cam;
 	static bool loaded;
 
+	TextRenderer* Textcontroller = new TextRenderer();
+
+	static int P1wins;
+	static int P2wins;
+	static int RoundCount;
+	
+	static Sound* audioEngine;
+	static bool AEinit;
+	
+	// Mouse Vars
+	float m_lastX = 400;
+	float m_lastY = 300;
+	bool firstMouse = true;
+public:
+
+	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) = 0;
+	virtual void KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt) = 0;
+	virtual void ControllerInput(unsigned int controller, int player, float dt) = 0;
+	virtual void Update(float dt) = 0;
+	virtual void Draw() = 0;
+	virtual void LoadScene() = 0;
+	virtual std::vector<Camera*> GetCams() { return Cam; }
+	virtual void ResizeCams();
+};
+
+class MenuItem {
+	bool disabled;
+public:
+	virtual void Use() = 0;
+	virtual void Draw() = 0;
+	void setDisabled(bool d) { disabled = d; }
+	bool isDisabled() { return disabled; };
+};
+
+class MenuScene : public Scene {
+protected:
+
+	TextRenderer* Textcontroller = new TextRenderer();
+
 	//Menu Variables
 	int menuSpot[2]{ 0, 0 };
 	int MAX_MENU;
@@ -69,8 +108,12 @@ protected:
 	int resolution = 0;
 	const int MAX_RES = 4;
 
-	//Cool Settings stuff
-	float sensitivity = 1.0f;
+	bool ChangingScn = false;
+
+	std::vector<PointLight*> lights;
+	DirectionalLight* sun;
+
+	std::vector<UI*> ui;
 
 	//MAIN MENU
 	Material* buttonPlay = new Material("playButton.png");
@@ -122,38 +165,11 @@ protected:
 	Material* shieldIcon = new Material("iconShield.png");
 	Material* nothingIcon = new Material("nothing.png");
 
-	TextRenderer* Textcontroller = new TextRenderer();
-
-	static int P1wins;
-	static int P2wins;
-	static int RoundCount;
-	
-	static Sound* audioEngine;
-	static bool AEinit;
-	//
-	//ButtonSelect* playerOne;
-	//ButtonSelect* playerTwo;
-	//
-	//Button* wOne;
-	//Button* wTwo;
-	//Button* sOne;
-	//Button* sTwo;
-	//
-	//Button* wOne_p1;
-	//Button* wTwo_p1;
-	//Button* sOne_p1;
-	//Button* sTwo_p1;
-	//Button* wOne_p2;
-	//Button* wTwo_p2;
-	//Button* sOne_p2;
-	//Button* sTwo_p2;
+public:
 	/******************/
 	/* Menu Variables */
 	/******************/
 
-	//Players
-	UI* playerOne;
-	UI* playerTwo;
 	//Menu 1
 	UI* play_Button;
 	UI* settings_Button;
@@ -193,50 +209,18 @@ protected:
 	UI* sTwo_p2;
 	UI* p1Ready;
 	UI* p2Ready;
-	
+
 	std::string WeaponName[2];
 	std::string ShieldName[2];
 	std::string ResolutionDisplay;
+/////////////////////////////////////////
 
-	// Mouse Vars
-	float m_lastX = 400;
-	float m_lastY = 300;
-	bool firstMouse = true;
-public:
-
-	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) = 0;
-	virtual void KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt) = 0;
-	virtual void ControllerInput(unsigned int controller, int player, float dt) = 0;
-	virtual void Update(float dt) = 0;
-	virtual void Draw() = 0;
-	virtual void LoadScene() = 0;
-	virtual std::vector<Camera*> GetCams() { return Cam; }
-	virtual void ResizeCams();
-};
-
-class MenuItem {
-	bool disabled;
-public:
-	virtual void Use() = 0;
-	virtual void Draw() = 0;
-	void setDisabled(bool d) { disabled = d; }
-	bool isDisabled() { return disabled; };
-};
-
-class MenuScene : public Scene {
-protected:
-	int selected;
-	std::vector<MenuItem*> items;
-
-public:
 	// Inherited via Scene
 	virtual void KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt) override;
 	virtual void ControllerInput(unsigned int controller, int player, float dt) override;
 	virtual void Update(float dt) override;
 	virtual void Draw() override;
 	virtual void LoadScene() override;
-
-	void SelectItem(int item);
 
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
@@ -264,10 +248,6 @@ protected:
 
 	bool Target1 = false;
 	bool Target2 = false;
-
-	bool isMenu;
-	bool ChangingScn = false;
-
 
 	int CgradeI = 0;
 	bool CgradeIDown[3] = { false,false,false };

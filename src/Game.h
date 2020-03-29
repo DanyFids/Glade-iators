@@ -11,6 +11,7 @@ enum SCENES {
 	MAIN_MENU = 0,
 	PLAY_SCENE = 1,
 	CHARACTER_SCENE = 2,
+	CREDITS = 4,
 	SETTINGS_SCENE = 3
 };
 
@@ -69,6 +70,7 @@ private:
 	Scene* TwoPlayerScn;
 	Scene* MainMenuScn;
 	Scene* CharacterScn;
+	Scene* CreditsScn;
 	Scene* SettingsScn;
 
 	bool wireframe = false;

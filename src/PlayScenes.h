@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include <thread>
 
-#include "Sound.h"
+
 
 class Light;
 class Mesh;
@@ -57,7 +57,8 @@ class OnePlayer: public PlayScene {
 
 	Object* morphyBoi;
 	Object* staticBoi;
-	Sound audioEngine;
+
+
 
 	float time = 0.0f;
 	float MAX_TIME = 0.2f;
@@ -90,7 +91,11 @@ class TwoPlayer: public PlayScene {
 
 	Shader* sunShader;
 
+
+	//Sound audioEngine;
+
 	float deathtimer = 4;
+	bool winannounce = false;
 
 	Object* morphyBoi;
 public:
@@ -115,8 +120,30 @@ class MainMenu : public PlayScene {
 	float menu_time = 1.0f;
 
 public:
-	MainMenu();
 	
+	MainMenu();
+	// Inherited via Scene
+	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
+	virtual void Update(float dt) override;
+	virtual void Draw() override;
+	virtual void LoadScene() override;
+};
+
+class Credits : public PlayScene {
+	Shader* shaderObj;
+	Shader* depthShader;
+	Shader* morphShader;
+	Shader* sunShader;
+	Shader* skelDepth;
+	UI* spaget;
+
+	const float MAX_TIME = 3.0f;
+	float menu_time = MAX_TIME;
+
+	bool displayed = false;
+public:
+	Credits();
+
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
 	virtual void Update(float dt) override;

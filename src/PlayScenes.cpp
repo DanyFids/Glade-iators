@@ -268,7 +268,7 @@ void OnePlayer::Update(float dt)
 		}
 	}
 
-	audioEngine.Update();
+	
 	for (int c = 0; c < players.size(); c++) {
 		players[c]->Update(dt);
 		
@@ -570,16 +570,16 @@ void OnePlayer::LoadScene()
 	//{91f62782-35bd-42df-85a1-8f359308dd0c}
 
 	//// Init AudioEngine (Don't forget to shut down and update)
-	audioEngine.Init();
+	//audioEngine.Init();
 
 	//// Load a bank (Use the flag FMOD_STUDIO_LOAD_BANK_NORMAL)
-	audioEngine.LoadBank("Master", FMOD_STUDIO_LOAD_BANK_NORMAL);
-
-	//// Load an event
-	audioEngine.LoadEvent("MenuPlaceholder", "{91f62782-35bd-42df-85a1-8f359308dd0c}");
-
-	//// Play the event
-	audioEngine.PlayEvent("MenuPlaceholder");
+	//audioEngine.LoadBank("Master", FMOD_STUDIO_LOAD_BANK_NORMAL);
+	//
+	////// Load an event
+	//audioEngine.LoadEvent("MenuPlaceholder", "{91f62782-35bd-42df-85a1-8f359308dd0c}");
+	//
+	////// Play the event
+	//audioEngine.PlayEvent("MenuPlaceholder");
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Geo_pass.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
@@ -962,7 +962,7 @@ void TwoPlayer::Update(float dt)
 				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) && !players[c]->GetWeapon()->getCooldown()) {
 					if (players[p]->GetShield()->hitbox->GetType() == COLLISION_TYPE::shield) {
 						std::cout << "Blocked!\n";
-
+						audioEngine->PlayEvent("Block");
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
 						players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
 					}
@@ -972,7 +972,7 @@ void TwoPlayer::Update(float dt)
 
 					if (players[p]->hitbox->GetType() == entity) {
 						std::cout << "Hit!\n";
-
+						audioEngine->PlayEvent("Hit");
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
 						players[c]->GetWeapon()->setCooldown(true);
 					}
@@ -990,6 +990,8 @@ void TwoPlayer::Update(float dt)
 			Cam[c]->SetTarget(players[c]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f));
 		}
 	}
+
+	
 
 	//for (int a = 0; a < attacks.size(); a++)
 	//{
@@ -1039,15 +1041,40 @@ void TwoPlayer::Update(float dt)
 
 	if (players[0]->GetHP() <= 0 || players[1]->GetHP() <= 0)
 	{
+		if (players[0]->GetHP() <= 0 && winannounce == false)
+		{
+			P2wins++;
+			winannounce = true;
+			audioEngine->PlayEvent("P2 Wins");
+			
+		}
+		if (players[1]->GetHP() <= 0 && winannounce == false)
+		{
+			P1wins++;
+			winannounce = true;
+			audioEngine->PlayEvent("P1 Wins");
+		}
 		deathtimer -= dt;
 		if (deathtimer <= 0)
 		{
-			Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			RoundCount++;
+			if (P2wins >= 3 || P1wins >= 3)
+			{
+				audioEngine->PlayEvent("Glory");
+				RoundCount = 1;
+				P1wins = 0;
+				P2wins = 0;
+			}
+			Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 			//setScene(MainMenu);
 
 		}
 	}
 }
+
+int PlayScene::P2wins = 0;
+int PlayScene::P1wins = 0;
+int PlayScene::RoundCount = 1;
 
 void TwoPlayer::Draw()
 {
@@ -1151,6 +1178,31 @@ void TwoPlayer::LoadScene()
 	isMenu = false;
 	ChangingScn = false;
 
+	//audioEngine.Init();
+
+	switch (RoundCount)
+	{
+	case 1:
+		audioEngine->PlayEvent("Round 1");
+		break;
+	case 2:
+		audioEngine->PlayEvent("Round 2");
+		break;
+	case 3:
+		audioEngine->PlayEvent("Round 3");
+		break;
+	case 4:
+		audioEngine->PlayEvent("Round 4");
+		break;
+	case 5:
+		audioEngine->PlayEvent("Final Round");
+		break;
+
+	}
+
+
+
+
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
@@ -1224,6 +1276,17 @@ void TwoPlayer::LoadScene()
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, -0.6f, 0.0f });
+
+	//////////////////////////////////Audio
+	
+	
+
+
+	//audioEngine.LoadEvent("P1 Wins", "{1251a18c-193c-4301-8578-9d9329038cb4}");
+	//audioEngine.PlayEvent("P2 Wins");
+	//audioEngine.SetEventPosition("P1 Wins", players[1]->GetPosition());
+
+	/////////////////////////////////////
 
 	//terrain.push_back(new Object(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
 	//terrain.b(glm::vec3(1.2f));
@@ -1484,6 +1547,8 @@ void MainMenu::LoadScene()
 	ChangingScn = true;
 	MAX_MENU = 0;
 	MIN_MENU = -3;
+
+
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1825,7 +1890,46 @@ void CharacterC::LoadScene()
 		p1Ready,
 		p2Ready
 	};
-	//Final Chunck
+
+	//ui[1]->Resize(70, 70);
+	//ui[2]->Resize(70, 70);
+	//ui[3]->Resize(60, 60);
+	//ui[4]->Resize(60, 60);
+	//ui[5]->Resize(60, 60);
+	//ui[6]->Resize(60, 60);
+	//
+	//ui[7]->Resize(600, 60);
+	//ui[8]->Resize(140, 60);
+	//ui[9]->Resize(140, 60);
+	//
+	//ui[10]->Resize(50, 50);
+	//ui[11]->Resize(50, 50);
+	//ui[12]->Resize(50, 50);
+	//ui[13]->Resize(50, 50);
+	//ui[14]->Resize(50, 50);
+	//ui[15]->Resize(50, 50);
+	//ui[16]->Resize(50, 50);
+	//ui[17]->Resize(50, 50);
+	//
+	//ui[18]->Resize(50, 50);
+	//ui[19]->Resize(50, 50);
+	//ui[20]->Resize(50, 50);
+	//ui[21]->Resize(50, 50);
+	//ui[22]->Resize(50, 50);
+	//ui[23]->Resize(50, 50);
+	//ui[24]->Resize(50, 50);
+	//ui[25]->Resize(50, 50);
+	//
+	//ui[26]->Resize(60, 60);
+	//ui[27]->Resize(50, 50);
+	//ui[28]->Resize(60, 60);
+	//ui[29]->Resize(50, 50);
+	//
+	//ui[30]->Resize(800, 400);
+	//ui[31]->Resize(180, 280);
+	//ui[32]->Resize(180, 280);
+	//
+	////Final Chunck
 	ui[41]->setOpacity(0.5);
 	ui[42]->setOpacity(0.5);
 	ui[43]->setOpacity(0.5);
@@ -2003,4 +2107,100 @@ void SettingsScene::LoadScene()
 		arrow_Button3
 	};
 
+}
+
+Credits::Credits()
+{
+	LoadScene();
+}
+
+void Credits::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
+{
+	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
+		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_2, dt);
+		}
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
+			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
+		}
+	}
+	else {
+
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
+
+		}
+		else {
+			KeyboardInput(window, mousePos, PLAYER_1, dt);
+		}
+
+	}
+}
+
+void Credits::Update(float dt)
+{
+}
+
+void Credits::Draw()
+{
+	//Programmers:\nDylan Brush\nCraig Holder\nAnthony Ona\nArtists:\nMaija Kinnunen\nTia Lee
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "ProjectManager:", 20, 550, 0.75, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Daniel Findleton", 20, 520, 0.5, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Programmers:", 20, 450, 0.75, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Dylan Brush", 20, 420, 0.5, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Craig Holder", 20, 390, 0.5, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Anthony Ona", 20, 360, 0.5, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Artists:", 20, 290, 0.75, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Maija Kinnunen", 20, 260, 0.5, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Tia Lee", 20, 230, 0.5, glm::vec3(1.f, 1.f, 1.f));
+
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Special Thanks", 20, 160, 0.75, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Playtesters:", 20, 125, 0.75, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Zach \"Vertigo\"", 20, 90, 0.5, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Marian Grippa", 20, 60, 0.5, glm::vec3(1.f, 1.f, 1.f));
+}
+
+void Credits::LoadScene()
+{
+	isMenu = true;
+	ChangingScn = false;
+
+	MAX_MENU = 0;
+	MIN_MENU = -2;
+
+
+
+	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
+
+	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
+	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
+	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
+
+	Material* blackBarMat = new Material("black.png");
+
+	Material* gladeiatorsTitle = new Material("Title.png");
+
+	Material* firstPlayer = new Material("redPlayer.png");
+	Material* secondPlayer = new Material("bluePlayer.png");
+	Material* buttonPlay = new Material("playButton.png");
+	Material* buttonSettings = new Material("settingsButton.png");
+	Material* buttonExit = new Material("exitButton.png");
+	Material* buttonBlank = new Material("blankButton.png");
+	Material* titleImage = new Material("gladewallpaper.png");
+
+	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
+	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
+
+	Cam = {
+		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
+	};
+
+	//Final Chunck
+	
 }

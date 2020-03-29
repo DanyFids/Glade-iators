@@ -9,6 +9,7 @@
 #include "Texture.h"
 #include "Mesh.h"
 #include "Text.h"
+#include "Sound.h"
  
 class Camera;
 class Shader;
@@ -123,6 +124,29 @@ protected:
 
 	TextRenderer* Textcontroller = new TextRenderer();
 
+	static int P1wins;
+	static int P2wins;
+	static int RoundCount;
+	
+	static Sound* audioEngine;
+	static bool AEinit;
+	//
+	//ButtonSelect* playerOne;
+	//ButtonSelect* playerTwo;
+	//
+	//Button* wOne;
+	//Button* wTwo;
+	//Button* sOne;
+	//Button* sTwo;
+	//
+	//Button* wOne_p1;
+	//Button* wTwo_p1;
+	//Button* sOne_p1;
+	//Button* sTwo_p1;
+	//Button* wOne_p2;
+	//Button* wTwo_p2;
+	//Button* sOne_p2;
+	//Button* sTwo_p2;
 	/******************/
 	/* Menu Variables */
 	/******************/

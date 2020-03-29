@@ -49,6 +49,10 @@ void Game::setScene(SCENES scn)
 		CharacterScn = new CharacterC();
 		curScene = CharacterScn;
 		break;
+	case CREDITS:
+		CreditsScn = new Credits();
+		curScene = CreditsScn;
+		break;
 	case SETTINGS_SCENE:
 		SettingsScn = new SettingsScene();
 		curScene = SettingsScn;

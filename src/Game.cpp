@@ -122,7 +122,7 @@ void Game::Initialize()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_TEXTURE_3D);
-
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//glEnable(GL_SCISSOR_TEST);
@@ -168,7 +168,7 @@ void Game::Initialize()
 		curScene = MainMenuScn;
 	}
 	else {
-		OnePlayerScn = new OnePlayer();
+		OnePlayerScn = new TwoPlayer();
 		
 		curScene = OnePlayerScn;
 		//curScene = MainMenuScn;

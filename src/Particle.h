@@ -21,14 +21,16 @@ protected:
 	ParticleBehavior behavior;
 
 public:
-	static void FireUpdate(float dt, Particle &p);
-
 	//Particle(glm::vec3 pos, glm::vec3 vel, float l) :position(pos), velocity(vel), life(l) {};
 	Particle(glm::vec3 pos, glm::vec3 vel, float l, glm::vec2 s, ParticleBehavior b);
 
 	virtual void Update(float dt);
 
 	friend class ParticleEngine;
+
+	// Behaviors
+	static void FireUpdate(float dt, Particle& p);
+	static void AudienceUpdate(float dt, Particle& p);
 };
 
 class ParticleEngine {
@@ -40,6 +42,8 @@ class ParticleEngine {
 	glm::vec3 origin;
 	glm::vec2 particle_size;
 	float particle_l;
+
+	bool e_init = true;
 
 	ParticleEngineBehavior engine_b;
 	ParticleBehavior particle_b;
@@ -59,4 +63,5 @@ public:
 
 	// behaviors
 	static void FireEngineBehavior(float dt, ParticleEngine& e);
+	static void AudienceEngineBehavior(float dt, ParticleEngine& e);
 };

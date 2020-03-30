@@ -21,13 +21,13 @@ struct Material{
 uniform Material material;
 
 void main(){
-	vec3 objColor = vec3(texture(material.diffuse, texCoord));
+	vec4 objColor = texture(material.diffuse, texCoord);
 	vec3 specVal = vec3(texture(material.specular, texCoord));
 	vec3 normTex = vec3(texture(material.normal, texCoord));
 	
 	if(objColor.r == objColor.b && objColor.g == 0.0){
 		objColor.g = objColor.r;
-		objColor = objColor * vec3(indexColor);
+		objColor = objColor * indexColor;
 	}
 
 	vec3 norm = (normTex * 2) - 1;
@@ -35,7 +35,10 @@ void main(){
 
 	vec3 outNorm = (normal / 2) + 0.5;
 
-	FragColor = vec4(objColor, 1.0);
+	if(objColor.a == 0.0)
+		discard;
+
+	FragColor = objColor;
 	Normals = vec4(outNorm, 1.0);
 	Specular = vec4(specVal, material.shine / 256);
 }

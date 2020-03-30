@@ -1,12 +1,11 @@
 #pragma once
 #include "Scene.h"
 #include <thread>
-
 #include "Sound.h"
+#include "Object.h"
 
 class Light;
 class Mesh;
-class Player;
 class ParticleEngine;
 
 class OnePlayer: public PlayScene {
@@ -97,8 +96,12 @@ class TwoPlayer: public PlayScene {
 	float deathtimer = 4;
 
 	Object* morphyBoi;
+
+	WeaponType _Weapons[2];
+	ShieldType _Shields[2];
+
 public:
-	TwoPlayer();
+	TwoPlayer(WeaponType p1_weapon = WEAPON_SWORD, ShieldType p1_shield = SHIELD_LARGE, WeaponType p2_weapon = WEAPON_SWORD, ShieldType p2_shield = SHIELD_LARGE);
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
 	virtual void Update(float dt) override;

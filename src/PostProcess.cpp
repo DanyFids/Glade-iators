@@ -3,8 +3,10 @@
 #include "Mesh.h"
 #include "Texture.h"
 
-FrameBuffer::FrameBuffer()
+FrameBuffer::FrameBuffer(bool ca)
 {
+	clear_alpha = ca;
+
 	// Generate Buffers
 	unsigned int t;
 
@@ -43,8 +45,10 @@ FrameBuffer::FrameBuffer()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-FrameBuffer::FrameBuffer(unsigned int d)
+FrameBuffer::FrameBuffer(unsigned int d, bool ca)
 {
+	clear_alpha = ca;
+
 	unsigned int t;
 
 	glGenFramebuffers(1, &ID);
@@ -86,6 +90,14 @@ void FrameBuffer::Use()
 void FrameBuffer::Clear()
 {
 	Use();
+
+	if (clear_alpha) {
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	}
+	else {
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	}
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

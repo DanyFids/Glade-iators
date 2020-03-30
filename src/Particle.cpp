@@ -13,6 +13,10 @@ void Particle::FireUpdate(float dt, Particle &p)
 	p.size = p.start_size * (p.life / p.lifetime);
 }
 
+void Particle::AudienceUpdate(float dt, Particle& p)
+{
+}
+
 Particle::Particle(glm::vec3 pos, glm::vec3 vel, float l, glm::vec2 s, ParticleBehavior b)
 {
 	position = pos;
@@ -139,5 +143,41 @@ void ParticleEngine::FireEngineBehavior(float dt, ParticleEngine& e)
 		e.particles.push_back(Particle(e.origin + glm::vec3(1.0f, 0.0f, 0.0f), vel, e.particle_l + r, e.particle_size, e.particle_b));
 		e.particles.push_back(Particle(e.origin + glm::vec3(-1.0f, 0.0f, 0.0f), vel, e.particle_l + r, e.particle_size, e.particle_b));
 		e.particles.push_back(Particle(e.origin + glm::vec3(0.0f, 0.0f, 1.0f), vel, e.particle_l + r, e.particle_size, e.particle_b));
+	}
+}
+
+void ParticleEngine::AudienceEngineBehavior(float dt, ParticleEngine& e)
+{
+	if (e.e_init) {
+		e.particles = {
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b)
+		};
+
+		e.e_init = false;
+	}
+	else {
+
 	}
 }

@@ -94,14 +94,16 @@ float ShadowCalc(vec3 fragPos, int light_id){
 
 void main()
 {
-	vec3 objColor = vec3(texture(material.diffuse, texCoord));
+	vec4 objColor = texture(material.diffuse, texCoord);
 	vec3 specVal = vec3(texture(material.specular, texCoord));
 	vec3 normTex = vec3(texture(material.normal, texCoord));
 
 	if(objColor.r == objColor.b && objColor.g == 0.0){
 		objColor.g = objColor.r;
-		objColor = objColor * vec3(indexColor);
+		objColor = objColor * indexColor;
 	}
+
+	vec3 albedo = objColor.rgb;
 
 	//vec3 normVal = vec3(0.0);
 
@@ -111,12 +113,12 @@ void main()
 	vec3 sunDir = normalize(sun.pos - vec3(0));
 
 	// Ambient Light
-	vec3 ambient = sun.ambient * objColor;
+	vec3 ambient = sun.ambient * albedo;
 
 	// Diffuse Light
 
 	float diff = max(dot(norm, sunDir), 0.0);
-	vec3 diffuse = sun.diffuse * diff * objColor;
+	vec3 diffuse = sun.diffuse * diff * albedo;
 
 	// Specular Light
 	vec3 viewDir = normalize(viewPos - fragPos);
@@ -141,11 +143,11 @@ void main()
 		float attenuation = 1.0 / (1.0 + lights[c].linear * distance + lights[c].quadratic * (distance * distance));
 
 		// Ambient Light
-		vec3 p_ambient = lights[c].ambient * objColor;
+		vec3 p_ambient = lights[c].ambient * albedo;
 
 		// Diffuse Light
 		float p_diff = max(dot(norm, lightDir), 0.0);
-		vec3 p_diffuse = lights[c].diffuse * p_diff * objColor;
+		vec3 p_diffuse = lights[c].diffuse * p_diff * albedo;
 
 		// Specular Light
 		vec3 reflectDir = reflect(-lightDir, norm);
@@ -159,6 +161,9 @@ void main()
 		//pointColor = vec3(shadow, shadow, shadow);
 	}
 
-    FragColor = vec4((pointColor + sunColor), 1.0);
+	if(texture(material.diffuse, texCoord).a == 0.0)
+		discard;
+
+    FragColor = vec4((pointColor + sunColor), objColor.a);
 	//FragColor = vec4(objColor, 1.0);
 }

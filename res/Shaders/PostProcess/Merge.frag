@@ -13,5 +13,5 @@ void main(){
 	vec4 col2 = texture(INPUT_1, texCoord);
 	vec4 col3 = texture(INPUT_2, texCoord);
 
-	fragColor = col1 * col2 + col3;
+	fragColor = (1.0 - col3.a)*(col1 * col2) + col3;
 }

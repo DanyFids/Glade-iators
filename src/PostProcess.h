@@ -40,9 +40,10 @@ private:
 	 std::vector<unsigned int> OUT;
 	unsigned int DEPTH;
 
+	bool clear_alpha;
 public:
-	FrameBuffer();
-	FrameBuffer(unsigned int d);
+	FrameBuffer(bool ca = false);
+	FrameBuffer(unsigned int d, bool ca = false);
 	~FrameBuffer();
 
 	void Use();

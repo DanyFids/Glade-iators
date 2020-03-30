@@ -319,6 +319,54 @@ bool Player::HitDetect(Object* other)
 	return false;
 }
 
+void Player::Draw(Shader* shdr, std::vector<Camera*> cam, Shader* childShader)
+{
+	glm::vec4 green(0.0f, 1.0f, 0.0f, 1.0f);
+	glm::vec4 ylw(1.0f, 1.0f, 0.0f, 1.0f);
+	glm::vec4 orange(1.0f, 0.65f, 0.0f, 1.0f);
+	glm::vec4 red(1.0f, 0.0f, 0.0f, 1.0f);
+	glm::vec4 brown(0.3f, 0.2f, 0.0f, 1.0f);
+	glm::vec4 gone(0.0f, 0.0f, 0.0f, 0.0f);
+
+	glm::vec4 color = green;
+
+	float hp = GetHP();
+
+	if (hp <= 100 && hp > 80) {
+		float t = (hp - 80) / 20.0f;
+		
+		color = lerp(ylw, green, t);
+	}
+	else if (hp < 81 && hp > 60) {
+		float t = (hp - 60) / 20.0f;
+
+		color = lerp(orange, ylw, t);
+	}
+	else if (hp < 61 && hp > 40) {
+		float t = (hp - 40) / 20.0f;
+
+		color = lerp(red, orange, t);
+	}
+	else if (hp < 41 && hp > 20) {
+		float t = (hp - 20) / 20.0f;
+
+		color = lerp(brown, red, t);
+	}
+	else if (hp < 21 && hp >= 0) {
+		float t = (hp) / 20.0f;
+
+		color = lerp(gone, brown, t);
+	}
+	else {
+		color = gone;
+	}
+
+	shdr->SetVec4("indexColor", color);
+
+	Object::Draw(shdr, cam, childShader);
+
+}
+
 void Player::dmgHP(float _dmg)
 {
 	if(GetFrameState() != FrameStates::Roll)
@@ -367,9 +415,9 @@ void Player::Idle()
 		_mesh->SetIntensity(1, 0.0f);
 		state = idle;
 
-		if (weapon->getCooldown()) {
-			weapon->setCooldown(false);
-		}
+		//if (weapon->getCooldown()) {
+		//	weapon->setCooldown(false);
+		//}
 	}
 }
 

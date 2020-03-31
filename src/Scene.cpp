@@ -977,7 +977,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					weapon[controller] = (int)rand() % 2;
 					shield[controller] = (int)rand() % 2;
 				}
-				
+				 
 				else if (menuSpot[0] == 0) {
 					//Character Scene
 					ChangingScn = true;

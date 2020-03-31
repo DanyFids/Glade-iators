@@ -1251,7 +1251,8 @@ void TwoPlayer::LoadScene()
 	Mesh* Square = new Mesh("d6.obj");
 	Mesh* d20 = new Mesh("d20.obj");
 	Mesh* boi = new Mesh("gladiator.obj");
-	
+	audioEngine->LoadEvent("BiggerBiggerCrowed", "{2a301faf-0978-4b16-aec9-5fb2242d6ac8}");
+	audioEngine->PlayEvent("BiggerBiggerCrowed");
 
 	Mesh* arena = new Mesh("Caulitreeum.obj");
 

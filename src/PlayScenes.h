@@ -94,13 +94,14 @@ class TwoPlayer: public PlayScene {
 
 	Shader* sunShader;
 
-
 	//Sound audioEngine;
 
 	float deathtimer = 4;
 	bool winannounce = false;
 
 	Object* morphyBoi;
+
+	Sound audioEngine;
 
 	WeaponType _Weapons[2];
 	ShieldType _Shields[2];

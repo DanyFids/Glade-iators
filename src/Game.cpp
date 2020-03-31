@@ -124,6 +124,7 @@ void Game::Run()
 
 }
 
+
 void Game::Initialize()
 {
 	// Initialize GLFW
@@ -187,6 +188,8 @@ void Game::Initialize()
 	//CharacterScn = new CharacterC();
 	//Attack Init(0);
 	//Init.init();
+
+	
 
 	MainMenuScn = new MainMenu();
 
@@ -336,6 +339,7 @@ void Game::InputHandle(float dt)
 
 	curScene->InputHandle(window, mousePos, dt);
 }
+
 
 void Game::Update(float dt)
 {

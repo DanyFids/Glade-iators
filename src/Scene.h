@@ -51,8 +51,7 @@ protected:
 	static int P2wins;
 	static int RoundCount;
 	
-	static Sound* audioEngine;
-	static bool AEinit;
+
 	
 	// Mouse Vars
 	float m_lastX = 400;
@@ -119,6 +118,8 @@ protected:
 	DirectionalLight* sun;
 
 	std::vector<UI*> ui;
+
+	Sound musicaudioEngine;
 
 	//MAIN MENU
 	Material* buttonPlay = new Material("playButton.png");

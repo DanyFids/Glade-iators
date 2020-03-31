@@ -22,7 +22,7 @@ void MenuScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 
 void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 {
-
+	
 	/*****************/
 	/* Menu Movement */
 	/*****************/
@@ -751,6 +751,7 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 			if (ready[0] && ready[1]) {
 				ChangingScn = true;
 				Game::CURRENT->Loadouts(weapon[0], weapon[1], shield[0], shield[1]);
+				musicaudioEngine.Shutdown();
 				Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 			}
 			menu_time[controller] = MENU_TIME;
@@ -890,8 +891,7 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 }
 
 
-bool PlayScene::AEinit = false;
-Sound* PlayScene::audioEngine = new Sound();
+
 
 void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 {
@@ -900,32 +900,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 	static bool guardButton1 = false;
 	static bool guardButton2 = false;
 
-	if (AEinit == false)
-	{
-		audioEngine->Init();
-		audioEngine->LoadBank("Master", FMOD_STUDIO_LOAD_BANK_NORMAL);
 
-		//// Load an event
-		audioEngine->LoadEvent("P2 Wins", "{94f1615e-0814-4af7-88bc-feb808703b6a}");
-		audioEngine->LoadEvent("P2 Wins", "{94f1615e-0814-4af7-88bc-feb808703b6a}");
-		audioEngine->LoadEvent("P1 Wins", "{1251a18c-193c-4301-8578-9d9329038cb4}");
-				   
-		audioEngine->LoadEvent("Round 1", "{67af2ee8-b62e-4a50-847a-4584747b5436}");
-		audioEngine->LoadEvent("Round 2", "{4e9ebd27-ddc1-4f38-875d-9194770b57c5}");
-		audioEngine->LoadEvent("Round 3", "{554f1588-e75d-4d2b-89ff-5387891cc5f5}");
-		audioEngine->LoadEvent("Round 4", "{765e00d8-6c31-4ff2-a40c-19119d9c615d}");
-		audioEngine->LoadEvent("Final Round", "{0c13e8a4-3ac6-466a-b2c1-99699876d4e3}");
-				   
-		audioEngine->LoadEvent("Block", "{f63a0013-8699-42f9-b6dc-23dd924031ce}");
-		audioEngine->LoadEvent("Hit", "{d7001405-ff86-4cab-9ea4-5189a22a4322}");
-		audioEngine->LoadEvent("SwingParry", "{0b3c9985-8103-4909-8f03-02e5dd6fcedb}");
-
-		audioEngine->LoadEvent("Glory", "{e99deb05-d8df-4a01-b317-af8ec3ede3bd}");
-
-		AEinit = true;
-	}
-
-	audioEngine->Update();
 
 	GLFWgamepadstate state;
 	if (glfwGetGamepadState(controller, &state)) {

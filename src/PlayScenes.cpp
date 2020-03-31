@@ -986,7 +986,9 @@ void TwoPlayer::Update(float dt)
 				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) && !players[c]->GetWeapon()->getCooldown()) {
 					if (players[p]->GetShield()->hitbox->GetType() == COLLISION_TYPE::shield) {
 						std::cout << "Blocked!\n";
-						audioEngine->PlayEvent("Block");
+						audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+						audioEngine.LoadEvent("Block", "{1058aacd-0878-4ea8-be1c-e68f1e06cbc4}");
+						audioEngine.PlayEvent("Block");
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
 						players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
 					}
@@ -995,8 +997,10 @@ void TwoPlayer::Update(float dt)
 				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
 
 					if (players[p]->hitbox->GetType() == entity) {
-						std::cout << "Hit!\n";
-						audioEngine->PlayEvent("Hit");
+						std::cout << "Hit!\n"; 
+						audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+						audioEngine.LoadEvent("Hit", "{3830d309-eab3-4e2d-9cc2-2b00807daf5c}");
+						audioEngine.PlayEvent("Hit");
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
 						players[c]->GetWeapon()->setCooldown(true);
 					}
@@ -1015,7 +1019,8 @@ void TwoPlayer::Update(float dt)
 		}
 	}
 
-	
+
+	audioEngine.Update();
 
 	//for (int a = 0; a < attacks.size(); a++)
 	//{
@@ -1069,14 +1074,14 @@ void TwoPlayer::Update(float dt)
 		{
 			P2wins++;
 			winannounce = true;
-			audioEngine->PlayEvent("P2 Wins");
+			audioEngine.PlayEvent("P2 Wins");
 			
 		}
 		if (players[1]->GetHP() <= 0 && winannounce == false)
 		{
 			P1wins++;
 			winannounce = true;
-			audioEngine->PlayEvent("P1 Wins");
+			audioEngine.PlayEvent("P1 Wins");
 		}
 		deathtimer -= dt;
 		if (deathtimer <= 0)
@@ -1084,7 +1089,7 @@ void TwoPlayer::Update(float dt)
 			RoundCount++;
 			if (P2wins >= 3 || P1wins >= 3)
 			{
-				audioEngine->PlayEvent("Glory");
+				audioEngine.PlayEvent("Glory");
 				RoundCount = 1;
 				P1wins = 0;
 				P2wins = 0;
@@ -1200,31 +1205,62 @@ void TwoPlayer::Draw()
 void TwoPlayer::LoadScene()
 {
 
-	//audioEngine.Init();
+	//audioEngine.Init(); 
+
+	audioEngine.Init();
+
+
 
 	switch (RoundCount)
 	{
 	case 1:
-		audioEngine->PlayEvent("Round 1");
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round1", "{287449cd-0f8c-4e01-b817-f7de974921f7}");
+		audioEngine.PlayEvent("Round1");
+
+		//audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		//audioEngine.LoadEvent("Engine_Start", "{329a5270-2532-46b0-9b28-7f1f2b627efa}");
+		//audioEngine.LoadEvent("Engine_Running_2", "{25d4404c-7bfe-49cc-a5d6-4c558667375d}");
+		//audioEngine.LoadEvent("GlassBreak", "{0cda6a63-08d1-49f6-9d08-aa9890357558}");
+		//
+		//audioEngine.PlayEvent("Engine_Running_2");
 		break;
 	case 2:
-		audioEngine->PlayEvent("Round 2");
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round2", "{a95cb409-79f2-4131-9f69-7530899d00fd}");
+		audioEngine.PlayEvent("Round2");
 		break;
 	case 3:
-		audioEngine->PlayEvent("Round 3");
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round3", "{8ac23920-72c4-4867-8ae6-c36fb8de6214}");
+		audioEngine.PlayEvent("Round3");
 		break;
 	case 4:
-		audioEngine->PlayEvent("Round 4");
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round4", "{1b41bcb5-c7e2-4032-9c7f-ea1f7fe37002}");
+		audioEngine.PlayEvent("Round4");
 		break;
 	case 5:
-		audioEngine->PlayEvent("Final Round");
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("FinalRound", "{c692a986-0db6-40d6-8b67-b9a049bdc6a3}");
+		audioEngine.PlayEvent("FinalRound");
 		break;
 
 	}
+	audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+	audioEngine.LoadEvent("BiggerBiggerCrowed", "{a36c2fde-3e9f-4557-8e4c-8a516095b57e}");
+	audioEngine.PlayEvent("BiggerBiggerCrowed");
+	//audioEngine.LoadEvent("BattleMusic", "{5d5be828-f39b-4d9e-9bf2-ea581daa0e20}");
+	//audioEngine.PlayEvent("BattleMusic"); 
 
 
-
-
+	//audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+	//audioEngine.LoadEvent("Engine_Start", "{329a5270-2532-46b0-9b28-7f1f2b627efa}");
+	//audioEngine.LoadEvent("Engine_Running_2", "{25d4404c-7bfe-49cc-a5d6-4c558667375d}");
+	//audioEngine.LoadEvent("GlassBreak", "{0cda6a63-08d1-49f6-9d08-aa9890357558}");
+	//
+	//audioEngine.PlayEvent("Engine_Running_2");
+	 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
@@ -1271,11 +1307,9 @@ void TwoPlayer::LoadScene()
 	//lights.push_back(new PointLight({ 0.0f, 30.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	//lights.push_back(new PointLight({ -4.0f, 1.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
-	Mesh* Square = new Mesh("d6.obj");
+	Mesh* Square = new Mesh("d6.obj"); 
 	Mesh* d20 = new Mesh("d20.obj");
 	Mesh* boi = new Mesh("gladiator.obj");
-	audioEngine->LoadEvent("BiggerBiggerCrowed", "{2a301faf-0978-4b16-aec9-5fb2242d6ac8}");
-	audioEngine->PlayEvent("BiggerBiggerCrowed");
 
 	Mesh* arena = new Mesh("Caulitreeum.obj");
 

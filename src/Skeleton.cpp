@@ -168,16 +168,20 @@ void Joint::Draw(glm::mat4 global, int a, int f, Shader* shader)
 
 void Joint::FillJointArray(glm::mat4* arr, glm::mat4*& axis, glm::mat4*& axis_i, glm::mat3* norms, glm::mat4 global, glm::vec3* binds, glm::vec3 last, glm::vec3*& bind_t, glm::vec3 last_b, float* anim_i, int* anim_c, int& cur, int* frame, int num_channels)
 {
-	glm::mat4 local_trans = glm::mat4(1.0f);
+	Transform local_trans;
 
 	for (int c = 0; c < num_channels; c++) {
 		if (anim_c[c] >= 0 && anim_c[c] < animations.size()) {
-			local_trans = local_trans * (anim_i[c] * animations[anim_c[c]][frame[c]].GetRotEul() + (1.0f - anim_i[c])*glm::mat4(1.0f));
+			local_trans.position += (animations[anim_c[c]][frame[c]].position - offset) * anim_i[c];
+			local_trans.rotation += animations[anim_c[c]][frame[c]].rotation * anim_i[c];
+			local_trans.scale += (animations[anim_c[c]][frame[c]].scale - glm::vec3(1.0f)) * anim_i[c];
 		}
 	}
 
+	local_trans.position += offset;
+
 	//glm::mat4 trans = global * local_trans;
-	glm::mat4 trans = global * glm::translate(glm::mat4(1.0f), offset) * local_trans;
+	glm::mat4 trans = global * local_trans.GetWorldTransform();
 	glm::vec3 bind = last + offset;
 	glm::mat3 norm = glm::mat3(glm::transpose(glm::inverse(trans)));
 	arr[cur] = trans;
@@ -235,19 +239,19 @@ void Joint::LoadAnimFrame(std::queue<float>& values, int anim, int frame)
 			animations[anim][frame].position.x = val;
 			break;
 		case ChannelType::Yposition:
-			animations[anim][frame].position.z = val;
-			break;
-		case ChannelType::Zposition:
 			animations[anim][frame].position.y = val;
 			break;
+		case ChannelType::Zposition:
+			animations[anim][frame].position.z = val;
+			break;
 		case ChannelType::Xrotation:
-			animations[anim][frame].rotation.x = -val;
+			animations[anim][frame].rotation.x = val;
 			break;
 		case ChannelType::Yrotation:
-			animations[anim][frame].rotation.z = val;
+			animations[anim][frame].rotation.y = val;
 			break;
 		case ChannelType::Zrotation:
-			animations[anim][frame].rotation.y = val;
+			animations[anim][frame].rotation.z = val;
 			break;
 		default:
 			std::cout << "ERROR::SKELETON:: '" + name + "' ::LOAD_FRAME::INVALID_CHANNEL";
@@ -277,6 +281,23 @@ glm::mat4 Joint::TransformTo(int anim, int frame)
 	}
 }
 
+glm::mat4 Joint::TransformTo(int* anims, int* frames, float* intensities, unsigned int num_chnls)
+{
+	Transform temp;
+	for (int c = 0; c < num_chnls; c++) {
+		temp.position += animations[anims[c]][frames[c]].position * intensities[c];
+		temp.rotation += animations[anims[c]][frames[c]].rotation * intensities[c];
+		//temp.scale += animations[anims[c]][frames[c]].scale * intensities[c];
+	}
+
+	if (parent != nullptr) {
+		return parent->TransformTo(anims, frames, intensities, num_chnls) * temp.GetWorldTransform();
+	}
+	else {
+		return glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, temp.position.y, 0.0f)) * temp.GetRotEul();
+	}
+}
+
 Skeleton::Skeleton(std::string name, std::string file)
 {
 	this->name = name;
@@ -287,6 +308,12 @@ Skeleton::Skeleton(std::string name, std::string file)
 void Skeleton::WriteTree()
 {
 	root->WriteOutput("");
+
+	std::cout << std::endl;
+	for (int c = 0; c < anim_names.size(); c++) {
+		std::cout << anim_names[c] << std::endl;
+	}
+	std::cout << std::endl;
 }
 
 int Skeleton::LoadFromFile(std::string f)
@@ -332,11 +359,11 @@ int Skeleton::LoadFromFile(std::string f)
 		else if (read.compare("OFFSET") == 0) {
 			if (cur != nullptr) {
 				file >> read;
-				cur->offset.x = -std::stof(read);
-				file >> read;
-				cur->offset.z = std::stof(read);
+				cur->offset.x = std::stof(read);
 				file >> read;
 				cur->offset.y = std::stof(read);
+				file >> read;
+				cur->offset.z = std::stof(read);
 
 				cur->animations[0][0].position = cur->offset;
 				continue;
@@ -499,21 +526,20 @@ void Skeleton::GetTransformArray(glm::mat4* & ret, glm::mat4* & axis, glm::mat4*
 
 	int id = 0;
 
-	for (int c = 0; c < root->children.size(); c++) {
-		
-		glm::mat4 r_tran = glm::mat4(1.0f);
-		glm::mat4 r_t = glm::mat4(1.0f);
+	Transform tmp;
 
-		for (int r = 0; r < num_channels; r++) {
-			if (anim_c[r] >= 0 && anim_c[r] < root->animations.size()) {
-				r_tran = r_tran * (anim_i[r] * root->animations[anim_c[r]][frame[r]].GetRotEul() + (1.0f - anim_i[r]) * glm::mat4(1.0f));
-				glm::vec3 t = root->animations[anim_c[r]][frame[r]].position - root->offset;
-				r_t = glm::translate(r_t, anim_i[r] * glm::vec3(0.0f, (root->animations[anim_c[r]][frame[r]].position - root->offset).y, 0.0f));
-			}
+	for (int c = 0; c < num_channels; c++) {
+		if (anim_c[c] >= 0 && anim_c[c] < root->animations.size()) {
+			tmp.position += glm::vec3(0.0f, root->animations[anim_c[c]][frame[c]].position.y - root->offset.y, 0.0f) * anim_i[c];
+			tmp.rotation += root->animations[anim_c[c]][frame[c]].rotation * anim_i[c];
+			//tmp.scale += root->animations[anim_c[c]][frame[c]].scale * anim_i[c];
 		}
+	}
 
-		r_tran = glm::translate(glm::mat4(1.0f), root->offset) * r_t * r_tran;
+	tmp.position.y += root->offset.y;
 
+	glm::mat4 r_tran = tmp.GetWorldTransform();
+	for (int c = 0; c < root->children.size(); c++) {
 		glm::vec3 newPos = root->offset + glm::vec3(r_tran * glm::vec4(root->children[c]->offset, 0.0f));
 		bind_t[id] = glm::vec3(newPos);
 		root->children[c]->FillJointArray(ret, axis, axis_i, norms, r_tran, binds, root->offset, bind_t, newPos, anim_i, anim_c, id, frame, num_channels); // float* anim_i, int* anim_c, int& cur, int* frame, int num_channels

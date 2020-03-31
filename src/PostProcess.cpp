@@ -3,8 +3,10 @@
 #include "Mesh.h"
 #include "Texture.h"
 
-FrameBuffer::FrameBuffer()
+FrameBuffer::FrameBuffer(bool ca)
 {
+	clear_alpha = ca;
+
 	// Generate Buffers
 	unsigned int t;
 
@@ -43,6 +45,36 @@ FrameBuffer::FrameBuffer()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+FrameBuffer::FrameBuffer(unsigned int d, bool ca)
+{
+	clear_alpha = ca;
+
+	unsigned int t;
+
+	glGenFramebuffers(1, &ID);
+	glGenTextures(1, &t);
+
+	//Setup Main Color Output
+	glBindTexture(GL_TEXTURE_2D, t);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Game::SCREEN.x, Game::SCREEN.y, 0, GL_RGBA, GL_FLOAT, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, ID);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, t, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, d, 0);
+
+	OUT.push_back(t);
+	DEPTH = d;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 FrameBuffer::~FrameBuffer() {
 	glDeleteFramebuffers(1, &ID);
 	for (int c = 0; c < OUT.size(); c++) {
@@ -58,6 +90,14 @@ void FrameBuffer::Use()
 void FrameBuffer::Clear()
 {
 	Use();
+
+	if (clear_alpha) {
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	}
+	else {
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	}
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

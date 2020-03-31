@@ -1,20 +1,15 @@
-#version 330 core
+#version 410 core
+const int MAX_PARTICLES = 512;
+
 layout (location = 0) in vec3 Pos;
-layout (location = 1) in vec2 texUv;
 
-out vec2 TexCoords;
+uniform vec3[MAX_PARTICLES] pos;
+uniform vec2[MAX_PARTICLES] size;
 
-out vec4 Color;
-
-uniform mat4 project;
-uniform vec2 offset;
-uniform vec4 color;
-uniform float scale;
+layout (location = 0) out vec2 outSize;
 
 void main()
 {
-    float size = scale;
-    TexCoords = vertex.zw;
-    ParticleColor = color;
-    gl_Position = projection * vec4((vertex.xy * scale) + offset, 0.0, 1.0);
+    gl_Position = vec4(pos[gl_VertexID], 1.0);
+    outSize = size[gl_VertexID];
 }

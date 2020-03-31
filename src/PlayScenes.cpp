@@ -9,14 +9,14 @@
 #include <random>
 #include <thread>
 #include <queue>
-#include <florp/app/timing.h>
+//#include <florp/app/timing.h>
 
 #include "Mesh.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "Camera.h"
 #include "Light.h"
-#include "Object.h"
+//#include "Object.h"
 #include "Mesh.h"
 #include "Constants.h"
 #include "Test_Primitives.h"
@@ -28,6 +28,7 @@
 #include "Game.h"
 #include "PostProcess.h"
 #include "Text.h"
+#include "Particle.h"
 
 OnePlayer::OnePlayer()
 {
@@ -337,11 +338,14 @@ void OnePlayer::Update(float dt)
 
 	//DUUDE->Update(dt);
 
+	fire->Update(dt);
+
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
 	}
 
-	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
+	shaderObj->SetVec4("indexColor", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	skelShader->SetVec4("indexColor", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 
 	test_player->Update(dt);
 }
@@ -350,6 +354,7 @@ void OnePlayer::Draw()
 {
 	main_pass->Clear();
 	light_buff->Clear();
+	particle_buff->Clear();
 	for (int c = 0; c < post_pass.size(); c++) {
 		post_pass[c]->buff->Clear();
 	}
@@ -418,9 +423,9 @@ void OnePlayer::Draw()
 		//morphyBoi->Draw(morphShader, Cam);
 		test_player->Draw(skelShader, Cam, shaderObj);
 		
-		//glDisable(GL_DEPTH_TEST);
-		//((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton( test_player->GetTransform().GetWorldTransform(), shaderObj);
-		//glEnable(GL_DEPTH_TEST);
+		glDisable(GL_DEPTH_TEST);
+		((SkelMesh*)(players[PLAYER_1]->GetMesh()))->DrawSkeleton( players[PLAYER_1]->GetTransform().GetWorldTransform(), shaderObj);
+		glEnable(GL_DEPTH_TEST);
 
 		//glDisable(GL_DEPTH_TEST);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -455,6 +460,11 @@ void OnePlayer::Draw()
 	light_buff->Use();
 
 	Game::QUAD->Draw(lightPass);
+
+	particle_buff->Use();
+	for (int c = 0; c < Cam.size(); c++) {
+		fire->Draw(Cam[c]);
+	}
 
 	for (int c = 0; c < post_pass.size(); c++) {
 		post_pass[c]->Draw();
@@ -534,10 +544,10 @@ void OnePlayer::LoadScene()
 
 	light_buff = new FrameBuffer();
 
-	//merge_buff = new FrameBuffer();
+	particle_buff = new FrameBuffer(main_pass->GetDepth(), true);
 
 	// Post processing passes 
-	
+
 	Material* LUT_TEST = new Material("LUTs/LUT_TEST.png");
 
 	lut_cool = new LUT("LUTs/Bluedabadee.cube");
@@ -547,7 +557,7 @@ void OnePlayer::LoadScene()
 	//post_pass.push_back(new LutColorCorrection(lut_custom, main_pass->GetOutput()));
 	//Textcontroller();
 
-	highlightshader = new Shader("Shaders/PostProcess/PostProcess.vert","Shaders/PostProcess/Highlights.frag");
+	highlightshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Highlights.frag");
 
 	vergausshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/GausBlur.frag");
 	vergausshader->SetB("isHorizontal", false);
@@ -559,12 +569,9 @@ void OnePlayer::LoadScene()
 
 
 	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
-	
-	// Sampler2d INPUT
-	post_pass.push_back(new PostProcess({ main_pass->GetOutput(), light_buff->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge.frag")));
 
-	isMenu = false; 
-	ChangingScn = false;
+	// Sampler2d INPUT
+	post_pass.push_back(new PostProcess({ main_pass->GetOutput(), light_buff->GetOutput(), particle_buff->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge.frag")));
 
 	Joint::init();
 	//{91f62782-35bd-42df-85a1-8f359308dd0c}
@@ -593,7 +600,7 @@ void OnePlayer::LoadScene()
 	Material* D20Tex = new Material("d20-texture.png");
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
 	Material* defaultTex = new Material("default-texture.png");
-	
+
 	Material* GladiatorWM = new Material("WeightMap.png");
 
 	Material* SnekWM = new Material("snek/WeightMap.png"); //Bone tester
@@ -602,26 +609,32 @@ void OnePlayer::LoadScene()
 	Material* stamBarMat = new Material("blue.png");
 	Material* crowdBarMat = new Material("white.png");
 	Material* blackBarMat = new Material("black.png");
+	Material* playerMat = new Material("TreeTexture.png");
 
 	Material* arenaTex = new Material("wood_texture.png");
 
 	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "bone_t.bvh");
+	Skeleton* gladiatorSkel2 = new Skeleton("Gladiator_Rig2", "gladiator2.bvh");
+
+
 	SkelMesh* GladiatorMesh = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
+	SkelMesh* GladiatorMesh2 = new SkelMesh("Base_Gladiator.obj", gladiatorSkel2, "PlayerWeightMap.png");
 
 	GladiatorMesh->SetAnim(gladiatorSkel->GetAnimByName("breathe"), 3, 0.34f, 0.5f);
 
-	SkelMesh* P1_mesh = new SkelMesh(*GladiatorMesh);
+	SkelMesh* P1_mesh = new SkelMesh(*GladiatorMesh2);
 	SkelMesh* P2_mesh = new SkelMesh(*GladiatorMesh);
 
 	gladiatorSkel->WriteTree();
+	gladiatorSkel2->WriteTree();
 	//gladiatorSkel->Find("l_arm2")->animations[0][0].rotation += glm::vec3(0.0f, -90.0f, 0.0f);
 	//gladiatorSkel->Find("l_arm1")->animations[0][0].scale = glm::vec3(2.0f, 2.0f, 2.0f);
 
 	//wiggleSkel->Find("bone2")->animations[0][0].scale = glm::vec3(2.0f, 1.0f, 2.0f);
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
-	//lights.push_back(new PointLight({ 4.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.5f, 0.7f, 0.1f, 0.014f, 0.0007f));
-	//lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.7f, 0.2f, 0.07f, 0.017f));
+	lights.push_back(new PointLight({ 4.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.2f, 0.7f, 0.9f, 0.014f, 0.0007f));
+	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.7f, 0.2f, 0.07f, 0.017f));
 	//lights.push_back(new PointLight({ 4.0, 4.0, 4.0 }, {1.0f, 0.0f, 0.0f}, 0.1, 0.5, 0.8, 0.7, 1.8));
 	Load_Lights_From_File("");
 
@@ -633,13 +646,13 @@ void OnePlayer::LoadScene()
 	Mesh* shield_mesh = new Mesh("Weapons/Circle_Shield.obj");
 
 
-	Hitbox* basicCubeHB = new CubeHitbox(1.2f,3.0f,1.2f);
+	Hitbox* basicCubeHB = new CubeHitbox(1.2f, 3.0f, 1.2f);
 	Hitbox* basicCubeHB2 = new CubeHitbox(1.0, 1.0f, 1.0f);
 
 	//Capsule testing
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f,4.0f,entity); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f,4.0f, entity);
-	Hitbox* basicCapsuleHB3 = new CapsuleHitbox(0.2,4.0);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f, 4.0f, entity); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.8f, 4.0f, entity);
+	Hitbox* basicCapsuleHB3 = new CapsuleHitbox(0.2, 4.0);
 	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.09f, 12.8f);
 	//Capsule Testing
 
@@ -647,11 +660,12 @@ void OnePlayer::LoadScene()
 	Hitbox* shieldSphereHB = new SphereHitbox(1.0f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
-	players.push_back(new Player(P1_mesh, defaultTex, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
+	players.push_back(new Player(P1_mesh, playerMat, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
 	players.push_back(new Player(P2_mesh, D20Tex, basicCapsuleHB2)); //P2
 
 	GladiatorMesh->SetAnim(1, 0);
 	GladiatorMesh->SetFrame(0, 0);
+	P1_mesh->SetIntensity(1, 0.5f);
 	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
 	//shieldSphereHB->SetScale({0.2f, 1.0f, 0.1f});
 	players[PLAYER_1]->dmgHP(50);
@@ -659,7 +673,7 @@ void OnePlayer::LoadScene()
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ -6.0f, 0.0f, 0.0f });
 	//players[PLAYER_2]->Rotate(glm::vec3(45,0,45));
-	
+
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 
 
@@ -667,21 +681,25 @@ void OnePlayer::LoadScene()
 	//test_player->Scale(glm::vec3(1.2f));
 
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
-	weapons.push_back(new Object(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("r_hand"),P1_mesh));
-	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel->Find("l_hand"), P1_mesh));
 
-	weapons[0]->SetPosition({-0.12f, 0.0f, -0.12f});
-	weapons[0]->Scale({0.9f, 0.9f, 0.9f});
-	weapons[0]->SetRotation({90.0f, 0.0f, 0.0f});
-	
+	std::vector<std::string> OneHand_LC = { "sword_1", "sword_2" };
 
-	shields[0]->SetPosition({ 0.095f, 0.115f, 0.0f });
+	Weapon* Hurt_Sword = new Weapon(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel2->Find("r_hand"), P1_mesh);
+
+	weapons.push_back(Hurt_Sword);
+	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel2->Find("l_hand"), P1_mesh));
+
+	weapons[0]->Scale({ 0.9f, 0.9f, 0.9f });
+	weapons[0]->SetRotation({ 0.0f, 90.0f, 90.0f });
+
+	shields[0]->SetPosition({ 0.f, 0.f, 0.0f });
 	shields[0]->Scale({ 0.8f, 0.8f, 0.8f });
 	shields[0]->SetRotation({ 0.0f, 0.0f, 270.0f });
 
 	//shields[0]->hitbox->SetPosition(glm::vec3(0.0f, 0.3f, 0.0f));
 	//glm::vec3 test = shields[0]->hitbox->GetTransform().position;
-	players[PLAYER_1]->addChild(weapons[0]);
+	players[PLAYER_1]->SetWeapon(Hurt_Sword);
+	players[PLAYER_1]->addChild(Hurt_Sword);
 	players[PLAYER_1]->addChild(shields[0]);
 	//sword->addChild(swordCapsuleHB);
 
@@ -703,22 +721,22 @@ void OnePlayer::LoadScene()
 	//terrain.push_back(SATtest1);
 
 	Object* floor = new Object(Square, defaultTex, basicCubeHB);
-	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0,-2,0));
+	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0, -2, 0));
 
 	Colitreeum->Scale(glm::vec3(2.5, 2.5, 2.5));
 
 	floor->Move({ 0.0f, -0.75f, 0.0f });
 	floor->Scale({ 30.0f, 0.5f, 30.0f });
 
-	
+
 
 	//terrain.push_back(floor);
 	terrain.push_back(Colitreeum);
 
-	beacons.push_back(glm::vec3(glm::vec3(1,1,1)));
-	beacons.push_back(glm::vec3(glm::vec3(1,1,3)));
-	beacons.push_back(glm::vec3(glm::vec3(1,2,5)));
-	beacons.push_back(glm::vec3(glm::vec3(2,1,4)));
+	beacons.push_back(glm::vec3(glm::vec3(1, 1, 1)));
+	beacons.push_back(glm::vec3(glm::vec3(1, 1, 3)));
+	beacons.push_back(glm::vec3(glm::vec3(1, 2, 5)));
+	beacons.push_back(glm::vec3(glm::vec3(2, 1, 4)));
 	beacons.push_back(glm::vec3(glm::vec3(3, 2, 5)));
 	beacons.push_back(glm::vec3(glm::vec3(7, 1, 4)));
 	beacons.push_back(glm::vec3(glm::vec3(9, 2, 5)));
@@ -753,7 +771,8 @@ void OnePlayer::LoadScene()
 		//new StaminaBar((Player*)players[PLAYER_1], glm::vec2(640, 500), stamBarMat, stamBG2),
 		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(395, 550), crowdBarMat, crowdBG2)
 	};
- 
+
+	fire = new ParticleEngine({ 1.0f, 0.0f, 1.0f }, {0.5f, 0.5f}, 4, 1.0f, new Material("redPlayer.png"), { ParticleEngine::FireEngineBehavior }, { Particle::FireUpdate });
 
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 
@@ -928,8 +947,13 @@ void OnePlayer::ResizeCams()
 *	Two Player Scene Functions
 *******************************************************************************************/
 
-TwoPlayer::TwoPlayer()
+TwoPlayer::TwoPlayer(WeaponType p1_weapon, ShieldType p1_shield, WeaponType p2_weapon, ShieldType p2_shield)
 {
+	_Weapons[PLAYER_1] = p1_weapon;
+	_Weapons[PLAYER_2] = p2_weapon;
+	_Shields[PLAYER_1] = p1_shield;
+	_Shields[PLAYER_2] = p2_shield;
+
 	LoadScene();
 }
 
@@ -1131,14 +1155,14 @@ void TwoPlayer::Draw()
 		glDisable(GL_DEPTH_TEST);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		
-		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
-		
-		weapons[0]->hitbox->Draw(shaderObj, weapons[0]->getParentTransform());
-		weapons[1]->hitbox->Draw(shaderObj, weapons[1]->getParentTransform());
-
-		shields[0]->hitbox->Draw(shaderObj, shields[0]->getParentTransform());
-		shields[1]->hitbox->Draw(shaderObj, shields[1]->getParentTransform());
+		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		//
+		//weapons[0]->hitbox->Draw(shaderObj, weapons[0]->getParentTransform());
+		//weapons[1]->hitbox->Draw(shaderObj, weapons[1]->getParentTransform());
+		//
+		//shields[0]->hitbox->Draw(shaderObj, shields[0]->getParentTransform());
+		//shields[1]->hitbox->Draw(shaderObj, shields[1]->getParentTransform());
 
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -1175,8 +1199,6 @@ void TwoPlayer::Draw()
 
 void TwoPlayer::LoadScene()
 {
-	isMenu = false;
-	ChangingScn = false;
 
 	//audioEngine.Init();
 
@@ -1214,6 +1236,7 @@ void TwoPlayer::LoadScene()
 	Material* D20Tex = new Material("d20-texture.png");
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
 	Material* defaultTex = new Material("default-texture.png", "default-normal.png");
+	Material* playerMat = new Material("TreeTexture.png");
 
 	Material* arenaTex = new Material("CaulitreeumTexture.png");
 	Material* floorTex = new Material("ArenaFloorTexture.png");
@@ -1256,8 +1279,8 @@ void TwoPlayer::LoadScene()
 
 	Mesh* arena = new Mesh("Caulitreeum.obj");
 
-	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "bone_t.bvh");
-	SkelMesh* P1_MESH = new SkelMesh("gladiator.obj", gladiatorSkel, "WeightMap.png");
+	Skeleton* gladiatorSkel = new Skeleton("Gladiator_Rig", "gladiator2.bvh");
+	SkelMesh* P1_MESH = new SkelMesh("Base_Gladiator.obj", gladiatorSkel, "PlayerWeightMap.png");
 	SkelMesh* P2_MESH = new SkelMesh(*P1_MESH);
 
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f, 1.0f, 1.0f);
@@ -1269,10 +1292,10 @@ void TwoPlayer::LoadScene()
 	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.3f, 5.2f, entity); //radius + height
 	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.3f, 5.2f, entity);
 
-	players.push_back(new Player(P1_MESH, defaultTex, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
+	players.push_back(new Player(P1_MESH, playerMat, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
 	players[PLAYER_1]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
 	//players[PLAYER_1]->Rotate(glm::vec3(0.0f,90.0f,0.0f));
-	players.push_back(new Player(P2_MESH, defaultTex, basicCapsuleHB2)); // THIS IS PLAYER TWO
+	players.push_back(new Player(P2_MESH, playerMat, basicCapsuleHB2)); // THIS IS PLAYER TWO
 	players[PLAYER_2]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
@@ -1309,15 +1332,24 @@ void TwoPlayer::LoadScene()
 
 	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0, 0.45, 0));
 
-	Colitreeum->Scale(glm::vec3(1.0, 1.0, 1.0));
+	Colitreeum->Scale(glm::vec3(0.65f, 0.65f, 0.65f));
 
 	terrain.push_back(Colitreeum);
 
 	terrain.push_back(Arenafloor);
 
 
-	Mesh* SwordMesh = new Mesh("Weapons/Sword.obj");
-	Mesh* ShieldMesh = new Mesh("Weapons/Circle_Shield.obj");
+	Mesh* SwordMesh = nullptr;
+	Mesh* SpearMesh = nullptr;
+	Mesh* HammerMesh = nullptr;
+	Mesh* ShieldMesh = nullptr;
+	Mesh* BucklerMesh = nullptr;
+
+	Material* SwordMat = nullptr;
+	Material* SpearMat = nullptr;
+	Material* HammerMat = nullptr;
+	Material* ShieldMat = nullptr;
+	Material* BucklerMat = nullptr;
 
 	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.09f, 12.8f);
 	Hitbox* shieldSphereHB = new SphereHitbox(1.0f, COLLISION_TYPE::shield);
@@ -1325,51 +1357,66 @@ void TwoPlayer::LoadScene()
 
 	std::vector<std::string> OneHand_LC = {"sword_1", "sword_2"};
 
-	Object* P1_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P1_MESH);
-	Object* P2_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P2_MESH);
+	//Object* P1_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P1_MESH);
+	//Object* P2_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P2_MESH);
 
-	Shield* P1_shield = new Shield(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f },0.6f, 0.25f, gladiatorSkel->Find("l_hand"), P1_MESH);
-	Shield* P2_shield = new Shield(ShieldMesh, defaultTex, shieldSphereHB, { 0.095f, 0.115f, 0.0f },0.6f, 0.25f, gladiatorSkel->Find("l_hand"), P2_MESH);
+	for (int p = 0; p <= PLAYER_2; p++) {
+		Weapon* weapon;
+		Shield* shield;
 
-	Weapon* Hurt_Sword = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), P1_MESH);
-	Weapon* Hurt_Sword2 = new Weapon(SwordMesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), P2_MESH);
+		SkelMesh* mesh;
 
-	weapons.push_back(Hurt_Sword);
-	weapons.push_back(Hurt_Sword2);
-
-	shields.push_back(P1_shield);
-	shields.push_back(P2_shield);
-
-	Hurt_Sword->Scale({ 0.9f, 0.9f, 0.9f });
-	Hurt_Sword->SetRotation({ 0.0f, 90.0f, 90.0f });
-
-	Hurt_Sword2->Scale({ 0.9f, 0.9f, 0.9f });
-	Hurt_Sword2->SetRotation({ 0.0f, 90.0f, 90.0f });
-
-	P1_sword->Scale({ 0.9f, 0.9f, 0.9f });
-	P1_sword->SetRotation({ 0.0f, 90.0f, 90.0f });
-
-	P2_sword->Scale({ 0.9f, 0.9f, 0.9f });
-	P2_sword->SetRotation({ 0.0f, 90.0f, 90.0f });
-
-	P1_shield->Scale({ 1, 1, 1 });
-	P1_shield->SetRotation({ 0.0f, 0.0f, 270.0f });
-
-	P2_shield->Scale({ 1, 1, 1 });
-	P2_shield->SetRotation({ 0.0f, 0.0f, 270.0f });
+		if (p == PLAYER_1) {
+			mesh = P1_MESH;
+		}
+		else {
+			mesh = P2_MESH;
+		}
 		
-	players[PLAYER_1]->SetWeapon(Hurt_Sword);
-	players[PLAYER_2]->SetWeapon(Hurt_Sword2);
+		switch (_Weapons[p]) {
+		case WEAPON_SPEAR:
 
-	players[PLAYER_1]->SetShield(P1_shield);
-	players[PLAYER_2]->SetShield(P2_shield);
+			break;
 
-	players[PLAYER_1]->addChild(Hurt_Sword);
-	players[PLAYER_1]->addChild(P1_shield);
+		case WEAPON_SWORD:
+		default:
+			if (SwordMesh == nullptr) {
+				SwordMesh = new Mesh("Weapons/Sword.obj");
+			}
 
-	players[PLAYER_2]->addChild(Hurt_Sword2);
-	players[PLAYER_2]->addChild(P2_shield);
+			if (SwordMat == nullptr) {
+				SwordMat = new Material("Weapons/tex/sword.png");
+			}
 
+			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon->Scale({ 0.9f, 0.9f, 0.9f });
+			weapon->SetRotation({ 0.0f, 90.0f, 90.0f });
+			break;
+		}
+
+		switch (_Shields[p]) {
+		case SHIELD_LARGE:
+		default:
+			if (ShieldMesh == nullptr) {
+				ShieldMesh = new Mesh("Weapons/CircleShield.obj");
+			}
+
+			if (ShieldMat == nullptr) {
+				ShieldMat = new Material("Weapons/tex/shield.png");
+			}
+
+			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { 0.095f, 0.115f, 0.0f }, 0.6f, 0.25f, gladiatorSkel->Find("l_hand"), mesh);
+			shield->Scale({ 1, 1, 1 });
+			shield->SetRotation({ 0.0f, 0.0f, 270.0f });
+			break;
+		}
+
+
+		players[p]->SetWeapon(weapon);
+		players[p]->addChild(weapon);
+		players[p]->SetShield(shield);
+		players[p]->addChild(shield);
+	}
 
 	Cam = {
 		new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec4(0,0, Game::SCREEN.x / 2, Game::SCREEN.y)), // Cam 1
@@ -1397,792 +1444,5 @@ void TwoPlayer::LoadScene()
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(15.0f, 1.0f, 2.0f));
 
-	
-}
-
-MainMenu::MainMenu()
-{
-	LoadScene();
-}
-
-void MainMenu::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
-{
-	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
-		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_2, dt);
-		}
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
-		}
-	}
-	else {
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_1, dt);
-		}
-
-	}
-}
-
-void MainMenu::Update(float dt)
-{
-
-	//audioEngine.Update();
-
-	for (int u = 0; u < ui.size(); u++) {
-		ui[u]->Update(dt);
-	}
-
-	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
-
-	if (spaget != nullptr) {
-		if (menu_time <= 0) {
-			if (!displayed) {
-				displayed = true;
-				menu_time = MAX_TIME;
-			}
-		}
-		else {
-			menu_time -= dt;
-		}
-		if (displayed) {
-			spaget->setOpacity(menu_time / MAX_TIME);
-		}
-	}
-
-}
-
-void MainMenu::Draw()
-{
-	glCullFace(GL_FRONT);
-
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
-	glClear(GL_DEPTH_BUFFER_BIT);
-	sun->SetupDepthShader(sunShader);
-	//sun->SetupDepthShader(skelDepth);
-
-	RenderScene(sunShader, sunShader);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
-
-	for (int l = 0; l < lights.size(); l++) {
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
-		glClear(GL_DEPTH_BUFFER_BIT);
-		lights[l]->SetupDepthShader(depthShader);
-		RenderScene(depthShader, sunShader);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		//glViewport(0, 0,  , SCREEN_HEIGHT);
-
-		glActiveTexture(GL_TEXTURE4 + l);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[l]->GetDepthMap());
-	}
-	glCullFace(GL_BACK);
-
-	sun->SetupLight(shaderObj);
-	sun->SetupLight(morphShader);
-
-	for (int c = 0; c < lights.size(); c++) {
-		lights[c]->SetupLight(shaderObj, c);
-		lights[c]->SetupLight(morphShader, c);
-
-	}
-	shaderObj->SetI("num_lights", lights.size());
-	//morphShader->SetI("num_lights", lights.size());
-
-
-	for (int c = 0; c < Cam.size(); c++) {
-		Cam[c]->SetupCam(shaderObj);
-
-		RenderScene(shaderObj, sunShader);
-		Cam[c]->SetupCam(morphShader);
-		//morphyBoi->Draw(morphShader, Cam);
-	}
-
-
-	//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	glDisable(GL_DEPTH_TEST);
-
-	for (int u = 0; u < ui.size(); u++) {
-		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
-	}
-
-	if (spaget != nullptr) {
-		spaget->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
-	}
-
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
-
-	glEnable(GL_DEPTH_TEST);
-
-}
-
-void MainMenu::LoadScene()
-{
-	isMenu = true;
-	ChangingScn = false;
-
-	MAX_MENU = 0;
-	MIN_MENU = -3;
-
-
-
-	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
-
-	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
-	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
-	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
-	
-	Material* blackBarMat = new Material("black.png");
-
-	Material* gladeiatorsTitle = new Material("Title.png");
-
-	Material* firstPlayer = new Material("redPlayer.png");
-	Material* secondPlayer = new Material("bluePlayer.png");
-	Material* buttonPlay = new Material("playButton.png"); 
-	Material* buttonSettings = new Material("settingsButton.png");
-	Material* buttonExit = new Material("exitButton.png");
-	Material* buttonCredits = new Material("creditsButton.png");
-	Material* titleImage = new Material("gladewallpaper.png");
-
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
-	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
-	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
-
-	Cam = {
-		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
-	}; 
-
-	playerOne = new UI(210, 80, glm::vec3(0, 435, 0), firstPlayer);
-	//playerTwo = new UI(210, 80, glm::vec3(0, 275, 0), firstPlayer);
-	play_Button = new UI(200, 70, glm::vec3(5, 440, 0), buttonPlay);
-	settings_Button = new UI(200, 70, glm::vec3(5, 320, 0), buttonSettings);
-	credits_Button = new UI(200, 70, glm::vec3(5, 200, 0), buttonCredits);
-	exit_Button = new UI(200, 70, glm::vec3(5, 80, 0), buttonExit);
-
-	ui = {
-		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), titleImage),
-		//playerOne,
-		//playerTwo,
-		play_Button,
-		settings_Button,
-		credits_Button,
-		exit_Button
-	};
-
-	if (!loaded) {
-		spaget = new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), gladeiatorsTitle);
-	}
-}
-
-CharacterC::CharacterC()
-{
-	LoadScene();
-}
-
-void CharacterC::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
-{
-	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
-		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_2, dt);
-		}
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
-		}
-	}
-	else {
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_1, dt);
-		}
-
-	}
-}
-
-void CharacterC::Update(float dt)
-{
-
-	//audioEngine.Update();
-
-	for (int u = 0; u < ui.size(); u++) {
-		ui[u]->Update(dt);
-	}
-
-	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
-
-}
-
-void CharacterC::Draw()
-{
-	glCullFace(GL_FRONT);
-
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
-	glClear(GL_DEPTH_BUFFER_BIT);
-	sun->SetupDepthShader(sunShader);
-	//sun->SetupDepthShader(skelDepth);
-
-	RenderScene(sunShader, sunShader);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
-
-	for (int l = 0; l < lights.size(); l++) {
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
-		glClear(GL_DEPTH_BUFFER_BIT);
-		lights[l]->SetupDepthShader(depthShader);
-		RenderScene(depthShader, sunShader);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-		glActiveTexture(GL_TEXTURE4 + l);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[l]->GetDepthMap());
-	}
-	glCullFace(GL_BACK);
-
-	sun->SetupLight(shaderObj);
-	sun->SetupLight(morphShader);
-
-	for (int c = 0; c < lights.size(); c++) {
-		lights[c]->SetupLight(shaderObj, c);
-		lights[c]->SetupLight(morphShader, c);
-
-	}
-	shaderObj->SetI("num_lights", lights.size());
-	//morphShader->SetI("num_lights", lights.size());
-
-
-	for (int c = 0; c < Cam.size(); c++) {
-		Cam[c]->SetupCam(shaderObj);
-
-		RenderScene(shaderObj, sunShader);
-		Cam[c]->SetupCam(morphShader);
-		//morphyBoi->Draw(morphShader, Cam);
-
-	}
-
-	glDisable(GL_DEPTH_TEST);
-
-	for (int u = 0; u < ui.size(); u++) {
-		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
-	}
-
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name1[0], 385.0f - (Name1[0].length() * 4), 570.0f, 0.45f, glm::vec3(1.f, 0.0f, 0.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name1[1], 385.0f - (Name1[1].length() * 4), 540.0f, 0.45f, glm::vec3(1.f, 0.0f, 0.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name1[2], 385.0f - (Name1[2].length() * 4), 510.0f, 0.45f, glm::vec3(1.f, 0.0f, 0.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "VS", 370.0f, 470.0f, 0.75f, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[0], 385.0f - (Name2[0].length() * 4), 430.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[1], 385.0f - (Name2[1].length() * 4), 400.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[2], 385.0f - (Name2[2].length() * 4), 370.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
-
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, WeaponName[0], 174.0f - (WeaponName[0].length() * 4), 227.5f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, WeaponName[1], 615.0f - (WeaponName[1].length() * 4), 227.5f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, ShieldName[0], 176.0f - (ShieldName[0].length() * 4), 142.5f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, ShieldName[1], 617.0f - (ShieldName[1].length() * 4), 142.5f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
-	glEnable(GL_DEPTH_TEST);
-
-}
-
-void CharacterC::LoadScene()
-{
-	isMenu = true;
-	ChangingScn = false;
-
-	MAX_MENU = 10;
-	menuSpot[0] = 10;
-	menuSpot[1] = 10;
-	MIN_MENU = 7;
-
-	srand(time(NULL));
-
-	Name1[0] = Textcontroller->GenerateTitle();
-	Name1[1] = Textcontroller->GenerateName();
-	Name1[2] = Textcontroller->GenerateSuffix();
-
-	Name2[0] = Textcontroller->GenerateTitle();
-	Name2[1] = Textcontroller->GenerateName();
-	Name2[2] = Textcontroller->GenerateSuffix();
-
-	WeaponName[0] = "Sword";
-	WeaponName[1] = "Sword";
-	ShieldName[0] = "Shield";
-	ShieldName[1] = "Shield";
-
-	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
-
-	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
-	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
-	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
-
-	Material* firstPlayer = new Material("redPlayer.png");
-	Material* secondPlayer = new Material("bluePlayer.png");
-	Material* buttonReady = new Material("readyButton.png");
-	Material* buttonRandom = new Material("randomButton.png");
-
-	Material* background = new Material("backgroundWood.png");
-	Material* backDrop = new Material("backdrop.png");
-	Material* backDropMain = new Material("backdrop2.png");
-	Material* backDropFade = new Material("backdrop3.png");
-	Material* nothing = new Material("nothing.png");
-
-	Material* swordIcon = new Material("iconSword.png");
-	Material* hammerIcon = new Material("iconHammer.png");
-	Material* spearIcon = new Material("iconSpear.png");
-	Material* shieldIcon = new Material("iconShield.png");
-	Material* bucklerIcon = new Material("iconBuckler.png");
-
-	Material* tree1 = new Material("treeportrait2.png");
-	Material* tree2 = new Material("treeportrait1.png");
-	Material* borderWall = new Material("borderPart1.png");
-
-	Material* blackBarMat = new Material("black.png");
-	Material* arrow = new Material("arrow.png");
-	Material* arrow2 = new Material("arrow (1).png");
-
-	Material* ehks = new Material("Ehks.png");
-	//PLAYERS
-	playerOne = new UI(70, 70, glm::vec3(145, 230, 0), firstPlayer);
-	playerTwo = new UI(70, 70, glm::vec3(585, 230, 0), secondPlayer);
-	
-	//BUTTONS
-	weapon1_Button = new UI(70, 70, glm::vec3(145, 155, 0), backDropMain);
-	shield1_Button = new UI(70, 70, glm::vec3(145, 70, 0), backDropMain);
-	weapon2_Button = new UI(70, 70, glm::vec3(585, 155, 0), backDropMain);
-	shield2_Button = new UI(70, 70, glm::vec3(585, 70, 0), backDropMain);
-
-	ready_Button = new UI(580, 60, glm::vec3(110, 10, 0), buttonReady); 
-	random1_Button = new UI(140, 60, glm::vec3(100, 235, 0), buttonRandom);
-	random2_Button = new UI(140, 60, glm::vec3(540, 235, 0), buttonRandom);
-
-	//ARROWS
-	arrow_Button1 = new UI(40, 50, glm::vec3(35, 168, 0), arrow);
-	arrow_Button2 = new UI(40, 50, glm::vec3(35, 88, 0), arrow);
-	arrow_Button3 = new UI(40, 50, glm::vec3(285, 168, 0), arrow2);
-	arrow_Button4 = new UI(40, 50, glm::vec3(285, 88, 0), arrow2); // PLAYER 1 ARROWS
-	arrow_Button5 = new UI(40, 50, glm::vec3(475, 168, 0), arrow);
-	arrow_Button6 = new UI(40, 50, glm::vec3(475, 88, 0), arrow);
-	arrow_Button7 = new UI(40, 50, glm::vec3(725, 168, 0), arrow2);
-	arrow_Button8 = new UI(40, 50, glm::vec3(725, 88, 0), arrow2); // PLAYER 2 ARROWS
-		
-	//ICONS
-	wOne = new UI(60, 60, glm::vec3(150, 160, 0), swordIcon);
-	sOne = new UI(50, 50, glm::vec3(155, 80, 0), shieldIcon);
-	wTwo = new UI(60, 60, glm::vec3(590, 160, 0), swordIcon);
-	sTwo = new UI(50, 50, glm::vec3(595, 80, 0), shieldIcon);
-	p1Ready = new UI(40, 40, glm::vec3(60, 20, 0), ehks);
-	p2Ready = new UI(40, 40, glm::vec3(695, 20, 0), ehks);
-	//Side Icons
-	wOne_p1 = new UI(50, 50, glm::vec3(90, 165, 0), hammerIcon);
-	sOne_p1 = new UI(40, 40, glm::vec3(95, 85, 0), nothing);
-	wTwo_p1 = new UI(50, 50, glm::vec3(530, 165, 0), hammerIcon);
-	sTwo_p1 = new UI(40, 40, glm::vec3(535, 85, 0), nothing);	 
-	wOne_p2 = new UI(50, 50, glm::vec3(220, 165, 0), spearIcon);
-	sOne_p2 = new UI(40, 40, glm::vec3(225, 85, 0), bucklerIcon);
-	wTwo_p2 = new UI(50, 50, glm::vec3(660, 165, 0), spearIcon);
-	sTwo_p2 = new UI(40, 40, glm::vec3(665, 85, 0), bucklerIcon);
-
-
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
-	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
-	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
-
-	Cam = {
-		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
-	};
-
-	ui = {
-		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background),
-		//playerOne,
-		//playerTwo,
-
-		weapon1_Button,
-		shield1_Button,
-		weapon2_Button,
-		shield2_Button,
-
-		ready_Button,
-		random1_Button,
-		random2_Button,
-
-		new UI(50, 50, glm::vec3(90, 165, 0), backDrop),
-		new UI(50, 50, glm::vec3(90, 80, 0), backDrop),
-		new UI(50, 50, glm::vec3(530, 165, 0), backDrop),
-		new UI(50, 50, glm::vec3(530, 80, 0), backDrop), //4
-		new UI(50, 50, glm::vec3(220, 165, 0), backDrop),
-		new UI(50, 50, glm::vec3(220, 80, 0), backDrop),
-		new UI(50, 50, glm::vec3(660, 165, 0), backDrop),
-		new UI(50, 50, glm::vec3(660, 80, 0), backDrop), //4
-
-		wOne_p1,
-		sOne_p1,
-		wTwo_p1,
-		sTwo_p1, //4
-		wOne_p2,
-		sOne_p2,
-		wTwo_p2,
-		sTwo_p2, //4
-
-		wOne,
-		sOne,
-		wTwo,
-		sTwo,
-
-		new UI(800, 400, glm::vec3(0, 305, 0), blackBarMat),
-		new UI(180, 280, glm::vec3(80, 310, 0), tree1),
-		new UI(180, 280, glm::vec3(520, 310, 0), tree2),
-		new UI(260, 328, glm::vec3(40, 305, 0), borderWall),
-		new UI(260, 328, glm::vec3(480, 305, 0), borderWall),
-
-		arrow_Button1,
-		arrow_Button2,
-		arrow_Button3,
-		arrow_Button4,
-		arrow_Button5,
-		arrow_Button6,
-		arrow_Button7,
-		arrow_Button8,
-
-		new UI(50, 50, glm::vec3(90, 165, 0), backDropFade),
-		new UI(50, 50, glm::vec3(90, 80, 0), backDropFade),
-		new UI(50, 50, glm::vec3(530, 165, 0), backDropFade),
-		new UI(50, 50, glm::vec3(530, 80, 0), backDropFade), //4
-		new UI(50, 50, glm::vec3(220, 165, 0), backDropFade),
-		new UI(50, 50, glm::vec3(220, 80, 0), backDropFade),
-		new UI(50, 50, glm::vec3(660, 165, 0), backDropFade),
-		new UI(50, 50, glm::vec3(660, 80, 0), backDropFade), //4
-
-		p1Ready,
-		p2Ready
-	};
-
-	//ui[1]->Resize(70, 70);
-	//ui[2]->Resize(70, 70);
-	//ui[3]->Resize(60, 60);
-	//ui[4]->Resize(60, 60);
-	//ui[5]->Resize(60, 60);
-	//ui[6]->Resize(60, 60);
-	//
-	//ui[7]->Resize(600, 60);
-	//ui[8]->Resize(140, 60);
-	//ui[9]->Resize(140, 60);
-	//
-	//ui[10]->Resize(50, 50);
-	//ui[11]->Resize(50, 50);
-	//ui[12]->Resize(50, 50);
-	//ui[13]->Resize(50, 50);
-	//ui[14]->Resize(50, 50);
-	//ui[15]->Resize(50, 50);
-	//ui[16]->Resize(50, 50);
-	//ui[17]->Resize(50, 50);
-	//
-	//ui[18]->Resize(50, 50);
-	//ui[19]->Resize(50, 50);
-	//ui[20]->Resize(50, 50);
-	//ui[21]->Resize(50, 50);
-	//ui[22]->Resize(50, 50);
-	//ui[23]->Resize(50, 50);
-	//ui[24]->Resize(50, 50);
-	//ui[25]->Resize(50, 50);
-	//
-	//ui[26]->Resize(60, 60);
-	//ui[27]->Resize(50, 50);
-	//ui[28]->Resize(60, 60);
-	//ui[29]->Resize(50, 50);
-	//
-	//ui[30]->Resize(800, 400);
-	//ui[31]->Resize(180, 280);
-	//ui[32]->Resize(180, 280);
-	//
-	////Final Chunck
-	ui[41]->setOpacity(0.5);
-	ui[42]->setOpacity(0.5);
-	ui[43]->setOpacity(0.5);
-	ui[44]->setOpacity(0.5);
-	ui[45]->setOpacity(0.5);
-	ui[46]->setOpacity(0.5);
-	ui[47]->setOpacity(0.5);
-	ui[48]->setOpacity(0.5);
-
-
-}
-
-
-SettingsScene::SettingsScene()
-{
-	LoadScene();
-}
-
-void SettingsScene::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
-{
-	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
-		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_2, dt);
-		}
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
-		}
-	}
-	else {
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_1, dt);
-		}
-
-	}
-}
-
-void SettingsScene::Update(float dt)
-{
-
-	//audioEngine.Update();
-
-	for (int u = 0; u < ui.size(); u++) {
-		ui[u]->Update(dt);
-	}
-
-	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
-
-}
-
-void SettingsScene::Draw()
-{
-	glCullFace(GL_FRONT);
-
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
-	glClear(GL_DEPTH_BUFFER_BIT);
-	sun->SetupDepthShader(sunShader);
-	//sun->SetupDepthShader(skelDepth);
-
-	RenderScene(sunShader, sunShader);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
-
-	for (int l = 0; l < lights.size(); l++) {
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
-		glClear(GL_DEPTH_BUFFER_BIT);
-		lights[l]->SetupDepthShader(depthShader);
-		RenderScene(depthShader, sunShader);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		//glViewport(0, 0,  , SCREEN_HEIGHT);
-
-		glActiveTexture(GL_TEXTURE4 + l);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[l]->GetDepthMap());
-	}
-	glCullFace(GL_BACK);
-
-	sun->SetupLight(shaderObj);
-	sun->SetupLight(morphShader);
-
-	for (int c = 0; c < lights.size(); c++) {
-		lights[c]->SetupLight(shaderObj, c);
-		lights[c]->SetupLight(morphShader, c);
-
-	}
-	shaderObj->SetI("num_lights", lights.size());
-	//morphShader->SetI("num_lights", lights.size());
-
-
-	for (int c = 0; c < Cam.size(); c++) {
-		Cam[c]->SetupCam(shaderObj);
-
-		RenderScene(shaderObj, sunShader);
-		Cam[c]->SetupCam(morphShader);
-		//morphyBoi->Draw(morphShader, Cam);
-	}
-
-
-	//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	glDisable(GL_DEPTH_TEST);
-
-	for (int u = 0; u < ui.size(); u++) {
-		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
-	}
-
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
-
-	glEnable(GL_DEPTH_TEST);
-
-}
-
-void SettingsScene::LoadScene()
-{
-	isMenu = true;
-	ChangingScn = false;
-
-	MAX_MENU = 20;
-	MIN_MENU = 19;
-
-	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
-
-	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
-	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
-	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
-
-	Material* blackBarMat = new Material("black.png");
-	Material* background = new Material("black.png");
-
-	Material* gladeiatorsTitle = new Material("Title.png");
-
-	buttonExit = new Material("exitButton.png");
-	buttonRes = new Material("resolutionButton.png");
-	Material* titleImage = new Material("gladewallpaper.png");
-
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
-	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
-	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
-
-	Cam = {
-		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
-	};
-
-	exit_Button = new UI(200, 70, glm::vec3(55, 80, 0), buttonExit);
-	resolution_Button = new UI(200, 70, glm::vec3(55, 240, 0), buttonRes);
-	arrow_Button1 = new UI(40, 50, glm::vec3(5, 80, 0), arrow);
-	arrow_Button3 = new UI(40, 50, glm::vec3(260, 80, 0), arrowBack);
-
-	ui = {
-		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background),
-		exit_Button,
-		resolution_Button,
-		arrow_Button1,
-		arrow_Button3
-	};
-
-}
-
-Credits::Credits()
-{
-	LoadScene();
-}
-
-void Credits::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
-{
-	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
-		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_2, dt);
-		}
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
-		}
-	}
-	else {
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_1, dt);
-		}
-
-	}
-}
-
-void Credits::Update(float dt)
-{
-}
-
-void Credits::Draw()
-{
-	//Programmers:\nDylan Brush\nCraig Holder\nAnthony Ona\nArtists:\nMaija Kinnunen\nTia Lee
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "ProjectManager:", 20, 550, 0.75, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Daniel Findleton", 20, 520, 0.5, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Programmers:", 20, 450, 0.75, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Dylan Brush", 20, 420, 0.5, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Craig Holder", 20, 390, 0.5, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Anthony Ona", 20, 360, 0.5, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Artists:", 20, 290, 0.75, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Maija Kinnunen", 20, 260, 0.5, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Tia Lee", 20, 230, 0.5, glm::vec3(1.f, 1.f, 1.f));
-
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Special Thanks", 20, 160, 0.75, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Playtesters:", 20, 125, 0.75, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Zach \"Vertigo\"", 20, 90, 0.5, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Marian Grippa", 20, 60, 0.5, glm::vec3(1.f, 1.f, 1.f));
-}
-
-void Credits::LoadScene()
-{
-	isMenu = true;
-	ChangingScn = false;
-
-	MAX_MENU = 0;
-	MIN_MENU = -2;
-
-
-
-	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
-
-	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
-	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
-	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
-
-	Material* blackBarMat = new Material("black.png");
-
-	Material* gladeiatorsTitle = new Material("Title.png");
-
-	Material* firstPlayer = new Material("redPlayer.png");
-	Material* secondPlayer = new Material("bluePlayer.png");
-	Material* buttonPlay = new Material("playButton.png");
-	Material* buttonSettings = new Material("settingsButton.png");
-	Material* buttonExit = new Material("exitButton.png");
-	Material* buttonBlank = new Material("blankButton.png");
-	Material* titleImage = new Material("gladewallpaper.png");
-
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
-	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
-	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
-
-	Cam = {
-		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
-	};
-
-	//Final Chunck
 	
 }

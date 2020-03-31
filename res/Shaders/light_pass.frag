@@ -38,10 +38,10 @@ uniform sampler2D normals;
 uniform	sampler2D depth;
 uniform	sampler2D spec;
 
-float shadow_bias = 0.0005;
+//float shadow_bias = 0.005;
 
 float ShadowCalc(vec3 fragPos, int light_id){
-	float shadowPen = 0.0005;
+	float shadowPen = 0.0001;
 
 	vec3 fragToLight = fragPos - lights[light_id].position;
 	fragToLight = fragToLight * vec3(1, -1, -1);
@@ -50,9 +50,11 @@ float ShadowCalc(vec3 fragPos, int light_id){
 
 	float curDepth = length(fragToLight);
 
-	float shadow;
+	float shadow = 0.0;
 
-	if ((curDepth - shadowPen) < closestDepth)
+
+
+	if ((curDepth + shadowPen) < closestDepth)
 	    shadow = 1.0;
 	else
 	    shadow = 0.0;
@@ -112,6 +114,9 @@ void main(){
 		float p_spec = pow(max(dot(norm, halfWay), 0.0), matVal);
 		vec3 p_specular = p_spec * lights[c].specular * specVal;
 	
+		float p_r = 1.0 - dot(viewDir, norm);
+		vec3 p_rim = p_r * lights[c].diffuse;
+
 		float shadow = ShadowCalc(fragPos, c);
 	
 		result += p_ambient + shadow * (p_diffuse + p_specular) * attenuation;

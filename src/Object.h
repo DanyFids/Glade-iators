@@ -162,7 +162,7 @@ class Player : public Object {
 
 	SkelMesh* _mesh;
 
-	PLAYER_STATE state;
+	PLAYER_STATE state = idle;
 
 	Weapon* weapon;
 	Shield* shield;
@@ -181,6 +181,7 @@ public:
 
 	virtual void Update(float dt);
 	virtual bool HitDetect(Object* other);
+	virtual void Draw(Shader* shdr, std::vector<Camera*> cam, Shader* childShader = nullptr);
 
 	float GetHP() { return health; }
 	void dmgHP(float _dmg);
@@ -210,6 +211,23 @@ public:
 	FrameStates GetFrameState(unsigned int chnl = 0);
 	bool IsLocked() { return anim_lock; }
 };
+
+/*
+enum WeaponType {
+	WEAPON_SWORD,
+	WEAPON_SPEAR,
+	WEAPON_HAMMER,
+	WEAPON_TRIDENT,
+	WEAPON_DAGGER,
+	WEAPON_FIST
+};
+
+enum ShieldType {
+	SHIELD_LARGE,
+	SHIELD_BUCKLER,
+	SHIELD_NONE
+};
+*/
 
 class Weapon : public Object {
 private:

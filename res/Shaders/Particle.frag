@@ -1,12 +1,11 @@
-#version 330 core
-in vec2 TexCoords;
-in vec4 Color;
+#version 410 core
+layout (location = 1) in vec2 TexCoords;
 
 out vec4 color;
 
-uniform Material tex;
+uniform sampler2D tex;
 
 void main()
 {
-    color = (texture(tex, TexCoords) * Color);
+    color = (texture(tex, TexCoords));
 }  

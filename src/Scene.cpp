@@ -672,8 +672,12 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 				readyChange[controller] = true;
 				if (ready[controller])
 					ready[controller] = false;
-				else
+				else {
 					ready[controller] = true;
+					ready[1] = true;
+					//ChangingScn = true;
+					//Game::CURRENT->setScene(SCENES::PLAY_SCENE);
+				}
 			}
 			else if (menuSpot[controller] == 10) {
 				//Randomize
@@ -746,6 +750,7 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 
 			if (ready[0] && ready[1]) {
 				ChangingScn = true;
+				Game::CURRENT->Loadouts(weapon[0], weapon[1], shield[0], shield[1]);
 				Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 			}
 			menu_time[controller] = MENU_TIME;

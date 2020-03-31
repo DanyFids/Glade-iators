@@ -90,19 +90,23 @@ protected:
 	int MIN_MENU;
 	const float MENU_TIME = 0.2f;
 	float menu_time[2];
+
 	bool _Abutton[2]{ false, false };
 	bool rPress[2]{ false, false };
 	bool _Bbutton[2]{ false, false };
+
 	const int MAX_W = 2;
 	const int MIN_W = 0;
 	const int MAX_S = 2;
 	const int MIN_S = 0;
 	int weapon[2]{ 0, 0 };
 	int shield[2]{ 0, 0 };
+
 	bool ready[2]{ false, false };
 	bool readyChange[2]{ false, false };
 	bool changeW[2]{ false, false };
 	bool changeS[2]{ false, false };
+
 	bool rightArrow = true;
 	bool arrowUsed = false;
 

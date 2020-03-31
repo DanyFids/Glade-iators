@@ -15,6 +15,21 @@ enum SCENES {
 	CREDITS = 4
 };
 
+enum WeaponType {
+	WEAPON_SWORD,
+	WEAPON_SPEAR,
+	WEAPON_HAMMER,
+	WEAPON_TRIDENT,
+	WEAPON_DAGGER,
+	WEAPON_FIST
+};
+
+enum ShieldType {
+	SHIELD_LARGE,
+	SHIELD_BUCKLER,
+	SHIELD_NONE
+};
+
 class Game {
 public:
 	static glm::ivec2 SCREEN;
@@ -23,6 +38,7 @@ public:
 	void setSize(int w, int h);
 	void applyRes();
 	static Mesh* QUAD;
+	void Loadouts(int w_1, int w_2, int s_1, int s_2);
 
 	Game();
 	~Game();
@@ -55,6 +71,9 @@ protected:
 	//Fun Settings Variables!
 	int widthScreen = 1920;
 	int heightScreen = 1080;
+	//Player Weapons!
+	WeaponType weaponChoice[2];
+	ShieldType shieldChoice[2];
 
 private:
 	// Stores the main window that the game is running in

@@ -67,6 +67,7 @@ public:
 	void LoadAnimFrame(std::queue<float>&, int anim, int frame);
 
 	glm::mat4 TransformTo(int anim, int frame);
+	glm::mat4 TransformTo(int* anims, int* frames, float* intensities, unsigned int num_chnls);
 
 	glm::vec3 GetOffset() { return offset; }
 

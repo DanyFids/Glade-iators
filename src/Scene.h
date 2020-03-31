@@ -24,6 +24,7 @@ class Button;
 class ButtonSelect; 
 class FrameBuffer;
 class PostProcess;
+class ParticleEngine;
 
 class SceneD {
 public:
@@ -234,6 +235,7 @@ protected:
 	//std::vector<Attack*> attacks;
 	std::vector<Object*> weapons;
 	std::vector<glm::vec3> beacons;
+	std::vector<ParticleEngine> particle_engines;
 
 	bool dodge1 = true;
 	bool dodge2 = true;

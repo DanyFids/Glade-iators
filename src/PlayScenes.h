@@ -1,12 +1,12 @@
 #pragma once
 #include "Scene.h"
 #include <thread>
-
-
+#include "Sound.h"
+#include "Object.h"
 
 class Light;
 class Mesh;
-class Player;
+class ParticleEngine;
 
 class OnePlayer: public PlayScene {
 	Shader* shaderObj;
@@ -19,6 +19,7 @@ class OnePlayer: public PlayScene {
 
 	FrameBuffer* light_buff;
 	FrameBuffer* merge_buff;
+	FrameBuffer* particle_buff;
 	int prev_num_l = 0;
 	const int MAX_LIGHTS = 25;
 	int active_lights = 1;
@@ -34,6 +35,8 @@ class OnePlayer: public PlayScene {
 	LUT* lut_cool;
 	LUT* lut_hot;
 	LUT* lut_custom;
+
+	ParticleEngine* fire;
 
 	Mesh* DebugQuad;
 
@@ -98,8 +101,12 @@ class TwoPlayer: public PlayScene {
 	bool winannounce = false;
 
 	Object* morphyBoi;
+
+	WeaponType _Weapons[2];
+	ShieldType _Shields[2];
+
 public:
-	TwoPlayer();
+	TwoPlayer(WeaponType p1_weapon = WEAPON_SWORD, ShieldType p1_shield = SHIELD_LARGE, WeaponType p2_weapon = WEAPON_SWORD, ShieldType p2_shield = SHIELD_LARGE);
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
 	virtual void Update(float dt) override;

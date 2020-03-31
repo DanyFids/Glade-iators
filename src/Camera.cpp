@@ -13,7 +13,7 @@ Camera::Camera(glm::vec3 pos, glm::vec4 s_dim)
 	target = glm::vec3(0.0f, 0.0f, 0.0f);
 	direction = glm::normalize(target - position);
 	glm::vec3 u = glm::vec3(0.0f, 1.0f, 0.0f);
-	right = glm::normalize(glm::cross(u, direction));
+	right = glm::normalize(glm::cross(direction, u));
 	up = glm::normalize(glm::cross(direction, right));
 
 	pitch = direction.y * 90;
@@ -25,6 +25,7 @@ Camera::Camera(glm::vec3 pos, glm::vec4 s_dim)
 	view_cor = glm::mat4(1.0f);
 	view_cor = glm::scale(view_cor, glm::vec3((float)Game::SCREEN.x / s_dim.z, 1.0f, 1.0f));
 
+	UpdateCam();
 }
 
 Camera::Camera(glm::vec3 pos, glm::vec3 targ, glm::vec4 s_dim)
@@ -46,6 +47,8 @@ Camera::Camera(glm::vec3 pos, glm::vec3 targ, glm::vec4 s_dim)
 	view_cor = glm::mat4(1.0f);
 	view_cor = glm::translate(view_cor, glm::vec3(-(Game::SCREEN.x - s_dim.z) / 2.0f, 0.0f, 0.0f));
 	view_cor = glm::scale(view_cor, glm::vec3((float)Game::SCREEN.x / s_dim.z, 1.0f, 1.0f));
+
+	UpdateCam();
 }
 
 void Camera::Move(glm::vec3 dir, float dt)
@@ -118,7 +121,7 @@ void Camera::UpdateCam()
 	right = glm::normalize(glm::cross(direction, u));
 	up = glm::normalize(glm::cross(right, direction));
 
-	lookAt = glm::lookAt(position, position + direction, up);
+	lookAt = glm::lookAt(position, position + direction, u);
 }
 
 void Camera::SetupCam(Shader* shader)

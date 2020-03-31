@@ -74,6 +74,14 @@ void Game::applyRes()
 	glfwSetWindowMonitor(window, NULL, 0, 0, widthScreen, heightScreen, 60);
 }
 
+void Game::Loadouts(int w_1, int w_2, int s_1, int s_2)
+{
+	weaponChoice[0] = (WeaponType)w_1;
+	weaponChoice[1] = (WeaponType)w_2;
+	shieldChoice[0] = (ShieldType)s_1;
+	shieldChoice[1] = (ShieldType)s_2;
+}
+
 Game::Game() :
 	window(nullptr),
 	windowTitle("Glade-iators"),
@@ -144,7 +152,7 @@ void Game::Initialize()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_TEXTURE_3D);
-
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	//glEnable(GL_SCISSOR_TEST);

@@ -422,10 +422,6 @@ void OnePlayer::Draw()
 		Cam[c]->SetupCam(morphShader);
 		//morphyBoi->Draw(morphShader, Cam);
 		test_player->Draw(skelShader, Cam, shaderObj);
-		
-		glDisable(GL_DEPTH_TEST);
-		((SkelMesh*)(players[PLAYER_1]->GetMesh()))->DrawSkeleton( players[PLAYER_1]->GetTransform().GetWorldTransform(), shaderObj);
-		glEnable(GL_DEPTH_TEST);
 
 		//glDisable(GL_DEPTH_TEST);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -462,6 +458,10 @@ void OnePlayer::Draw()
 	Game::QUAD->Draw(lightPass);
 
 	particle_buff->Use();
+	glDisable(GL_DEPTH_TEST);
+	((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton(test_player->GetTransform().GetWorldTransform(), shaderObj);
+	glEnable(GL_DEPTH_TEST);
+
 	for (int c = 0; c < Cam.size(); c++) {
 		fire->Draw(Cam[c]);
 	}
@@ -626,7 +626,7 @@ void OnePlayer::LoadScene()
 	GladiatorMesh->SetAnim(gladiatorSkel->GetAnimByName("breathe"), 3, 0.34f, 0.5f);
 
 	SkelMesh* P1_mesh = new SkelMesh(*GladiatorMesh2);
-	SkelMesh* P2_mesh = new SkelMesh(*GladiatorMesh);
+	SkelMesh* P2_mesh = new SkelMesh(*GladiatorMesh2);
 
 	gladiatorSkel->WriteTree();
 	gladiatorSkel2->WriteTree();
@@ -666,8 +666,8 @@ void OnePlayer::LoadScene()
 	players.push_back(new Player(P1_mesh, playerMat, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
 	players.push_back(new Player(P2_mesh, D20Tex, basicCapsuleHB2)); //P2
 
-	GladiatorMesh->SetAnim(1, 0);
-	GladiatorMesh->SetFrame(0, 0);
+	GladiatorMesh2->SetAnim(GladiatorMesh2->GetSkeleton()->GetAnimByName("walk"), 0);
+	GladiatorMesh2->SetFrame(0, 0);
 	P1_mesh->SetIntensity(1, 0.5f);
 	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
 	//shieldSphereHB->SetScale({0.2f, 1.0f, 0.1f});
@@ -680,7 +680,7 @@ void OnePlayer::LoadScene()
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 
 
-	test_player = new Player(GladiatorMesh, defaultTex, basicCapsuleHB3, { 0.0f, 0.0f, 0.0f });
+	test_player = new Player(GladiatorMesh2, defaultTex, basicCapsuleHB3, { 0.0f, 0.0f, 0.0f });
 	//test_player->Scale(glm::vec3(1.2f));
 
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
@@ -939,6 +939,8 @@ void OnePlayer::ResizeCams()
 {
 	Scene::ResizeCams();
 	main_pass->Resize();
+	light_buff->Resize();
+	particle_buff->Resize();
 
 	for (int c = 0; c < post_pass.size(); c++) {
 		post_pass[c]->buff->Resize();
@@ -1235,6 +1237,8 @@ void TwoPlayer::LoadScene()
 	SkelMesh* P1_MESH = new SkelMesh("Base_Gladiator.obj", gladiatorSkel, "PlayerWeightMap.png");
 	SkelMesh* P2_MESH = new SkelMesh(*P1_MESH);
 
+	gladiatorSkel->WriteTree();
+
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f, 1.0f, 1.0f);
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
@@ -1315,10 +1319,33 @@ void TwoPlayer::LoadScene()
 		}
 		
 		switch (_Weapons[p]) {
+		case WEAPON_HAMMER:
+			if (HammerMesh == nullptr) {
+				HammerMesh = new Mesh("Weapons/Warhammer_Maul.obj");
+			}
+
+			if (HammerMat == nullptr) {
+				HammerMat = new Material("Weapons/tex/warhammer.png");
+			}
+			weapon = new Weapon(HammerMesh, HammerMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon->SetRotation({90.0f, 90.0f, 0.0f});
+			weapon->Scale({1.2f, 1.2f, 1.2f});
+			break;
+		// Spear
 		case WEAPON_SPEAR:
+			if (SpearMesh == nullptr) {
+				SpearMesh = new Mesh("Weapons/Spear.obj");
+			}
+
+			if (SpearMat == nullptr) {
+				SpearMat = new Material("Weapons/tex/spear.png");
+			}
+			weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon->SetRotation({ 90.0f, 90.0f, 0.0f });
 
 			break;
 
+		// Sword
 		case WEAPON_SWORD:
 		default:
 			if (SwordMesh == nullptr) {
@@ -1329,13 +1356,27 @@ void TwoPlayer::LoadScene()
 				SwordMat = new Material("Weapons/tex/sword.png");
 			}
 
-			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.15f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->Scale({ 0.9f, 0.9f, 0.9f });
 			weapon->SetRotation({ 0.0f, 90.0f, 90.0f });
 			break;
 		}
 
 		switch (_Shields[p]) {
+		case SHIELD_BUCKLER:
+			if (BucklerMesh == nullptr) {
+				BucklerMesh = new Mesh("Weapons/Buckler.obj");
+			}
+
+			if (BucklerMat == nullptr) {
+				BucklerMat = new Material("Weapons/tex/buckler.png");
+			}
+
+			shield = new Shield(BucklerMesh, BucklerMat, shieldSphereHB, { -0.30f, 0.1f, 0.05f }, 0.6f, 0.25f, gladiatorSkel->Find("l_hand"), mesh);
+			shield->SetRotation({ 0.0f, 0.0f, 270.0f });
+			shield->Scale({0.85f, 0.85f, 0.85f});
+			break;
+
 		case SHIELD_LARGE:
 		default:
 			if (ShieldMesh == nullptr) {
@@ -1346,9 +1387,9 @@ void TwoPlayer::LoadScene()
 				ShieldMat = new Material("Weapons/tex/shield.png");
 			}
 
-			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { 0.095f, 0.115f, 0.0f }, 0.6f, 0.25f, gladiatorSkel->Find("l_hand"), mesh);
-			shield->Scale({ 1, 1, 1 });
-			shield->SetRotation({ 0.0f, 0.0f, 270.0f });
+			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { -0.25f, 0.1f, 0.05f }, 0.6f, 0.25f, gladiatorSkel->Find("l_arm2"), mesh);
+			shield->Scale(glm::vec3(0.85f));
+			shield->SetRotation({ 0.0f, 0.0f, 265.0f });
 			break;
 		}
 

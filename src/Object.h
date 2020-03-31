@@ -25,7 +25,7 @@ struct Transform {
 		glm::quat qYaw = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::quat qRoll = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
-		glm::quat rot = qYaw * qPitch * qRoll;
+		glm::quat rot = qPitch * qYaw * qRoll;
 
 		return
 			glm::translate(glm::mat4(1.0f), position) *
@@ -39,7 +39,7 @@ struct Transform {
 		glm::quat qYaw = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::quat qRoll = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
-		glm::quat rot = qYaw * qPitch * qRoll;
+		glm::quat rot = qPitch * qYaw * qRoll;
 
 		return
 			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f) * glm::length(position)) *
@@ -53,7 +53,7 @@ struct Transform {
 		glm::quat qYaw = glm::angleAxis(glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::quat qRoll = glm::angleAxis(glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
-		glm::quat rot = qYaw * qPitch * qRoll;
+		glm::quat rot = qPitch * qYaw * qRoll;
 
 		return glm::mat4_cast(rot);
 	}

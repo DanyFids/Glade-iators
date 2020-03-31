@@ -836,6 +836,14 @@ void SkelMesh::DrawSkeleton(glm::mat4 global, Shader* shdr)
 	skeleton->DrawSkeleton(global, anim[0], curFrame[0], shdr);
 }
 
+void SkelMesh::GetChnlInfo(int*& anims, int*& frames, float*& intensities, int& num_channels)
+{
+	anims = anim;
+	frames = curFrame;
+	intensities = chnl_intensity;
+	num_channels = this->num_channels;
+}
+
 FrameStates SkelMesh::GetFrameCode(unsigned int chnl)
 {
 	return skeleton->AnimStates[anim[chnl]][curFrame[chnl]];

@@ -285,10 +285,14 @@ glm::mat4 Joint::TransformTo(int* anims, int* frames, float* intensities, unsign
 {
 	Transform temp;
 	for (int c = 0; c < num_chnls; c++) {
-		temp.position += animations[anims[c]][frames[c]].position * intensities[c];
-		temp.rotation += animations[anims[c]][frames[c]].rotation * intensities[c];
-		//temp.scale += animations[anims[c]][frames[c]].scale * intensities[c];
+		if (anims[c] >= 0 && anims[c] < animations.size()) {
+			temp.position += (animations[anims[c]][frames[c]].position - offset) * intensities[c];
+			temp.rotation += animations[anims[c]][frames[c]].rotation * intensities[c];
+			//temp.scale += animations[anims[c]][frames[c]].scale * intensities[c];
+		}
 	}
+
+	temp.position += offset;
 
 	if (parent != nullptr) {
 		return parent->TransformTo(anims, frames, intensities, num_chnls) * temp.GetWorldTransform();

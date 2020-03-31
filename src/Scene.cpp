@@ -213,12 +213,12 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
 				if (players[player]->GetState() < PLAYER_STATE::walking && players[player]->GetFrameState() == FrameStates::Neutral && !players[player]->IsLocked()) {
 					players[player]->PlayAnim("walk", 0, glm::length(axisPos));
-					players[player]->PlayAnim("idle", 1, 1.0f - glm::length(axisPos));
+					players[player]->PlayAnim("idle", 1, 1.0f);
 					players[player]->SetState(walking);
 				}
 				else if (!players[player]->IsLocked()) {
 					((SkelMesh*)players[player]->GetMesh())->SetIntensity(0, glm::length(axisPos));
-					((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f - glm::length(axisPos));
+					((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f);
 				}
 			}
 			else if (players[player]->GetState() == PLAYER_STATE::walking) {

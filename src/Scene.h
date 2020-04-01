@@ -158,12 +158,12 @@ protected:
 	Material* buttonRandomBlue = new Material("randomButtonBlue.png");
 	Material* backDropBlue = new Material("backdrop2Blue.png");
 
-	Material* arrow = new Material("arrow.png");
+	Material* arrow = new Material("arrow.png"); 
 	Material* arrowBack = new Material("arrow (1).png");
 	Material* arrow2 = new Material("arrow2.png");
 	Material* arrowBack2 = new Material("arrow (1)2.png");
 	Material* ehks = new Material("ehks.png");
-	Material* check = new Material("checkmark.png");
+	Material* check = new Material("checkmark.png"); 
 
 	Material* swordIcon = new Material("iconSword.png");
 	Material* spearIcon = new Material("iconSpear.png");
@@ -172,7 +172,7 @@ protected:
 	Material* daggerIcon = new Material("iconDagger.png");
 
 	Material* bucklerIcon = new Material("iconBuckler.png");
-	Material* shieldIcon = new Material("iconShield.png");
+	Material* shieldIcon = new Material("iconShield.png"); 
 	Material* nothingIcon = new Material("nothing.png");
 
 public:

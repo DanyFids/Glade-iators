@@ -12,6 +12,11 @@ class ParticleEngine;
 struct ParticleBehavior { std::function<void(float, Particle&)> func; };
 struct ParticleEngineBehavior { std::function<void(float, ParticleEngine&)> func; };
 
+struct Part {
+	glm::vec3 pos;
+	glm::vec2 size;
+};
+
 class Particle {
 protected:
 	glm::vec3 position, velocity;

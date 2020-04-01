@@ -133,7 +133,7 @@ public:
 };
 
 enum PLAYER_STATE {
-	idle, walking, attacking, blocking, rolling, taunting
+	idle, walking, attacking, blocking, rolling, taunting, dying
 };
 
 enum COLLISION_TYPE {
@@ -201,7 +201,9 @@ public:
 	void Idle();
 	void Attack();
 	void Block();
+	void Die();
 
+	void Reset();
 	PLAYER_STATE GetState() {return state;}
 	void SetState(PLAYER_STATE s) {state = s;}
 	void SetWeapon(Weapon*& w) { weapon = w; }

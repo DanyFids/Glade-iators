@@ -148,7 +148,7 @@ void Camera::SetupPostLight(Shader* shader, int id)
 	shader->Use();
 
 	shader->SetVec3("cam[" + std::to_string(id) + "].position", position);
-	shader->SetMat4("cam[" + std::to_string(id) + "].iVP", glm::inverse(project * lookAt * view_cor));
+	shader->SetMat4("cam[" + std::to_string(id) + "].iVP", glm::inverse(project * lookAt));
 }
 
 void Camera::TogglePerspective()

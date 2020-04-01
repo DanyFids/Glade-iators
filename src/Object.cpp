@@ -244,6 +244,10 @@ Player::Player(SkelMesh* me, Material* ma, Hitbox* hb, glm::vec3 pos) : Object(m
 
 void Player::Update(float dt)
 {
+	if (health <= 0.0f && state != dying) {
+		Die();
+	}
+
 	if (recov_timer > 0.0f) {
 		recov_timer -= dt;
 	}
@@ -391,7 +395,7 @@ void Player::PlayAnim(std::string n, unsigned int c, float i, float s)
 
 void Player::Run()
 {
-	if (!run && recov_timer <= 0.0f) {
+	if (!run && state == walking && recov_timer <= 0.0f) {
 		run = true;
 	}
 }
@@ -454,6 +458,23 @@ void Player::Block()
 		PlayAnim("block",1,1,1.0f);
 		state = blocking;
 	}
+}
+
+void Player::Die()
+{
+	state = dying;
+	PlayAnim("die", 0);
+	_mesh->SetIntensity(1, 0.0f);
+	_mesh->SetIntensity(2, 0.0f);
+	_mesh->SetIntensity(3, 0.0f);
+}
+
+void Player::Reset()
+{
+	health = MAX_HEALTH;
+	stamina = MAX_STAMINA;
+
+	Idle();
 }
 
 FrameStates Player::GetFrameState(unsigned int chnl)

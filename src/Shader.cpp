@@ -56,11 +56,11 @@ Shader::Shader(const char* vertShaderPath, const char* fragShaderPath, const cha
 	char infoLog[512];
 
 	if (int err = LoadShaderCode(vertShaderPath, &vertexShaderSource)) {
-		std::cout << "ERROR::SHADER::VERTEX::ERROR_READING_FILE\nERROR_CODE: " << err << std::endl;
+		std::cout << "ERROR::SHADER::VERTEX::ERROR_READING_FILE: " << vertShaderPath << "\nERROR_CODE: " << err << std::endl;
 		return;
 	}
 	if (int err = LoadShaderCode(fragShaderPath, &fragShaderSource)) {
-		std::cout << "ERROR::SHADER::FRAG::ERROR_READING_FILE\nERROR_CODE: " << err << std::endl;
+		std::cout << "ERROR::SHADER::FRAG::ERROR_READING_FILE: " << fragShaderPath << "\nERROR_CODE: " << err << std::endl;
 		return;
 	}
 
@@ -100,7 +100,7 @@ Shader::Shader(const char* vertShaderPath, const char* fragShaderPath, const cha
 		geoShader = glCreateShader(GL_GEOMETRY_SHADER);
 
 		if (int err = LoadShaderCode(geoShaderPath, &geoShaderSource)) {
-			std::cout << "ERROR::SHADER::GEO::ERROR_READING_FILE\nERROR_CODE: " << err << std::endl;
+			std::cout << "ERROR::SHADER::GEO::ERROR_READING_FILE: " << geoShaderPath << "\nERROR_CODE: " << err << std::endl;
 			return;
 		}
 

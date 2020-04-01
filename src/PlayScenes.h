@@ -17,9 +17,6 @@ class OnePlayer: public PlayScene {
 	Shader* morphShader;
 	Shader* lightPass;
 
-	FrameBuffer* light_buff;
-	FrameBuffer* merge_buff;
-	FrameBuffer* particle_buff;
 	int prev_num_l = 0;
 	const int MAX_LIGHTS = 25;
 	int active_lights = 1;
@@ -91,13 +88,14 @@ class TwoPlayer: public PlayScene {
 	Shader* depthShader;
 	Shader* morphShader;
 	Shader* skelShader;
-
+	Shader* skelDepth;
+	Shader* lightPass;
 	Shader* sunShader;
 
 
 	//Sound audioEngine;
-
-	float deathtimer = 4;
+	const float DEATH_TIME = 4.0f;
+	float deathtimer = DEATH_TIME;
 	bool winannounce = false;
 
 	Object* morphyBoi;
@@ -112,4 +110,8 @@ public:
 	virtual void Update(float dt) override;
 	virtual void Draw() override;
 	virtual void LoadScene() override;
+
+	virtual void ResizeCams();
+
+	virtual void Reset();
 };

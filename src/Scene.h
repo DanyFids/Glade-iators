@@ -46,10 +46,6 @@ protected:
 	static bool loaded;
 
 	TextRenderer* Textcontroller = new TextRenderer();
-
-	static int P1wins;
-	static int P2wins;
-	static int RoundCount;
 	
 	static Sound* audioEngine;
 	static bool AEinit;
@@ -258,6 +254,10 @@ protected:
 	int CgradeI = 0;
 	bool CgradeIDown[3] = { false,false,false };
 	int lutloaded = 0;
+
+	int RoundCount = 1;
+	int P1wins = 0;
+	int P2wins = 0;
 	
 
 	SplineMan* DUUDE;
@@ -270,7 +270,10 @@ protected:
 	std::vector<PointLight*> lights;
 	DirectionalLight * sun;
 
-	FrameBuffer* main_pass;
+	FrameBuffer* main_pass[2];
+	FrameBuffer* light_buff[2];
+	FrameBuffer* merge_buff;
+	FrameBuffer* particle_buff[2];
 	std::vector<PostProcess*> post_pass;
 
 	std::vector<UI*> ui;
@@ -283,4 +286,8 @@ public:
 	virtual void KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt) override;
 	virtual void ControllerInput(unsigned int controller, int player, float dt) override;
 	void RenderScene(Shader* shader, Shader* playerShader);
+
+	void ClearBuffs();
+
+	virtual void Reset();
 };

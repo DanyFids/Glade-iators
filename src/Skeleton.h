@@ -21,7 +21,8 @@ enum FrameStates {
 	Roll,
 	Attack,
 	Deflect,
-	End
+	End,
+	Hold
 };
 
 ChannelType StringToChnlTp(std::string name);

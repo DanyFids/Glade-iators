@@ -190,6 +190,7 @@ void MainMenu::LoadScene()
 	Material* buttonExit = new Material("exitButton.png");
 	Material* buttonCredits = new Material("creditsButton.png");
 	Material* titleImage = new Material("gladewallpaper.png");
+	Material* menuImage = new Material("blackMenu.png");
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
@@ -218,7 +219,7 @@ void MainMenu::LoadScene()
 
 	if (!loaded) {
 		logos = new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), gladeiatorsTitle);
-		blackBox = new UI(600, 350, glm::vec3(150, 350, 0), blackBarMat);
+		blackBox = new UI(750, 400, glm::vec3(0, 0, 0), menuImage);
 	}
 }
 

@@ -19,7 +19,7 @@ protected:
 	UI* blackBox;
 
 	const float MAX_TIME = 2.0f;
-	float menu_time = 1.0f;
+	float menu_time = 3.0f;
 
 public:
 

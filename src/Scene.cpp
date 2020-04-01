@@ -669,8 +669,10 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && _Bbutton[controller] && !ChangingScn) {
 			if (MAX_MENU != 0) {
 				_Bbutton[controller] = false;
-				ChangingScn = true;
-				Game::CURRENT->setScene(SCENES::MAIN_MENU);
+				if (controller == PLAYER_1 || MAX_MENU == 10) {
+					ChangingScn = true;
+					Game::CURRENT->setScene(SCENES::MAIN_MENU);
+				}
 			}
 		}
 		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && _Abutton[controller] && !ChangingScn) {

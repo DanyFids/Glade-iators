@@ -978,6 +978,15 @@ void TwoPlayer::Update(float dt)
 		players[c]->Update(dt);
 
 		for (int p = 0; p < players.size(); p++) {
+
+			if (combo[p]) {
+				comboTime[p] -= dt;
+				if (comboTime[p] <= 0) {
+					combo[p] = false;
+					comboMult[p] = 1.0f;
+				}
+			}
+
 			if (players[c] != players[p]) {
 				if (players[c]->HitDetect(players[p])) {
 					std::cout << "Welp\n";
@@ -998,7 +1007,10 @@ void TwoPlayer::Update(float dt)
 					if (players[p]->hitbox->GetType() == entity) {
 						std::cout << "Hit!\n";
 						audioEngine->PlayEvent("Hit");
-						curScore += 5 * taunted[p];
+						curScore += 5 * taunted[p] * comboMult[p];
+						combo[p] = true;
+						comboTime[p] = MAX_COMBO;
+						comboMult[p] += 0.5f;
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
 						players[c]->GetWeapon()->setCooldown(true);
 					}
@@ -1096,11 +1108,17 @@ void TwoPlayer::Update(float dt)
 
 		}
 	}
+	// Combo Stuff
+
+	// Crowd Stuff
 	subIncreaser -= dt;
 	if (subIncreaser <= 0) {
 		subIncreaser = INCREASE_TIME;
 		scoreSub++;
 	}
+
+	if (curScore > MAX_SCORE)
+		curScore = MAX_SCORE;
 
 	curScore -= dt * scoreSub;
 	if (CrowdBoi != nullptr) {

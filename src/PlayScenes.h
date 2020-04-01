@@ -102,6 +102,11 @@ class TwoPlayer: public PlayScene {
 	float subIncreaser = INCREASE_TIME;
 	float taunted[2]{ 1.0f, 1.0f };
 
+	float MAX_COMBO = 5.0f;
+	float comboTime[2]{ MAX_COMBO, MAX_COMBO };
+	float comboMult[2]{ 1.0f, 1.0f };
+	bool combo[2]{ false, false };
+
 	//Sound audioEngine;
 
 	float deathtimer = 4;

@@ -21,6 +21,7 @@ enum FrameStates {
 	Roll,
 	Attack,
 	Deflect,
+	Taunt,
 	End
 };
 

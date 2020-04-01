@@ -483,6 +483,9 @@ int Skeleton::LoadFromFile(std::string f)
 					else if (read.compare("B") == 0) {
 						AnimStates[AnimStates.size() - 1].push_back(Block);
 					}
+					else if (read.compare("T") == 0) {
+						AnimStates[AnimStates.size() - 1].push_back(Taunt);
+					}
 				}
 				else {
 					AnimStates[AnimStates.size() - 1].push_back(Neutral);

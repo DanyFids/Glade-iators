@@ -451,6 +451,13 @@ void Player::Block()
 	}
 }
 
+void Player::Taunt()
+{
+	anim_lock = true;
+	_mesh->SetAnim(_mesh->GetSkeleton()->GetAnimByName("dab"), 0);
+	state = rolling;
+}
+
 FrameStates Player::GetFrameState(unsigned int chnl)
 {
 	return _mesh->GetFrameCode();

@@ -1017,6 +1017,11 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				((Player*)players[player])->StopRun();
 			}
 
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_Y] == GLFW_PRESS) {
+				((Player*)players[player])->Taunt();
+				
+			}
+
 			static bool r_stick_down[2] = { false, false };
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && !r_stick_down[player]) {
 				players[player]->ToggleCamLock();

@@ -201,6 +201,7 @@ public:
 	void Idle();
 	void Attack();
 	void Block();
+	void Taunt();
 
 	PLAYER_STATE GetState() {return state;}
 	void SetState(PLAYER_STATE s) {state = s;}

@@ -979,12 +979,22 @@ void TwoPlayer::Update(float dt)
 
 		for (int p = 0; p < players.size(); p++) {
 
-			if (combo[p]) {
-				comboTime[p] -= dt;
-				if (comboTime[p] <= 0) {
-					combo[p] = false;
-					comboMult[p] = 1.0f;
+			if (combo[c]) {
+				comboTime[c] -= dt;
+				if (comboTime[c] <= 0) {
+					combo[c] = false;
+					comboMult[c] = 1.0f;
 				}
+			}
+
+			if (tauntTime[c] > 0)
+				tauntTime[c] -= dt;
+			else
+				taunted[c] = 1.0f;
+
+			if (players[c]->GetState() == taunting) {
+				taunted[c] = 2.0f;
+				tauntTime[c] = MAX_TAUNT;
 			}
 
 			if (players[c] != players[p]) {
@@ -1007,10 +1017,10 @@ void TwoPlayer::Update(float dt)
 					if (players[p]->hitbox->GetType() == entity) {
 						std::cout << "Hit!\n";
 						audioEngine->PlayEvent("Hit");
-						curScore += 5 * taunted[p] * comboMult[p];
-						combo[p] = true;
-						comboTime[p] = MAX_COMBO;
-						comboMult[p] += 0.5f;
+						curScore += (5 * taunted[c] * comboMult[c]);
+						combo[c] = true;
+						comboTime[c] = MAX_COMBO;
+						comboMult[c] += 0.5f;
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
 						players[c]->GetWeapon()->setCooldown(true);
 					}
@@ -1103,12 +1113,13 @@ void TwoPlayer::Update(float dt)
 				P1wins = 0;
 				P2wins = 0;
 			}
+			scoreSub = 1.0f;
+			curScore = MAX_SCORE;
 			Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 			//setScene(MainMenu);
 
 		}
 	}
-	// Combo Stuff
 
 	// Crowd Stuff
 	subIncreaser -= dt;

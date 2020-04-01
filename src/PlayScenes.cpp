@@ -1285,7 +1285,7 @@ void TwoPlayer::LoadScene()
 	Material* mainUI = new Material("hpbarcool.png");
 	Material* hpBarMat = new Material("yuck.png");
 	Material* stamBarMat = new Material("blue.png");
-	Material* crowdBarMat = new Material("white.png");
+	Material* crowdBarMat = new Material("crowdbar.png");
 	Material* blackBarMat = new Material("black.png");
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 155.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.4f, 0.7f, 0.9f);
@@ -1296,10 +1296,10 @@ void TwoPlayer::LoadScene()
 	beacons.push_back(glm::vec3(glm::vec3(1, 1, 3)));
 	beacons.push_back(glm::vec3(glm::vec3(1, 2, 5)));
 	beacons.push_back(glm::vec3(glm::vec3(2, 1, 4)));
-	beacons.push_back(glm::vec3(glm::vec3(3, 2, 5)));
+	beacons.push_back(glm::vec3(glm::vec3(3, 2, 5))); 
 	beacons.push_back(glm::vec3(glm::vec3(7, 1, 4)));
 	beacons.push_back(glm::vec3(glm::vec3(9, 2, 5)));
-	beacons.push_back(glm::vec3(glm::vec3(12, 1, 4)));
+	beacons.push_back(glm::vec3(glm::vec3(12, 1, 4))); 
 	beacons.push_back(glm::vec3(glm::vec3(4, 2, 5)));
 	beacons.push_back(glm::vec3(glm::vec3(2, 1, 4)));
 
@@ -1465,11 +1465,11 @@ void TwoPlayer::LoadScene()
 
 	UI* hpBG = new UI(260, 10, { 55.0f, 554.5f, -1.0f }, blackBarMat);
 	UI* stamBG = new UI(260, 10, { 55.0f, 534.50f, -1.0f }, blackBarMat);
-	UI* crowdBG = new UI(80, 70, { 360.0f, 515.0f, -1.0f }, blackBarMat);
+	UI* crowdBG = new UI(80, 71, { 360.0f, 514.0f, -1.0f }, blackBarMat);
 
 	UI* hpBG2 = new UI(260, 10, { 487.5f, 554.5f, -1.0f }, blackBarMat);
 	UI* stamBG2 = new UI(260, 10, { 487.5f, 534.5f, -1.0f }, blackBarMat);
-	CrowdBoi = new CrowdBar((Player*)players[PLAYER_1], glm::vec2(360, 515), crowdBarMat, crowdBG);
+	CrowdBoi = new CrowdBar((Player*)players[PLAYER_1], glm::vec2(361, 515), crowdBarMat, crowdBG);
 
 	ui = {
 		new UI(801.5, 100, glm::vec3(0.0f, 500.0f, 0.0f), mainUI),

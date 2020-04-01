@@ -264,8 +264,8 @@ void HealthBar::Draw(glm::vec2 scrn)
 	UI::Draw(scrn);
 }
 
-const int CrowdBar::MAX_WIDTH = 80;
-const int CrowdBar::HEIGHT = 70;
+const int CrowdBar::MAX_WIDTH = 78.75;
+const int CrowdBar::HEIGHT = 69;
 CrowdBar::CrowdBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg) : UI(MAX_WIDTH, HEIGHT, glm::vec3(pos, 0), ma)
 {
 	player = p;

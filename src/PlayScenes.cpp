@@ -973,6 +973,7 @@ void TwoPlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void TwoPlayer::Update(float dt)
 {
+
 	for (int c = 0; c < players.size(); c++) {
 		players[c]->Update(dt);
 
@@ -997,6 +998,7 @@ void TwoPlayer::Update(float dt)
 					if (players[p]->hitbox->GetType() == entity) {
 						std::cout << "Hit!\n";
 						audioEngine->PlayEvent("Hit");
+						curScore += 5 * taunted[p];
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
 						players[c]->GetWeapon()->setCooldown(true);
 					}
@@ -1093,6 +1095,16 @@ void TwoPlayer::Update(float dt)
 			//setScene(MainMenu);
 
 		}
+	}
+	subIncreaser -= dt;
+	if (subIncreaser <= 0) {
+		subIncreaser = INCREASE_TIME;
+		scoreSub++;
+	}
+
+	curScore -= dt * scoreSub;
+	if (CrowdBoi != nullptr) {
+		CrowdBoi->setScore(curScore);
 	}
 }
 
@@ -1424,17 +1436,17 @@ void TwoPlayer::LoadScene()
 
 	UI* hpBG = new UI(260, 10, { 55.0f, 554.5f, -1.0f }, blackBarMat);
 	UI* stamBG = new UI(260, 10, { 55.0f, 534.50f, -1.0f }, blackBarMat);
-	UI* crowdBG = new UI(185, 30, { 55.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* crowdBG = new UI(80, 70, { 360.0f, 515.0f, -1.0f }, blackBarMat);
 
 	UI* hpBG2 = new UI(260, 10, { 487.5f, 554.5f, -1.0f }, blackBarMat);
 	UI* stamBG2 = new UI(260, 10, { 487.5f, 534.5f, -1.0f }, blackBarMat);
-
+	CrowdBoi = new CrowdBar((Player*)players[PLAYER_1], glm::vec2(360, 515), crowdBarMat, crowdBG);
 
 	ui = {
 		new UI(801.5, 100, glm::vec3(0.0f, 500.0f, 0.0f), mainUI),
 		new HealthBar((Player*)players[PLAYER_1], glm::vec2(60, 557), hpBarMat, hpBG),
 		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(60, 537), stamBarMat, stamBG),
-		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG), 
+		CrowdBoi,
 
 		new HealthBar((Player*)players[PLAYER_2], glm::vec2(492.5, 557.5), hpBarMat, hpBG2),
 		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(492.5, 537.5), stamBarMat, stamBG2)

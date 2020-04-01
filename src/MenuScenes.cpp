@@ -634,7 +634,7 @@ void SettingsScene::Draw()
 	}
 
 	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, ResolutionDisplay, 450.0f - (ResolutionDisplay.length() * 4), 550.0f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, ResolutionDisplay, 440.0f - (ResolutionDisplay.length() * 4), 550.0f, 0.45f, glm::vec3(1.0f, 1.0f, 1.0f));
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -654,6 +654,7 @@ void SettingsScene::LoadScene()
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
 
 	Material* blackBarMat = new Material("black.png");
+	Material* white = new Material("white.png");
 	Material* background = new Material("backgroundWood.png");
 	Material* art = new Material("colitreeums.png");
 	Material* shrup = new Material("shrup.png");
@@ -680,13 +681,15 @@ void SettingsScene::LoadScene()
 	arrow_Button3 = new UI(40, 50, glm::vec3(260, 530, 0), arrowBack);
 	 
 	ui = {
-		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background),
-		new UI(SCREEN_WIDTH, 420, glm::vec3(0.0f), blackBarMat),
-		new UI(SCREEN_WIDTH, 600, glm::vec3(0.0f), art), 
-		new UI(95, 30, glm::vec3(410, 542, 0.0f), blackBarMat),
+		new UI(SCREEN_WIDTH, 600, glm::vec3(0.0f), art),
+		new UI(SCREEN_WIDTH, 30, glm::vec3(0, 400,0.0f), blackBarMat),
+		//new UI(SCREEN_WIDTH, 420, glm::vec3(0.0f), blackBarMat),
+		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0, 420, 0.0f), background),
+		new UI(100, 35, glm::vec3(397.5, 539.5, 0.0f), white),
+		new UI(95, 30, glm::vec3(400, 542, 0.0f), blackBarMat),
 		new UI(180, 170, glm::vec3(580, 430, 0), shrup),
 		return_Button,
-		resolution_Button,
+		resolution_Button, 
 		arrow_Button1,
 		arrow_Button3
 	};

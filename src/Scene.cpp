@@ -36,11 +36,11 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 				switch (menuSpot[controller]) {
 				case 18:
 					resolution_Button->ChangeTex(buttonResRed);
-					exit_Button->ChangeTex(buttonExit);
+					return_Button->ChangeTex(buttonReturn);
 					break;
 				case 19:
 					resolution_Button->ChangeTex(buttonRes);
-					exit_Button->ChangeTex(buttonExitRed);
+					return_Button->ChangeTex(buttonReturnRed);
 					break;
 				case -4:
 					play_Button->ChangeTex(buttonPlayRed);
@@ -53,13 +53,13 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 				case -2:
 					credits_Button->ChangeTex(buttonCreditsRed);
 					settings_Button->ChangeTex(buttonSettings);
-					break;
+					break; 
 				case -3:
 					exit_Button->ChangeTex(buttonExitRed);
 					credits_Button->ChangeTex(buttonCredits);
 					break;
 				case 6:
-					random1_Button->ChangeTex(buttonRandomRed);
+					random1_Button->ChangeTex(buttonRandomRed); 
 					if (menuSpot[1] == 7) {
 						ready_Button->ChangeTex(buttonReadyBlue);
 					}
@@ -115,11 +115,11 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 				switch (menuSpot[controller]) {
 				case 20:
 					resolution_Button->ChangeTex(buttonResRed);
-					exit_Button->ChangeTex(buttonExit);
+					return_Button->ChangeTex(buttonReturn);
 					break;
 				case 21:
 					resolution_Button->ChangeTex(buttonRes);
-					exit_Button->ChangeTex(buttonExitRed);
+					return_Button->ChangeTex(buttonReturnRed);
 					break;
 				case 0:
 					play_Button->ChangeTex(buttonPlayRed);
@@ -244,14 +244,23 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 				}
 				break;
 			case 19:
-				//Exit Button
+				//Return Button
 				if (_Abutton[controller] && menu_time[controller] > 0) {
-					exit_Button->ChangeTex(buttonExit2);
+					return_Button->ChangeTex(buttonReturn2);
 				}
 				else if (menu_time[controller] <= 0) {
-					exit_Button->ChangeTex(buttonExitRed);
+					return_Button->ChangeTex(buttonReturnRed);
 				}
-				break;
+				break; 
+			case 17:
+					//Return Button
+					if (_Abutton[controller] && menu_time[controller] > 0) {
+						return_Button->ChangeTex(buttonReturn2);
+					}
+					else if (menu_time[controller] <= 0) {
+						return_Button->ChangeTex(buttonReturnRed);
+					}
+					break;
 			case 10:
 				//Random Button
 				if (_Abutton[controller] && menu_time[controller] > 0) {
@@ -674,7 +683,8 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 					ready[controller] = false;
 				else {
 					ready[controller] = true;
-					ready[1] = true;
+					//Everything below is debug
+					//ready[1] = true;
 					//ChangingScn = true;
 					//Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 				}
@@ -686,48 +696,38 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 				weapon[controller] = (int)rand() % 2;
 				shield[controller] = (int)rand() % 2;
 			}
-
-			else if (menuSpot[0] == 0) {
-				//Character Scene
-				ChangingScn = true;
-				Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
-			}
-			else if (menuSpot[0] == -1) {
-				//Settings
-				Game::CURRENT->setScene(SCENES::SETTINGS_SCENE);
-			}
-			else if (menuSpot[0] == -2) {
-				//Credits
-				Game::CURRENT->setScene(SCENES::CREDITS);
-			}
-			else if (menuSpot[0] == -3) {
-				//Exit
-				//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
-				glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
-			}
 			else if (controller == 0) {
-				if (menuSpot[0] == 0) {
+				if (menuSpot[PLAYER_1] == 0) {
 					//Character Scene
 					ChangingScn = true;
 					Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
 				}
-				else if (menuSpot[0] == -1) {
+				else if (menuSpot[PLAYER_1] == -1) {
 					//Settings
 					ChangingScn = true;
 					Game::CURRENT->setScene(SCENES::SETTINGS_SCENE);
 				}
-				else if (menuSpot[0] == -2) {
+				else if (menuSpot[PLAYER_1] == -2) {
 					//Credits 
+					ChangingScn = true;
+					Game::CURRENT->setScene(SCENES::CREDITS);
 				}
-				else if (menuSpot[0] == -3) {
+				else if (menuSpot[PLAYER_1] == -3) {
 					//Exit
 					//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
 					glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
 				}
-				else if (menuSpot[0] == 20) {
+				else if (menuSpot[PLAYER_1] == 20) {
+					//resolution
 					Game::CURRENT->applyRes();
 				}
-				else if (menuSpot[0] == 19) {
+				else if (menuSpot[PLAYER_1] == 19) {
+					//Return
+					ChangingScn = true;
+					Game::CURRENT->setScene(SCENES::MAIN_MENU);
+				}
+				else if (menuSpot[PLAYER_1] == 17) {
+					//Return
 					ChangingScn = true;
 					Game::CURRENT->setScene(SCENES::MAIN_MENU);
 				}
@@ -748,13 +748,19 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 					p2Ready->ChangeTex(ehks);
 			}
 
-			if (ready[0] && ready[1]) {
+			menu_time[controller] = MENU_TIME;
+		}
+		if (!ready[PLAYER_1] || !ready[PLAYER_2])
+			ready_timer = MAX_READY;
+
+		if (ready[PLAYER_1] && ready[PLAYER_2]) {
+			ready_timer -= dt;
+			if (ready_timer <= 0) {
 				ChangingScn = true;
-				Game::CURRENT->Loadouts(weapon[0], weapon[1], shield[0], shield[1]);
+				Game::CURRENT->Loadouts(weapon[PLAYER_1], weapon[PLAYER_2], shield[PLAYER_1], shield[PLAYER_2]);
 				musicaudioEngine.Shutdown();
 				Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 			}
-			menu_time[controller] = MENU_TIME;
 		}
 
 		menu_time[controller] -= dt;
@@ -984,6 +990,11 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 			}
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
 				((Player*)players[player])->StopRun();
+			}
+
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_Y] == GLFW_PRESS) {
+				((Player*)players[player])->Taunt();
+				
 			}
 
 			static bool r_stick_down[2] = { false, false };

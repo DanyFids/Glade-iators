@@ -973,10 +973,30 @@ void TwoPlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 
 void TwoPlayer::Update(float dt)
 {
+
 	for (int c = 0; c < players.size(); c++) {
 		players[c]->Update(dt);
 
 		for (int p = 0; p < players.size(); p++) {
+
+			if (combo[c]) {
+				comboTime[c] -= dt;
+				if (comboTime[c] <= 0) {
+					combo[c] = false;
+					comboMult[c] = 1.0f;
+				}
+			}
+
+			if (tauntTime[c] > 0)
+				tauntTime[c] -= dt;
+			else
+				taunted[c] = 1.0f;
+
+			if (players[c]->GetState() == taunting) {
+				taunted[c] = 2.0f;
+				tauntTime[c] = MAX_TAUNT;
+			}
+
 			if (players[c] != players[p]) {
 				if (players[c]->HitDetect(players[p])) {
 					std::cout << "Welp\n";
@@ -997,7 +1017,12 @@ void TwoPlayer::Update(float dt)
 				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
 
 					if (players[p]->hitbox->GetType() == entity) {
-						std::cout << "Hit!\n"; 
+						std::cout << "Hit!\n";
+						//audioEngine.PlayEvent("Hit");
+						curScore += (5 * taunted[c] * comboMult[c]);
+						combo[c] = true;
+						comboTime[c] = MAX_COMBO;
+						comboMult[c] += 0.5f;
 						audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
 						audioEngine.LoadEvent("Hit", "{3830d309-eab3-4e2d-9cc2-2b00807daf5c}");
 						audioEngine.PlayEvent("Hit");
@@ -1094,10 +1119,27 @@ void TwoPlayer::Update(float dt)
 				P1wins = 0;
 				P2wins = 0;
 			}
+			scoreSub = 1.0f;
+			curScore = MAX_SCORE;
 			Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 			//setScene(MainMenu);
 
 		}
+	}
+
+	// Crowd Stuff
+	subIncreaser -= dt;
+	if (subIncreaser <= 0) {
+		subIncreaser = INCREASE_TIME;
+		scoreSub++;
+	}
+
+	if (curScore > MAX_SCORE)
+		curScore = MAX_SCORE;
+
+	curScore -= dt * scoreSub;
+	if (CrowdBoi != nullptr) {
+		CrowdBoi->setScore(curScore);
 	}
 }
 
@@ -1280,7 +1322,7 @@ void TwoPlayer::LoadScene()
 	Material* mainUI = new Material("hpbarcool.png");
 	Material* hpBarMat = new Material("yuck.png");
 	Material* stamBarMat = new Material("blue.png");
-	Material* crowdBarMat = new Material("white.png");
+	Material* crowdBarMat = new Material("crowdbar.png");
 	Material* blackBarMat = new Material("black.png");
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 155.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.4f, 0.7f, 0.9f);
@@ -1291,10 +1333,10 @@ void TwoPlayer::LoadScene()
 	beacons.push_back(glm::vec3(glm::vec3(1, 1, 3)));
 	beacons.push_back(glm::vec3(glm::vec3(1, 2, 5)));
 	beacons.push_back(glm::vec3(glm::vec3(2, 1, 4)));
-	beacons.push_back(glm::vec3(glm::vec3(3, 2, 5)));
+	beacons.push_back(glm::vec3(glm::vec3(3, 2, 5))); 
 	beacons.push_back(glm::vec3(glm::vec3(7, 1, 4)));
 	beacons.push_back(glm::vec3(glm::vec3(9, 2, 5)));
-	beacons.push_back(glm::vec3(glm::vec3(12, 1, 4)));
+	beacons.push_back(glm::vec3(glm::vec3(12, 1, 4))); 
 	beacons.push_back(glm::vec3(glm::vec3(4, 2, 5)));
 	beacons.push_back(glm::vec3(glm::vec3(2, 1, 4)));
 
@@ -1459,17 +1501,17 @@ void TwoPlayer::LoadScene()
 
 	UI* hpBG = new UI(260, 10, { 55.0f, 554.5f, -1.0f }, blackBarMat);
 	UI* stamBG = new UI(260, 10, { 55.0f, 534.50f, -1.0f }, blackBarMat);
-	UI* crowdBG = new UI(185, 30, { 55.0f, 545.0f, -1.0f }, blackBarMat);
+	UI* crowdBG = new UI(80, 71, { 360.0f, 514.0f, -1.0f }, blackBarMat);
 
 	UI* hpBG2 = new UI(260, 10, { 487.5f, 554.5f, -1.0f }, blackBarMat);
 	UI* stamBG2 = new UI(260, 10, { 487.5f, 534.5f, -1.0f }, blackBarMat);
-
+	CrowdBoi = new CrowdBar((Player*)players[PLAYER_1], glm::vec2(361, 515), crowdBarMat, crowdBG);
 
 	ui = {
 		new UI(801.5, 100, glm::vec3(0.0f, 500.0f, 0.0f), mainUI),
 		new HealthBar((Player*)players[PLAYER_1], glm::vec2(60, 557), hpBarMat, hpBG),
 		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(60, 537), stamBarMat, stamBG),
-		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(225, 550), crowdBarMat, crowdBG), 
+		CrowdBoi,
 
 		new HealthBar((Player*)players[PLAYER_2], glm::vec2(492.5, 557.5), hpBarMat, hpBG2),
 		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(492.5, 537.5), stamBarMat, stamBG2)

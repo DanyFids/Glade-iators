@@ -7,6 +7,7 @@
 class Light;
 class Mesh;
 class ParticleEngine;
+class CrowdBar;
 
 class OnePlayer: public PlayScene {
 	Shader* shaderObj;
@@ -94,12 +95,27 @@ class TwoPlayer: public PlayScene {
 
 	Shader* sunShader;
 
+	const float MAX_SCORE = 100.0f;
+	float curScore = MAX_SCORE;
+	float scoreSub = 1.0f;
+	const float INCREASE_TIME = 7.5f;
+	float subIncreaser = INCREASE_TIME;
+	
+	const float MAX_TAUNT = 15.0f;
+	float tauntTime[2]{ 0.0f, 0.0f };
+	float taunted[2]{ 1.0f, 1.0f };
+
+	float MAX_COMBO = 5.0f;
+	float comboTime[2]{ MAX_COMBO, MAX_COMBO };
+	float comboMult[2]{ 1.0f, 1.0f };
+	bool combo[2]{ false, false };
 	//Sound audioEngine;
 
 	float deathtimer = 4;
 	bool winannounce = false;
 
 	Object* morphyBoi;
+	CrowdBar* CrowdBoi = nullptr;
 
 	Sound audioEngine;
 

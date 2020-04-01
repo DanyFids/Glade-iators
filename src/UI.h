@@ -87,14 +87,15 @@ public:
 class CrowdBar : public UI {
 	static const int HEIGHT;
 	static const int MAX_WIDTH;
-	const float MAX_TIME = 300.0f; // 5 minutes
-	float time = MAX_TIME;
+	const float MAX_TIME = 100.0f; 
+	float score = MAX_TIME;
 
 	Player* player;
 
 public:
 	CrowdBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg);
 
+	void setScore(float s);
 	virtual void Update(float dt);
 	virtual void Draw(glm::vec2 scrn);
 };

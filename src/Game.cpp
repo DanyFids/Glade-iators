@@ -201,9 +201,10 @@ void Game::Initialize()
 		curScene = MainMenuScn;
 	}
 	else {
-		//OnePlayerScn = new MainMenuPlayer();
 
-		curScene = MainMenuScn;
+		TwoPlayerScn = new TwoPlayer();
+		curScene = TwoPlayerScn;
+		
 		//curScene = MainMenuScn;
 	}
 }

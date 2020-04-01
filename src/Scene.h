@@ -101,6 +101,8 @@ protected:
 	int weapon[2]{ 0, 0 };
 	int shield[2]{ 0, 0 };
 
+	const float MAX_READY = 2.0f;
+	float ready_timer;
 	bool ready[2]{ false, false };
 	bool readyChange[2]{ false, false };
 	bool changeW[2]{ false, false };
@@ -127,17 +129,20 @@ protected:
 	Material* buttonExit = new Material("exitButton.png");
 	Material* buttonCredits = new Material("creditsButton.png");
 	Material* buttonRes = new Material("resolutionButton.png");
+	Material* buttonReturn = new Material("returnButton.png");
 	Material* buttonPlay2 = new Material("playButton2.png");
 	Material* buttonSettings2 = new Material("settingsButton2.png");
 	Material* buttonExit2 = new Material("exitButton2.png");
 	Material* buttonCredits2 = new Material("creditsButton2.png");
 	Material* buttonRes2 = new Material("resolutionButton2.png");
+	Material* buttonReturn2 = new Material("returnButton2.png");
 
 	Material* buttonPlayRed = new Material("playButtonRed.png");
 	Material* buttonSettingsRed = new Material("settingsButtonRed.png");
 	Material* buttonExitRed = new Material("exitButtonRed.png");
 	Material* buttonCreditsRed = new Material("creditsButtonRed.png");
 	Material* buttonResRed = new Material("resolutionButtonRed.png");
+	Material* buttonReturnRed = new Material("returnButtonRed.png");
 
 	//CHARACTER MENU
 	Material* buttonReady = new Material("readyButton.png");
@@ -181,6 +186,7 @@ public:
 	UI* settings_Button;
 	UI* credits_Button;
 	UI* exit_Button;
+	UI* return_Button;
 
 	UI* resolution_Button;
 	//Menu 2

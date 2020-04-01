@@ -9,7 +9,8 @@
 #include "Texture.h"
 #include "Mesh.h"
 #include "Text.h"
-
+#include "Sound.h"
+ 
 class Camera;
 class Shader;
 class Object;
@@ -20,7 +21,7 @@ class Player;
 class Material;
 class Hitbox;
 class Button;
-class ButtonSelect;
+class ButtonSelect; 
 class FrameBuffer;
 class PostProcess;
 class ParticleEngine;
@@ -42,53 +43,17 @@ private:
 class Scene {
 protected:
 	std::vector<Camera*> Cam;
-	int menuSpot[2]{ 0, 0 };
-	int MAX_MENU;
-	int MIN_MENU;
-	const float MENU_TIME = 0.2f;
-	float menu_time[2];
-	bool _Abutton[2]{ false, false };
-	bool _Bbutton[2]{ false, false };
-	const int MAX_W = 4;
-	const int MIN_W = 0;
-	const int MAX_S = 2;
-	const int MIN_S = 0;
-	int weapon[2]{ 0, 0 };
-	int shield[2]{ 0, 0 };
-	bool changeW[2]{ false, false };
-	bool changeS[2]{ false, false };
 	static bool loaded;
-
-	Material* swordIcon = new Material("iconSword.png");
-	Material* spearIcon = new Material("iconSpear.png");
-	Material* tridentIcon = new Material("iconTrident.png");
-	Material* hammerIcon = new Material("iconHammer.png");
-	Material* daggerIcon = new Material("iconDagger.png");
-
-	Material* bucklerIcon = new Material("iconBuckler.png");
-	Material* shieldIcon = new Material("iconShield.png");
-	Material* nothingIcon = new Material("nothing.png");
 
 	TextRenderer* Textcontroller = new TextRenderer();
 
-	ButtonSelect* playerOne;
-	ButtonSelect* playerTwo;
-
-	Button* wOne;
-	Button* wTwo;
-	Button* sOne;
-	Button* sTwo;
-
-	Button* wOne_p1;
-	Button* wTwo_p1;
-	Button* sOne_p1;
-	Button* sTwo_p1;
-	Button* wOne_p2;
-	Button* wTwo_p2;
-	Button* sOne_p2;
-	Button* sTwo_p2;
+	static int P1wins;
+	static int P2wins;
+	static int RoundCount;
 	
-
+	static Sound* audioEngine;
+	static bool AEinit;
+	
 	// Mouse Vars
 	float m_lastX = 400;
 	float m_lastY = 300;
@@ -116,18 +81,151 @@ public:
 
 class MenuScene : public Scene {
 protected:
-	int selected;
-	std::vector<MenuItem*> items;
+
+	TextRenderer* Textcontroller = new TextRenderer();
+
+	//Menu Variables
+	int menuSpot[2]{ 0, 0 };
+	int MAX_MENU;
+	int MIN_MENU;
+	const float MENU_TIME = 0.2f;
+	float menu_time[2];
+
+	bool _Abutton[2]{ false, false };
+	bool rPress[2]{ false, false };
+	bool _Bbutton[2]{ false, false };
+
+	const int MAX_W = 2;
+	const int MIN_W = 0;
+	const int MAX_S = 2;
+	const int MIN_S = 0;
+	int weapon[2]{ 0, 0 };
+	int shield[2]{ 0, 0 };
+
+	bool ready[2]{ false, false };
+	bool readyChange[2]{ false, false };
+	bool changeW[2]{ false, false };
+	bool changeS[2]{ false, false };
+
+	bool rightArrow = true;
+	bool arrowUsed = false;
+
+	int resolution = 0;
+	const int MAX_RES = 4;
+
+	bool ChangingScn = false;
+
+	std::vector<PointLight*> lights;
+	DirectionalLight* sun;
+
+	std::vector<UI*> ui;
+
+	//MAIN MENU
+	Material* buttonPlay = new Material("playButton.png");
+	Material* buttonSettings = new Material("settingsButton.png");
+	Material* buttonExit = new Material("exitButton.png");
+	Material* buttonCredits = new Material("creditsButton.png");
+	Material* buttonRes = new Material("resolutionButton.png");
+	Material* buttonPlay2 = new Material("playButton2.png");
+	Material* buttonSettings2 = new Material("settingsButton2.png");
+	Material* buttonExit2 = new Material("exitButton2.png");
+	Material* buttonCredits2 = new Material("creditsButton2.png");
+	Material* buttonRes2 = new Material("resolutionButton2.png");
+
+	Material* buttonPlayRed = new Material("playButtonRed.png");
+	Material* buttonSettingsRed = new Material("settingsButtonRed.png");
+	Material* buttonExitRed = new Material("exitButtonRed.png");
+	Material* buttonCreditsRed = new Material("creditsButtonRed.png");
+	Material* buttonResRed = new Material("resolutionButtonRed.png");
+
+	//CHARACTER MENU
+	Material* buttonReady = new Material("readyButton.png");
+	Material* buttonRandom = new Material("randomButton.png");
+	Material* buttonReady2 = new Material("readyButton2.png");
+	Material* buttonRandom2 = new Material("randomButton2.png");
+	Material* backDropMain = new Material("backdrop2.png");
+
+	Material* buttonReadyRed = new Material("readyButtonRed.png");
+	Material* buttonReadyBlue = new Material("readyButtonBlue.png");
+	Material* buttonReadyPurple = new Material("readyButtonPurple.png");
+	Material* buttonRandomRed = new Material("randomButtonRed.png");
+	Material* backDropRed = new Material("backdrop2Red.png");
+	Material* buttonRandomBlue = new Material("randomButtonBlue.png");
+	Material* backDropBlue = new Material("backdrop2Blue.png");
+
+	Material* arrow = new Material("arrow.png");
+	Material* arrowBack = new Material("arrow (1).png");
+	Material* arrow2 = new Material("arrow2.png");
+	Material* arrowBack2 = new Material("arrow (1)2.png");
+	Material* ehks = new Material("ehks.png");
+	Material* check = new Material("checkmark.png");
+
+	Material* swordIcon = new Material("iconSword.png");
+	Material* spearIcon = new Material("iconSpear.png");
+	Material* tridentIcon = new Material("iconTrident.png");
+	Material* hammerIcon = new Material("iconHammer.png");
+	Material* daggerIcon = new Material("iconDagger.png");
+
+	Material* bucklerIcon = new Material("iconBuckler.png");
+	Material* shieldIcon = new Material("iconShield.png");
+	Material* nothingIcon = new Material("nothing.png");
 
 public:
+	/******************/
+	/* Menu Variables */
+	/******************/
+
+	//Menu 1
+	UI* play_Button;
+	UI* settings_Button;
+	UI* credits_Button;
+	UI* exit_Button;
+
+	UI* resolution_Button;
+	//Menu 2
+	UI* random1_Button;
+	UI* random2_Button;
+	UI* weapon1_Button;
+	UI* weapon2_Button;
+	UI* shield1_Button;
+	UI* shield2_Button;
+	UI* ready_Button;
+	//Arrows
+	UI* arrow_Button1;
+	UI* arrow_Button2;
+	UI* arrow_Button3;
+	UI* arrow_Button4;
+	UI* arrow_Button5;
+	UI* arrow_Button6;
+	UI* arrow_Button7;
+	UI* arrow_Button8;
+	//Icons
+	UI* wOne;
+	UI* wTwo;
+	UI* sOne;
+	UI* sTwo;
+	UI* wOne_p1;
+	UI* wTwo_p1;
+	UI* sOne_p1;
+	UI* sTwo_p1;
+	UI* wOne_p2;
+	UI* wTwo_p2;
+	UI* sOne_p2;
+	UI* sTwo_p2;
+	UI* p1Ready;
+	UI* p2Ready;
+
+	std::string WeaponName[2];
+	std::string ShieldName[2];
+	std::string ResolutionDisplay;
+/////////////////////////////////////////
+
 	// Inherited via Scene
 	virtual void KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player, float dt) override;
 	virtual void ControllerInput(unsigned int controller, int player, float dt) override;
 	virtual void Update(float dt) override;
 	virtual void Draw() override;
 	virtual void LoadScene() override;
-
-	void SelectItem(int item);
 
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
@@ -156,10 +254,6 @@ protected:
 
 	bool Target1 = false;
 	bool Target2 = false;
-
-	bool isMenu;
-	bool ChangingScn = false;
-
 
 	int CgradeI = 0;
 	bool CgradeIDown[3] = { false,false,false };

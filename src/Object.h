@@ -212,6 +212,7 @@ public:
 	bool IsLocked() { return anim_lock; }
 };
 
+/*
 enum WeaponType {
 	WEAPON_SWORD,
 	WEAPON_SPEAR,
@@ -226,7 +227,7 @@ enum ShieldType {
 	SHIELD_BUCKLER,
 	SHIELD_NONE
 };
-
+*/
 
 class Weapon : public Object {
 private:

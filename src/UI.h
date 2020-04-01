@@ -31,6 +31,7 @@ public:
 	static void INIT();
 
 	UI(int width, int height, glm::vec3 pos, Material* ma);
+	void move(int _x, int _y);
 	int scaleX(int _x);
 	void setOpacity(float o) { opacity = o;  }
 	void Resize(int x, int y);
@@ -93,33 +94,6 @@ class CrowdBar : public UI {
 
 public:
 	CrowdBar(Player* p, glm::vec2 pos, Material* ma, UI* _bg);
-
-	virtual void Update(float dt);
-	virtual void Draw(glm::vec2 scrn);
-};
-
-class Button : public UI {
-	static const int HEIGHT;
-	static const int MAX_WIDTH;
-
-public:
-	Button(glm::vec2 pos, Material* ma);
-	//Button(int width, int height, glm::vec2 pos, Material* ma);
-
-	virtual void Update(float dt);
-	virtual void Draw(glm::vec2 scrn);
-};
-
-class ButtonSelect : public UI {
-	static const int HEIGHT;
-	static const int MAX_WIDTH;
-
-	int player;
-public:
-	ButtonSelect(int _player, glm::vec2 pos, Material* ma);
-	//ButtonSelect(int width, int height, int _player, glm::vec2 pos, Material* ma);
-
-	void move(int _x, int _y);
 
 	virtual void Update(float dt);
 	virtual void Draw(glm::vec2 scrn);

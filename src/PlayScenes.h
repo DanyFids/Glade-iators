@@ -60,7 +60,8 @@ class OnePlayer: public PlayScene {
 
 	Object* morphyBoi;
 	Object* staticBoi;
-	Sound audioEngine;
+
+
 
 	float time = 0.0f;
 	float MAX_TIME = 0.2f;
@@ -93,7 +94,11 @@ class TwoPlayer: public PlayScene {
 
 	Shader* sunShader;
 
+
+	//Sound audioEngine;
+
 	float deathtimer = 4;
+	bool winannounce = false;
 
 	Object* morphyBoi;
 
@@ -102,50 +107,6 @@ class TwoPlayer: public PlayScene {
 
 public:
 	TwoPlayer(WeaponType p1_weapon = WEAPON_SWORD, ShieldType p1_shield = SHIELD_LARGE, WeaponType p2_weapon = WEAPON_SWORD, ShieldType p2_shield = SHIELD_LARGE);
-	// Inherited via Scene
-	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
-	virtual void Update(float dt) override;
-	virtual void Draw() override;
-	virtual void LoadScene() override;
-};
-
-class MainMenu : public PlayScene {
-	Shader* shaderObj;
-	Shader* depthShader;
-	Shader* morphShader;
-	Shader* sunShader;
-	Shader* skelDepth;
-	UI* spaget;
-
-	const float MAX_TIME = 3.0f;
-	float menu_time = MAX_TIME;
-
-	bool displayed = false;
-public:
-	MainMenu();
-
-
-	
-	// Inherited via Scene
-	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
-	virtual void Update(float dt) override;
-	virtual void Draw() override;
-	virtual void LoadScene() override;
-};
-
-class CharacterC : public PlayScene {
-	Shader* shaderObj;
-	Shader* depthShader;
-	Shader* morphShader;
-	Shader* sunShader;
-	Shader* skelDepth;
-
-public:
-	CharacterC();
-
-	std::string Name1[3];
-	std::string Name2[3];
-
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
 	virtual void Update(float dt) override;

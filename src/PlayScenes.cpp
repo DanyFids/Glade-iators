@@ -269,7 +269,7 @@ void OnePlayer::Update(float dt)
 		}
 	}
 
-	audioEngine.Update();
+	
 	for (int c = 0; c < players.size(); c++) {
 		players[c]->Update(dt);
 		
@@ -573,23 +573,20 @@ void OnePlayer::LoadScene()
 	// Sampler2d INPUT
 	post_pass.push_back(new PostProcess({ main_pass->GetOutput(), light_buff->GetOutput(), particle_buff->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge.frag")));
 
-	isMenu = false;
-	ChangingScn = false;
-
 	Joint::init();
 	//{91f62782-35bd-42df-85a1-8f359308dd0c}
 
 	//// Init AudioEngine (Don't forget to shut down and update)
-	audioEngine.Init();
+	//audioEngine.Init();
 
 	//// Load a bank (Use the flag FMOD_STUDIO_LOAD_BANK_NORMAL)
-	audioEngine.LoadBank("Master", FMOD_STUDIO_LOAD_BANK_NORMAL);
-
-	//// Load an event
-	audioEngine.LoadEvent("MenuPlaceholder", "{91f62782-35bd-42df-85a1-8f359308dd0c}");
-
-	//// Play the event
-	audioEngine.PlayEvent("MenuPlaceholder");
+	//audioEngine.LoadBank("Master", FMOD_STUDIO_LOAD_BANK_NORMAL);
+	//
+	////// Load an event
+	//audioEngine.LoadEvent("MenuPlaceholder", "{91f62782-35bd-42df-85a1-8f359308dd0c}");
+	//
+	////// Play the event
+	//audioEngine.PlayEvent("MenuPlaceholder");
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Geo_pass.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
@@ -991,7 +988,7 @@ void TwoPlayer::Update(float dt)
 				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) && !players[c]->GetWeapon()->getCooldown()) {
 					if (players[p]->GetShield()->hitbox->GetType() == COLLISION_TYPE::shield) {
 						std::cout << "Blocked!\n";
-
+						audioEngine->PlayEvent("Block");
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
 						players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
 					}
@@ -1001,7 +998,7 @@ void TwoPlayer::Update(float dt)
 
 					if (players[p]->hitbox->GetType() == entity) {
 						std::cout << "Hit!\n";
-
+						audioEngine->PlayEvent("Hit");
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
 						players[c]->GetWeapon()->setCooldown(true);
 					}
@@ -1019,6 +1016,8 @@ void TwoPlayer::Update(float dt)
 			Cam[c]->SetTarget(players[c]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f));
 		}
 	}
+
+	
 
 	//for (int a = 0; a < attacks.size(); a++)
 	//{
@@ -1068,15 +1067,40 @@ void TwoPlayer::Update(float dt)
 
 	if (players[0]->GetHP() <= 0 || players[1]->GetHP() <= 0)
 	{
+		if (players[0]->GetHP() <= 0 && winannounce == false)
+		{
+			P2wins++;
+			winannounce = true;
+			audioEngine->PlayEvent("P2 Wins");
+			
+		}
+		if (players[1]->GetHP() <= 0 && winannounce == false)
+		{
+			P1wins++;
+			winannounce = true;
+			audioEngine->PlayEvent("P1 Wins");
+		}
 		deathtimer -= dt;
 		if (deathtimer <= 0)
 		{
-			Game::CURRENT->setScene(SCENES::MAIN_MENU);
+			RoundCount++;
+			if (P2wins >= 3 || P1wins >= 3)
+			{
+				audioEngine->PlayEvent("Glory");
+				RoundCount = 1;
+				P1wins = 0;
+				P2wins = 0;
+			}
+			Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 			//setScene(MainMenu);
 
 		}
 	}
 }
+
+int PlayScene::P2wins = 0;
+int PlayScene::P1wins = 0;
+int PlayScene::RoundCount = 1;
 
 void TwoPlayer::Draw()
 {
@@ -1177,8 +1201,31 @@ void TwoPlayer::Draw()
 
 void TwoPlayer::LoadScene()
 {
-	isMenu = false;
-	ChangingScn = false;
+
+	//audioEngine.Init();
+
+	switch (RoundCount)
+	{
+	case 1:
+		audioEngine->PlayEvent("Round 1");
+		break;
+	case 2:
+		audioEngine->PlayEvent("Round 2");
+		break;
+	case 3:
+		audioEngine->PlayEvent("Round 3");
+		break;
+	case 4:
+		audioEngine->PlayEvent("Round 4");
+		break;
+	case 5:
+		audioEngine->PlayEvent("Final Round");
+		break;
+
+	}
+
+
+
 
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
@@ -1256,6 +1303,17 @@ void TwoPlayer::LoadScene()
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, -0.6f, 0.0f });
+
+	//////////////////////////////////Audio
+	
+	
+
+
+	//audioEngine.LoadEvent("P1 Wins", "{1251a18c-193c-4301-8578-9d9329038cb4}");
+	//audioEngine.PlayEvent("P2 Wins");
+	//audioEngine.SetEventPosition("P1 Wins", players[1]->GetPosition());
+
+	/////////////////////////////////////
 
 	//terrain.push_back(new Object(boi, defaultTex, BlockyBoiHB, { -3.0f, 0.0f, 2.0f }));
 	//terrain.b(glm::vec3(1.2f));
@@ -1427,458 +1485,4 @@ void TwoPlayer::LoadScene()
 	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(15.0f, 1.0f, 2.0f));
 
 	
-}
-
-MainMenu::MainMenu()
-{
-	LoadScene();
-}
-
-void MainMenu::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
-{
-	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
-		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_2, dt);
-		}
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
-		}
-	}
-	else {
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_1, dt);
-		}
-
-	}
-}
-
-void MainMenu::Update(float dt)
-{
-
-	//audioEngine.Update();
-
-	for (int u = 0; u < ui.size(); u++) {
-		ui[u]->Update(dt);
-	}
-
-	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
-
-	if (spaget != nullptr) {
-		if (menu_time <= 0) {
-			if (!displayed) {
-				displayed = true;
-				menu_time = MAX_TIME;
-			}
-		}
-		else {
-			menu_time -= dt;
-		}
-		if (displayed) {
-			spaget->setOpacity(menu_time / MAX_TIME);
-		}
-	}
-
-}
-
-void MainMenu::Draw()
-{
-	glCullFace(GL_FRONT);
-
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
-	glClear(GL_DEPTH_BUFFER_BIT);
-	sun->SetupDepthShader(sunShader);
-	//sun->SetupDepthShader(skelDepth);
-
-	RenderScene(sunShader, sunShader);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
-
-	for (int l = 0; l < lights.size(); l++) {
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
-		glClear(GL_DEPTH_BUFFER_BIT);
-		lights[l]->SetupDepthShader(depthShader);
-		RenderScene(depthShader, sunShader);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		//glViewport(0, 0,  , SCREEN_HEIGHT);
-
-		glActiveTexture(GL_TEXTURE4 + l);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[l]->GetDepthMap());
-	}
-	glCullFace(GL_BACK);
-
-	sun->SetupLight(shaderObj);
-	sun->SetupLight(morphShader);
-
-	for (int c = 0; c < lights.size(); c++) {
-		lights[c]->SetupLight(shaderObj, c);
-		lights[c]->SetupLight(morphShader, c);
-
-	}
-	shaderObj->SetI("num_lights", lights.size());
-	//morphShader->SetI("num_lights", lights.size());
-
-
-	for (int c = 0; c < Cam.size(); c++) {
-		Cam[c]->SetupCam(shaderObj);
-
-		RenderScene(shaderObj, sunShader);
-		Cam[c]->SetupCam(morphShader);
-		//morphyBoi->Draw(morphShader, Cam);
-	}
-
-
-	//glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	glDisable(GL_DEPTH_TEST);
-
-	for (int u = 0; u < ui.size(); u++) {
-		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
-	}
-
-	if (spaget != nullptr) {
-		spaget->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
-	}
-
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "", 25.0f, 25.0f, 1.0f, glm::vec3(1.f, 1.f, 1.f));
-
-	glEnable(GL_DEPTH_TEST);
-
-}
-
-void MainMenu::LoadScene()
-{
-	isMenu = true;
-	ChangingScn = false;
-
-	MAX_MENU = 0;
-	MIN_MENU = -2;
-
-	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
-
-	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
-	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
-	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
-	
-	Material* blackBarMat = new Material("black.png");
-
-	Material* gladeiatorsTitle = new Material("Title.png");
-
-	Material* firstPlayer = new Material("redPlayer.png");
-	Material* secondPlayer = new Material("bluePlayer.png");
-	Material* buttonPlay = new Material("playButton.png"); 
-	Material* buttonSettings = new Material("settingsButton.png");
-	Material* buttonExit = new Material("exitButton.png");
-	Material* buttonBlank = new Material("blankButton.png");
-	Material* titleImage = new Material("gladewallpaper.png");
-
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.0f, 0.0f, 0.0f);
-	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
-	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
-
-	Cam = {
-		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
-	}; 
-
-	playerOne = new ButtonSelect(0, glm::vec2(0, 275), firstPlayer);
-	playerTwo = new ButtonSelect(1, glm::vec2(0, 275), secondPlayer);
-
-	ui = {
-		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), titleImage),
-		playerOne,
-		//playerTwo,
-		new Button(glm::vec2(5, 280), buttonPlay), 
-		new Button(glm::vec2(5, 180), buttonSettings),
-		new Button(glm::vec2(5, 80), buttonExit),
-	};
-
-	if (!loaded) {
-		spaget = new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), gladeiatorsTitle);
-	}
-}
-
-CharacterC::CharacterC()
-{
-	LoadScene();
-}
-
-void CharacterC::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
-{
-	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) &&
-		glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_2, dt);
-		}
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
-			ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
-		}
-	}
-	else {
-
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
-			ControllerInput(GLFW_JOYSTICK_1, PLAYER_1, dt);
-
-		}
-		else {
-			KeyboardInput(window, mousePos, PLAYER_1, dt);
-		}
-
-	}
-}
-
-void CharacterC::Update(float dt)
-{
-
-	//audioEngine.Update();
-
-	for (int u = 0; u < ui.size(); u++) {
-		ui[u]->Update(dt);
-	}
-
-	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
-
-}
-
-void CharacterC::Draw()
-{
-	glCullFace(GL_FRONT);
-
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
-	glClear(GL_DEPTH_BUFFER_BIT);
-	sun->SetupDepthShader(sunShader);
-	//sun->SetupDepthShader(skelDepth);
-
-	RenderScene(sunShader, sunShader);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
-
-	for (int l = 0; l < lights.size(); l++) {
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
-		glClear(GL_DEPTH_BUFFER_BIT);
-		lights[l]->SetupDepthShader(depthShader);
-		RenderScene(depthShader, sunShader);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-		glActiveTexture(GL_TEXTURE4 + l);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[l]->GetDepthMap());
-	}
-	glCullFace(GL_BACK);
-
-	sun->SetupLight(shaderObj);
-	sun->SetupLight(morphShader);
-
-	for (int c = 0; c < lights.size(); c++) {
-		lights[c]->SetupLight(shaderObj, c);
-		lights[c]->SetupLight(morphShader, c);
-
-	}
-	shaderObj->SetI("num_lights", lights.size());
-	//morphShader->SetI("num_lights", lights.size());
-
-
-	for (int c = 0; c < Cam.size(); c++) {
-		Cam[c]->SetupCam(shaderObj);
-
-		RenderScene(shaderObj, sunShader);
-		Cam[c]->SetupCam(morphShader);
-		//morphyBoi->Draw(morphShader, Cam);
-
-	}
-
-	glDisable(GL_DEPTH_TEST);
-
-	for (int u = 0; u < ui.size(); u++) {
-		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
-	}
-
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name1[0], 385.0f - (Name1[0].length() * 4), 570.0f, 0.45f, glm::vec3(1.f, 0.0f, 0.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name1[1], 385.0f - (Name1[1].length() * 4), 540.0f, 0.45f, glm::vec3(1.f, 0.0f, 0.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name1[2], 385.0f - (Name1[2].length() * 4), 510.0f, 0.45f, glm::vec3(1.f, 0.0f, 0.0f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "VS", 370.0f, 470.0f, 0.75f, glm::vec3(1.f, 1.f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[0], 385.0f - (Name2[0].length() * 4), 430.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[1], 385.0f - (Name2[1].length() * 4), 400.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
-	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[2], 385.0f - (Name2[2].length() * 4), 370.0f, 0.45f, glm::vec3(0.5f, 0.5f, 1.f));
-	glEnable(GL_DEPTH_TEST);
-
-}
-
-void CharacterC::LoadScene()
-{
-	isMenu = true;
-	ChangingScn = false;
-
-	MAX_MENU = 10;
-	menuSpot[0] = 10;
-	menuSpot[1] = 10;
-	MIN_MENU = 7;
-
-	srand(time(NULL));
-
-	Name1[0] = Textcontroller->GenerateTitle();
-	Name1[1] = Textcontroller->GenerateName();
-	Name1[2] = Textcontroller->GenerateSuffix();
-
-	Name2[0] = Textcontroller->GenerateTitle();
-	Name2[1] = Textcontroller->GenerateName();
-	Name2[2] = Textcontroller->GenerateSuffix();
-
-	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
-
-	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
-	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
-	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
-
-	Material* firstPlayer = new Material("redPlayer.png");
-	Material* secondPlayer = new Material("bluePlayer.png");
-	Material* buttonPlay = new Material("readyButton.png");
-	Material* buttonRandom = new Material("randomButton.png");
-
-	Material* background = new Material("backgroundWood.png");
-	Material* backDrop = new Material("backdrop.png");
-	Material* backDropMain = new Material("backdrop2.png");
-
-	Material* swordIcon = new Material("iconSword.png");
-	Material* daggerIcon = new Material("iconDagger.png");
-	Material* spearIcon = new Material("iconSpear.png");
-	Material* shieldIcon = new Material("iconShield.png");
-	Material* bucklerIcon = new Material("iconBuckler.png");
-
-	Material* tree1 = new Material("treeportrait2.png");
-	Material* tree2 = new Material("treeportrait1.png");
-	Material* borderWall = new Material("borderPart1.png");
-
-	Material* stamBarMat = new Material("blue.png");
-	Material* crowdBarMat = new Material("white.png");
-	Material* blackBarMat = new Material("black.png");
-
-	playerOne = new ButtonSelect(0, glm::vec2(145, 230), firstPlayer);
-	playerTwo = new ButtonSelect(1, glm::vec2(585, 230), secondPlayer);
-	wOne = new Button(glm::vec2(150, 160), swordIcon);
-	sOne = new Button(glm::vec2(155, 90), shieldIcon);
-	wTwo = new Button(glm::vec2(590, 160), swordIcon);
-	sTwo = new Button(glm::vec2(595, 90), shieldIcon);
-
-	wOne_p1 = new Button(glm::vec2(90, 165), daggerIcon);
-	sOne_p1 = new Button(glm::vec2(90, 90), backDrop);
-	wTwo_p1 = new Button(glm::vec2(530, 165), daggerIcon);
-	sTwo_p1 = new Button(glm::vec2(530, 90), backDrop);
-
-	wOne_p2 = new Button(glm::vec2(220, 165), spearIcon);
-	sOne_p2 = new Button(glm::vec2(220, 90), bucklerIcon);
-	wTwo_p2 = new Button(glm::vec2(660, 165), spearIcon);
-	sTwo_p2 = new Button(glm::vec2(660, 90), bucklerIcon);
-
-	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 15.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.2f, 0.5f, 0.8f);
-	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
-	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
-
-	Cam = {
-		new Camera({ -4.0f, 4.0f, 4.0f }, glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y))
-	};
-
-	ui = {
-		new UI(SCREEN_WIDTH, SCREEN_HEIGHT, glm::vec3(0.0f), background),
-		playerOne,
-		playerTwo,
-		new Button(glm::vec2(150, 160), backDropMain),
-		new Button(glm::vec2(150, 85), backDropMain),
-		new Button(glm::vec2(590, 160), backDropMain),
-		new Button(glm::vec2(590, 85), backDropMain), //
-
-		new Button(glm::vec2(100, 10), buttonPlay),
-		new Button(glm::vec2(100, 235), buttonRandom),
-		new Button(glm::vec2(540, 235), buttonRandom),
-
-		new Button(glm::vec2(90, 165), backDrop),
-		new Button(glm::vec2(90, 90), backDrop),
-		new Button(glm::vec2(530, 165), backDrop),
-		new Button(glm::vec2(530, 90), backDrop), //
-		new Button(glm::vec2(220, 165), backDrop),
-		new Button(glm::vec2(220, 90), backDrop),
-		new Button(glm::vec2(660, 165), backDrop),
-		new Button(glm::vec2(660, 90), backDrop), //
-		wOne_p1,
-		sOne_p1,
-		wTwo_p1,
-		sTwo_p1,
-		wOne_p2,
-		sOne_p2,
-		wTwo_p2,
-		sTwo_p2,
-
-		wOne,
-		sOne,
-		wTwo,
-		sTwo,
-
-		new Button(glm::vec2(0, 305), blackBarMat),
-		new Button(glm::vec2(80, 310), tree1),
-		new Button(glm::vec2(520, 310), tree2),
-		new Button(glm::vec2(40, 305), borderWall),
-		new Button(glm::vec2(480, 305), borderWall)
-	};
-
-	ui[1]->Resize(70, 70);
-	ui[2]->Resize(70, 70);
-	ui[3]->Resize(60, 60);
-	ui[4]->Resize(60, 60);
-	ui[5]->Resize(60, 60);
-	ui[6]->Resize(60, 60);
-
-	ui[7]->Resize(600, 60);
-	ui[8]->Resize(140, 60);
-	ui[9]->Resize(140, 60);
-
-	ui[10]->Resize(50, 50);
-	ui[11]->Resize(50, 50);
-	ui[12]->Resize(50, 50);
-	ui[13]->Resize(50, 50);
-	ui[14]->Resize(50, 50);
-	ui[15]->Resize(50, 50);
-	ui[16]->Resize(50, 50);
-	ui[17]->Resize(50, 50);
-
-	ui[18]->Resize(50, 50);
-	ui[19]->Resize(50, 50);
-	ui[20]->Resize(50, 50);
-	ui[21]->Resize(50, 50);
-	ui[22]->Resize(50, 50);
-	ui[23]->Resize(50, 50);
-	ui[24]->Resize(50, 50);
-	ui[25]->Resize(50, 50);
-
-	ui[26]->Resize(60, 60);
-	ui[27]->Resize(50, 50);
-	ui[28]->Resize(60, 60);
-	ui[29]->Resize(50, 50);
-
-	ui[30]->Resize(800, 400);
-	ui[31]->Resize(180, 280);
-	ui[32]->Resize(180, 280);
-	ui[33]->Resize(260, 328);
-	ui[34]->Resize(260, 328);
 }

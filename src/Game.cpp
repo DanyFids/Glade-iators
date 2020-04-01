@@ -8,6 +8,7 @@
 #include"SceneManager.h"
 #include "Constants.h"
 #include"PlayScenes.h"
+#include "MenuScenes.h"
 #include "Camera.h"
 #include "Object.h"
 #include "Mesh.h"
@@ -27,6 +28,20 @@ void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height) {
 	Game::CURRENT->curScene->ResizeCams();
 }
 
+void GLAPIENTRY
+MessageCallback(GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message,
+	const void* userParam)
+{
+	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+		type, severity, message);
+}
+
 glm::vec2 mousePos = glm::vec2(400, 300);
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -42,14 +57,43 @@ void Game::setScene(SCENES scn)
 		break;
 	case PLAY_SCENE:
 		//OnePlayerScn = new OnePlayer();
-		TwoPlayerScn = new TwoPlayer();
+		TwoPlayerScn = new TwoPlayer(weaponChoice[PLAYER_1], shieldChoice[PLAYER_1], weaponChoice[PLAYER_2], shieldChoice[PLAYER_2]);
 		curScene = TwoPlayerScn;
 		break;
 	case CHARACTER_SCENE:
 		CharacterScn = new CharacterC();
 		curScene = CharacterScn;
 		break;
+	case CREDITS:
+		CreditsScn = new Credits();
+		curScene = CreditsScn;
+		break;
+	case SETTINGS_SCENE:
+		SettingsScn = new SettingsScene();
+		curScene = SettingsScn;
+		break;
 	}
+}
+
+void Game::setSize(int w, int h)
+{
+	widthScreen = w;
+	heightScreen = h;
+}
+
+void Game::applyRes()
+{
+	Game::SCREEN.x = widthScreen;
+	Game::SCREEN.y = heightScreen;
+	glfwSetWindowMonitor(window, NULL, 0, 0, widthScreen, heightScreen, 60);
+}
+
+void Game::Loadouts(int w_1, int w_2, int s_1, int s_2)
+{
+	weaponChoice[0] = (WeaponType)w_1;
+	weaponChoice[1] = (WeaponType)w_2;
+	shieldChoice[0] = (ShieldType)s_1;
+	shieldChoice[1] = (ShieldType)s_2;
 }
 
 Game::Game() :
@@ -125,6 +169,9 @@ void Game::Initialize()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	//glEnable(GL_DEBUG_OUTPUT);
+	//glDebugMessageCallback(MessageCallback, 0);
+
 	//glEnable(GL_SCISSOR_TEST);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -139,10 +186,10 @@ void Game::Initialize()
 
 	float quad_prim[] = {
 		// x, y, z, r, g, b, u, v
-		-1.0f, -1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f,
-		 1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, 0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f,
-		 1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,  0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f,
-		-1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,  0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f
+		-1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,  -1.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,
+		 1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,  -1.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,
+		 1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,  -1.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,
+		-1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,  -1.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f
 	};
 
 	unsigned int quad_index[] = {
@@ -289,16 +336,9 @@ void Game::InputHandle(float dt)
 		w_pressed = false;
 	
 	if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS && !f11_pressed) {
-		if (Game::SCREEN.x == 800) {
-			Game::SCREEN.x = 1920; 
-			Game::SCREEN.y = 1080;
-			glfwSetWindowMonitor(window, NULL, 0, 0, 1920, 1080, 60);
-		}
-		else {
-			Game::SCREEN.x = SCREEN_WIDTH;
-			Game::SCREEN.y = SCREEN_HEIGHT;
-			glfwSetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
-		}
+		Game::SCREEN.x = widthScreen; 
+		Game::SCREEN.y = heightScreen;
+		glfwSetWindowMonitor(window, NULL, 0, 0, widthScreen, heightScreen, 60);
 		f11_pressed = true;
 	}
 	if (glfwGetKey(window, GLFW_KEY_F11) == GLFW_RELEASE)

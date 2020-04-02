@@ -30,7 +30,7 @@ Material::Material(std::string f, std::string n, std::string s)
 		if(nrChannels == 4)
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		else
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {
@@ -54,7 +54,10 @@ Material::Material(std::string f, std::string n, std::string s)
 	unsigned char* ndata = stbi_load(n.c_str(), &nwidth, &nheight, &nnrChannels, 0);
 
 	if (ndata) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nwidth, nheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ndata);
+		if (nrChannels == 4)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nwidth, nheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, ndata);
+		else
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nwidth, nheight, 0, GL_RGB, GL_UNSIGNED_BYTE, ndata);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {
@@ -75,7 +78,10 @@ Material::Material(std::string f, std::string n, std::string s)
 	unsigned char* sdata = stbi_load(s.c_str(), &swidth, &sheight, &snrChannels, 0);
 
 	if (sdata) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, swidth, sheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, sdata);
+		if (nrChannels == 4)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, swidth, sheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, sdata);
+		else
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, swidth, sheight, 0, GL_RGB, GL_UNSIGNED_BYTE, sdata);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {

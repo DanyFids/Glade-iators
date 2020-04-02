@@ -12,6 +12,7 @@
 #include "Shader.h"
 #include "Lerp.h"
 #include "Particle.h"
+#include "PostProcess.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -985,12 +986,12 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
 				if (players[player]->GetState() < PLAYER_STATE::walking && players[player]->GetFrameState() == FrameStates::Neutral && !players[player]->IsLocked()) {
 					players[player]->PlayAnim("walk", 0, glm::length(axisPos));
-					players[player]->PlayAnim("idle", 1, 1.0f - glm::length(axisPos));
+					players[player]->PlayAnim("idle", 1, 1.0f);
 					players[player]->SetState(walking);
 				}
-				else if (!players[player]->IsLocked()) {
+				else if (!players[player]->IsLocked() && players[player]->GetState() == walking) {
 					((SkelMesh*)players[player]->GetMesh())->SetIntensity(0, glm::length(axisPos));
-					((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f - glm::length(axisPos));
+					//((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f);
 				}
 			}
 			else if (players[player]->GetState() == PLAYER_STATE::walking) {
@@ -1131,10 +1132,25 @@ void PlayScene::RenderScene(Shader* shader, Shader* playerShader)
 	
 }
 
+void PlayScene::ClearBuffs()
+{
+	for (int c = 0; c < Cam.size(); c++) {
+		main_pass[c]->Clear();
+		light_buff[c]->Clear();
+		particle_buff[c]->Clear();
+		//merge_buff->Clear();
+	}
+	for (int c = 0; c < post_pass.size(); c++) {
+		post_pass[c]->buff->Clear();
+	}
+}
+
+void PlayScene::Reset(){}
+
 void Scene::ResizeCams()
 {
 	for (int c = 0; c < Cam.size(); c++) {
-		Cam[c]->UpdateScreen({ Game::SCREEN.x / Cam.size() * c,0, Game::SCREEN.x / Cam.size(),Game::SCREEN.y});
+		Cam[c]->UpdateScreen({ 0,0, Game::SCREEN.x,Game::SCREEN.y});
 	}
 }
 

@@ -150,6 +150,7 @@ public:
 	int GetAnim() { return anim[0]; }
 	int GetFrame() { return curFrame[0]; }
 	void DrawSkeleton(glm::mat4 global, Shader* shdr);
+	void GetChnlInfo(int*& anims, int*& frames, float*& intensities, int& num_channels);
 
 	FrameStates GetFrameCode(unsigned int chnl = 0);
 

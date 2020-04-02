@@ -28,6 +28,20 @@ void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height) {
 	Game::CURRENT->curScene->ResizeCams();
 }
 
+void GLAPIENTRY
+MessageCallback(GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message,
+	const void* userParam)
+{
+	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+		type, severity, message);
+}
+
 glm::vec2 mousePos = glm::vec2(400, 300);
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
@@ -43,7 +57,7 @@ void Game::setScene(SCENES scn)
 		break;
 	case PLAY_SCENE:
 		//OnePlayerScn = new OnePlayer();
-		TwoPlayerScn = new TwoPlayer();
+		TwoPlayerScn = new TwoPlayer(weaponChoice[PLAYER_1], shieldChoice[PLAYER_1], weaponChoice[PLAYER_2], shieldChoice[PLAYER_2]);
 		curScene = TwoPlayerScn;
 		break;
 	case CHARACTER_SCENE:
@@ -155,6 +169,9 @@ void Game::Initialize()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	//glEnable(GL_DEBUG_OUTPUT);
+	//glDebugMessageCallback(MessageCallback, 0);
+
 	//glEnable(GL_SCISSOR_TEST);
 
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -169,10 +186,10 @@ void Game::Initialize()
 
 	float quad_prim[] = {
 		// x, y, z, r, g, b, u, v
-		-1.0f, -1.0f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f, 0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f,
-		 1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, 0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f,
-		 1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,  0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f,
-		-1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  0.0f, 1.0f,  0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,1.0f
+		-1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,  -1.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,
+		 1.0f, -1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 0.0f,  -1.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,
+		 1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,  -1.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f,
+		-1.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f,  -1.0f,0.0f,0.0f, 0.0f,1.0f,0.0f, 1.0f
 	};
 
 	unsigned int quad_index[] = {

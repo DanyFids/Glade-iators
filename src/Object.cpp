@@ -98,7 +98,12 @@ void Object::DrawChild(Shader* shader, glm::mat4 parent)
 	glm::mat4 par_j = glm::mat4(1.0f);
 
 	if (parent_joint != nullptr && parent_Mesh != nullptr) {
-		par_j = parent_joint->TransformTo(parent_Mesh->GetAnim(), parent_Mesh->GetFrame());
+		int* a, * f, c;
+		float* i;
+
+		parent_Mesh->GetChnlInfo(a, f, i, c);
+
+		par_j = parent_joint->TransformTo(a, f, i, c);
 	}
 
 	glm::mat4 model = parent * par_j * transform.GetWorldTransform();
@@ -239,6 +244,10 @@ Player::Player(SkelMesh* me, Material* ma, Hitbox* hb, glm::vec3 pos) : Object(m
 
 void Player::Update(float dt)
 {
+	if (health <= 0.0f && state != dying) {
+		Die();
+	}
+
 	if (recov_timer > 0.0f) {
 		recov_timer -= dt;
 	}
@@ -388,7 +397,7 @@ void Player::PlayAnim(std::string n, unsigned int c, float i, float s)
 
 void Player::Run()
 {
-	if (!run && recov_timer <= 0.0f) {
+	if (!run && state == walking && recov_timer <= 0.0f) {
 		run = true;
 	}
 }
@@ -427,6 +436,7 @@ void Player::Attack()
 {
 	if (state != attacking) {
 		anim_lock = true;
+		weapon->setCooldown(false);
 		atk_combo = 0;
 		PlayAnim(this->weapon->GetAtkAnim(atk_combo), 0, 1.0f, 2.5f);
 		_mesh->SetIntensity(1, 0.0f);
@@ -451,6 +461,23 @@ void Player::Block()
 		PlayAnim("block",1,1,1.0f);
 		state = blocking;
 	}
+}
+
+void Player::Die()
+{
+	state = dying;
+	PlayAnim("die", 0);
+	_mesh->SetIntensity(1, 0.0f);
+	_mesh->SetIntensity(2, 0.0f);
+	_mesh->SetIntensity(3, 0.0f);
+}
+
+void Player::Reset()
+{
+	health = MAX_HEALTH;
+	stamina = MAX_STAMINA;
+
+	Idle();
 }
 
 void Player::Taunt()

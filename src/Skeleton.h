@@ -22,7 +22,8 @@ enum FrameStates {
 	Attack,
 	Deflect,
 	Taunt,
-	End
+	End,
+	Hold
 };
 
 ChannelType StringToChnlTp(std::string name);

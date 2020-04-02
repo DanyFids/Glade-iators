@@ -512,7 +512,7 @@ void CapsuleHitbox::Draw(Shader* shdr, glm::mat4 p)
 	node_me->Draw(shdr);
 
 	//Center Top
-	model = p * transform.GetWorldTransform() * glm::translate(glm::mat4(1.0f),upperBound);
+	model = p * glm::translate(glm::mat4(1.0f), upperBound) * transform.GetWorldTransform();
 	
 
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));

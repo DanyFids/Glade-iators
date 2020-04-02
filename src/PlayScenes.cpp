@@ -1174,6 +1174,7 @@ void TwoPlayer::Update(float dt)
 				RoundCount = 1;
 				P1wins = 0;
 				P2wins = 0;
+				audioEngine.Shutdown();
 				Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
 			}
 			scoreSub = 1.0f;

@@ -187,11 +187,12 @@ void MainMenu::LoadScene()
 	{
 		musicaudioEngine.Init();
 		Musicinit = true;
+		musicaudioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		musicaudioEngine.LoadEvent("BattleMusic", "{5d5be828-f39b-4d9e-9bf2-ea581daa0e20}");
+		musicaudioEngine.PlayEvent("BattleMusic");
 	}
 
-	musicaudioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
-	musicaudioEngine.LoadEvent("BattleMusic", "{5d5be828-f39b-4d9e-9bf2-ea581daa0e20}");
-	musicaudioEngine.PlayEvent("BattleMusic");
+	
 
 	Material* gladeiatorsTitle = new Material("Title.png");
 
@@ -272,6 +273,8 @@ void CharacterC::Update(float dt)
 {
 
 	//audioEngine.Update();
+
+	musicaudioEngine.Update();
 
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
@@ -368,6 +371,15 @@ void CharacterC::LoadScene()
 	MIN_MENU = 7;
 
 	srand(time(NULL));
+
+	if (Musicinit == false)
+	{
+		musicaudioEngine.Init();
+		Musicinit = true;
+		musicaudioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		musicaudioEngine.LoadEvent("BattleMusic", "{5d5be828-f39b-4d9e-9bf2-ea581daa0e20}");
+		musicaudioEngine.PlayEvent("BattleMusic");
+	}
 
 	Name1[0] = Textcontroller->GenerateTitle();
 	Name1[1] = Textcontroller->GenerateName();

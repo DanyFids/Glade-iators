@@ -18,6 +18,7 @@ void Particle::FireUpdate(float dt, Particle &p)
 
 void Particle::AudienceUpdate(float dt, Particle& p)
 {
+	p.life -= dt;
 }
 
 Particle::Particle(glm::vec3 pos, glm::vec3 vel, float l, glm::vec2 s, ParticleBehavior b)
@@ -57,9 +58,13 @@ void ParticleEngine::INIT()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Part), &(temp->size));
 	glEnableVertexAttribArray(1);
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(Part), &(temp->variation));
+	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(3, 1, GL_INT, sizeof(Part), &(temp->frame));
+	glEnableVertexAttribArray(3);
 }
 
-ParticleEngine::ParticleEngine(glm::vec3 position, glm::vec2 size, int max, float l, Material* mat, ParticleEngineBehavior eb, ParticleBehavior pb)
+ParticleEngine::ParticleEngine(glm::vec3 position, glm::vec2 size, int max, float l, std::vector<std::vector<Material*>> mat, ParticleEngineBehavior eb, ParticleBehavior pb)
 {
 	max_particles = max;
 	engine_b = eb;
@@ -116,16 +121,23 @@ void ParticleEngine::Draw(Camera* Cam)
 
 	shdr->SetI("num_particles", particles.size());
 
-	std::vector<Part> parts;
+	std::vector<Part> parts = {};
 	for (int p = 0; p < particles.size(); p++) {
-		parts.push_back({particles[p].position, particles[p].size});
+		parts.push_back({particles[p].position, particles[p].size, particles[p].variation, particles[p].frame});
 	}
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Tex->DIFF);
-	shdr->SetI("tex", 0);
+	int id = 0;
+	for (int v = 0; v < Tex.size(); v++) {
+		for (int f = 0; f < Tex[v].size(); f++) {
+			glActiveTexture(GL_TEXTURE0 + id);
+			glBindTexture(GL_TEXTURE_2D, Tex[v][f]->DIFF);
+			shdr->SetI("tex[" + std::to_string(v) + "][" + std::to_string(f) + "]", id);
+			id++;
+		}
+	}
 	
 	glBindVertexArray(PARTICLE_VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, PARTICLE_VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Part) * parts.size(), parts.data(), GL_DYNAMIC_DRAW);
 	glDrawArrays(GL_POINTS, 0, parts.size());
 	glBindVertexArray(0);
@@ -357,14 +369,34 @@ void ParticleEngine::AudienceEngineBehavior(float dt, ParticleEngine& e)
 			for (int c = 0; c < section_positions.size(); c++) {
 				glm::vec3 tmp = rot_mat * section_positions[c];
 
+				float start_l = e.particle_l * (float)(rand() % 10 + 1) / 10.0f;
+
 				particle_pos.push_back(tmp);
-				e.particles.push_back(Particle(tmp, glm::vec3(), e.particle_l, e.particle_size, e.particle_b));
+				Particle temp = Particle(tmp, glm::vec3(), start_l, e.particle_size, e.particle_b);
+
+				int variation = rand() % e.Tex.size();
+				int start_f = rand() % e.Tex[variation].size();
+
+				temp.variation = variation;
+				temp.frame = start_f;
+
+				e.particles.push_back(temp);
 			}
 		}
 
 		e.e_init = false;
 	}
-	else {
+	else {	
+		for (int p = 0; p < e.particles.size(); p++) {
+			if (e.particles[p].life <= 0.0f) {
+				e.particles[p].frame = e.particles[p].frame + 1;
+				if (e.particles[p].frame > 3) {
+					e.particles[p].frame = 0;
+				}
 
+				//e.particles[p].frame = (e.particles[p].frame < e.Tex[e.particles[p].variation].size() - 1) ? e.particles[p].frame++ : 0;
+				e.particles[p].life = e.particle_l;
+			}
+		}
 	}
 }

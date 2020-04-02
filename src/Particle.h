@@ -15,6 +15,8 @@ struct ParticleEngineBehavior { std::function<void(float, ParticleEngine&)> func
 struct Part {
 	glm::vec3 pos;
 	glm::vec2 size;
+	int variation;
+	int frame;
 };
 
 class Particle {
@@ -22,6 +24,7 @@ protected:
 	glm::vec3 position, velocity;
 	glm::vec2 size, start_size;
 	float life, lifetime;
+	int variation = 0, frame = 0;
 
 	ParticleBehavior behavior;
 
@@ -40,7 +43,7 @@ public:
 
 class ParticleEngine {
 	std::vector<Particle> particles;
-	Material* Tex;
+	std::vector<std::vector<Material*>> Tex;
 
 	int max_particles;
 
@@ -61,7 +64,7 @@ public:
 
 	static void INIT();
 
-	ParticleEngine(glm::vec3 positions, glm::vec2 size, int max, float l, Material* mat, ParticleEngineBehavior eb, ParticleBehavior pb);
+	ParticleEngine(glm::vec3 positions, glm::vec2 size, int max, float l, std::vector<std::vector<Material*>> mat, ParticleEngineBehavior eb, ParticleBehavior pb);
 
 	virtual void Update(float dt);
 	virtual void Draw(Camera* Cam);

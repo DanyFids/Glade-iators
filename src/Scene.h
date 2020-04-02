@@ -280,7 +280,6 @@ protected:
 
 	FrameBuffer* main_pass[2];
 	FrameBuffer* light_buff[2];
-	FrameBuffer* merge_buff;
 	FrameBuffer* particle_buff[2];
 	std::vector<PostProcess*> post_pass;
 

@@ -107,7 +107,6 @@ class TwoPlayer: public PlayScene {
 	float comboTime[2]{ MAX_COMBO, MAX_COMBO };
 	float comboMult[2]{ 1.0f, 1.0f };
 	bool combo[2]{ false, false };
-
 	//Sound audioEngine;
 	const float DEATH_TIME = 4.0f;
 	float deathtimer = DEATH_TIME;
@@ -117,6 +116,8 @@ class TwoPlayer: public PlayScene {
 
 	Object* morphyBoi;
 	CrowdBar* CrowdBoi = nullptr;
+
+	Sound audioEngine;
 
 	WeaponType _Weapons[2];
 	ShieldType _Shields[2];

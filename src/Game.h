@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <GLM/glm.hpp>
 #include<vector>
+#include "Sound.h"
 
 class Scene;
 class Mesh;
@@ -45,6 +46,8 @@ public:
 
 	void Run();
 
+	
+
 	GLFWwindow* GetWindow() { return window; }
 
 	friend void GlfwWindowResizedCallback(GLFWwindow* window, int width, int height);
@@ -71,6 +74,8 @@ protected:
 	//Fun Settings Variables!
 	int widthScreen = 1920;
 	int heightScreen = 1080;
+
+
 	//Player Weapons!
 	WeaponType weaponChoice[2];
 	ShieldType shieldChoice[2];

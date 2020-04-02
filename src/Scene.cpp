@@ -756,6 +756,12 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 		if (!ready[PLAYER_1] || !ready[PLAYER_2])
 			ready_timer = MAX_READY;
 
+
+		if (weapon[controller] == 2 && shield[controller] != 2) {
+			shield[controller] = 2;
+			changeS[controller] = true;
+		}
+
 		if (ready[PLAYER_1] && ready[PLAYER_2]) {
 			ready_timer -= dt;
 			if (ready_timer <= 0) {

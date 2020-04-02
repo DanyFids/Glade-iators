@@ -1544,7 +1544,7 @@ void TwoPlayer::LoadScene()
 				SwordMat = new Material("Weapons/tex/sword.png");
 			}
 
-			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f,0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.15f), OneHand_LC, 15.0f, 25.0f,0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->Scale({ 0.9f, 0.9f, 0.9f });
 
 			weapon->SetRotation({ 0.0f, 90.0f, 90.0f });

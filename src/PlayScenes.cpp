@@ -1539,7 +1539,7 @@ void TwoPlayer::LoadScene()
 	};
 
 	particle_engines = {
-		ParticleEngine(glm::vec3(), glm::vec2(1.0f, 1.65f), ParticleEngine::MAX_PARTICLES, 100000.f, crowd_mats, {ParticleEngine::AudienceEngineBehavior}, {Particle::AudienceUpdate})
+		ParticleEngine(glm::vec3(), glm::vec2(1.0f, 1.65f), ParticleEngine::MAX_PARTICLES, 0.15f, crowd_mats, {ParticleEngine::AudienceEngineBehavior}, {Particle::AudienceUpdate})
 	};
 
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };

@@ -1014,8 +1014,8 @@ void TwoPlayer::Update(float dt)
 					}
 				}
 
-				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
-
+				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown() && players[p]->GetFrameState() != FrameStates::Roll) {
+					
 					if (players[p]->hitbox->GetType() == entity) {
 						std::cout << "Hit!\n";
 						//audioEngine.PlayEvent("Hit");
@@ -1134,6 +1134,12 @@ void TwoPlayer::Update(float dt)
 		scoreSub++;
 	}
 
+	if (curScore <= 0)
+	{
+		players[PLAYER_1]->dmgHP(1 * dt);
+		players[PLAYER_2]->dmgHP(1 * dt);
+	}
+
 	if (curScore > MAX_SCORE)
 		curScore = MAX_SCORE;
 
@@ -1142,7 +1148,7 @@ void TwoPlayer::Update(float dt)
 		CrowdBoi->setScore(curScore);
 	}
 }
-
+ 
 int PlayScene::P2wins = 0;
 int PlayScene::P1wins = 0;
 int PlayScene::RoundCount = 1;
@@ -1241,7 +1247,17 @@ void TwoPlayer::Draw()
 		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 1 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
 
 	}
-	
+	//std::string output1 = Name1[0] + " " + Name1[1] + " " + Name1[2];
+	//std::string output2 = Name2[0] + " " + Name2[1] + " " + Name2[2];
+
+	// + " Wins: " + std::to_string(P1wins);
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name1[0] + " " + Name1[1] + " " + Name1[2], 10, 10, 0.40, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Wins: " + std::to_string(P1wins), 50, 500, 0.60, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[0] + " " + Name2[1] + " " + Name2[2], 470, 10, 0.40, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Wins: " + std::to_string(P2wins), 670, 500, 0.60, glm::vec3(1.f, 1.f, 1.f));
+
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Round: " + std::to_string(RoundCount), 360, 460, 0.60, glm::vec3(1.f, 1.f, 1.f));
+
 }
 
 void TwoPlayer::LoadScene()
@@ -1519,6 +1535,4 @@ void TwoPlayer::LoadScene()
 
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(15.0f, 1.0f, 2.0f));
-
-	
 }

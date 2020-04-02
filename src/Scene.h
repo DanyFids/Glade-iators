@@ -51,7 +51,8 @@ protected:
 	static int P2wins;
 	static int RoundCount;
 	
-
+	static std::string Name1[3];
+	static std::string Name2[3];
 	
 	// Mouse Vars
 	float m_lastX = 400;

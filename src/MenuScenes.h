@@ -22,7 +22,7 @@ protected:
 	float menu_time = 1.0f;
 
 public:
-
+	static bool Musicinit;
 	MainMenu();
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;
@@ -66,8 +66,7 @@ protected:
 public:
 	CharacterC();
 
-	std::string Name1[3];
-	std::string Name2[3];
+
 
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;

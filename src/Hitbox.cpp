@@ -610,6 +610,10 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 
 	//Calculate Line Segment distance
 	{
+		// Copyright 2001 softSurfer, 2012 Dan Sunday
+		// Source: http://geomalgorithms.com/a07-_distance.html#dist3D_Segment_to_Segment()
+
+
 		constexpr auto SMALL_VALUE = 0.00000001;
 
 		glm::vec3 LineA = tub - tlb; //u

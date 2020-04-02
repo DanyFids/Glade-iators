@@ -888,6 +888,35 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 		t += Cam[player]->GetRight();
 	if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f)
 		Cam[player]->Move(glm::normalize(t), dt);
+
+	//if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+	//{
+	//	if (players[0]->GetStam() > 0.0f) {
+	//
+	//		//glm::vec3 p1 = glm::vec3();
+	//		//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+	//		//p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+	//
+	//
+	//
+	//		//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
+	//
+	//		//std::cout << "OOF\n";
+	//		//players[player]->dmgSTAM(15.0f);
+	//		players[0]->Attack();
+	//		atk1 = true;
+	//	}
+	//}
+	//
+	//if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS) {
+	//	testBool = true;
+	//	std::cout << "Testing begin\n";
+	//}
+	//if (glfwGetKey(window, GLFW_KEY_C) == GLFW_RELEASE) {
+	//	testBool = false;
+	//	std::cout << "Testing end\n";
+	//}
+
 }
 
 

@@ -434,6 +434,7 @@ void Player::Attack()
 {
 	if (state != attacking) {
 		anim_lock = true;
+		weapon->setCooldown(false);
 		atk_combo = 0;
 		PlayAnim(this->weapon->GetAtkAnim(atk_combo), 0, 1.0f, 2.5f);
 		_mesh->SetIntensity(1, 0.0f);

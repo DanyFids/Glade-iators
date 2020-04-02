@@ -973,7 +973,7 @@ void TwoPlayer::Update(float dt)
 	for (int c = 0; c < players.size(); c++) {
 		players[c]->Update(dt);
 
-		for (int p = 0; p < players.size(); p++) {
+ 		for (int p = 0; p < players.size(); p++) {
 			if (players[c] != players[p]) {
 				if (players[c]->HitDetect(players[p])) {
 					std::cout << "Welp\n";
@@ -989,17 +989,36 @@ void TwoPlayer::Update(float dt)
 				//	}
 				//}
 
-				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
+				
 
+				//THIS IS THE ORIGINAL
+				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
+				
 					if (players[p]->hitbox->GetType() == entity) {
 						std::cout << "Hit!\n";
 						audioEngine->PlayEvent("Hit");
 						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
 						players[c]->GetWeapon()->setCooldown(true);
 					}
-
-					
+				
+				
 				}
+
+
+				//if (players[c]->GetFrameState() == FrameStates::Attack){
+				//	if (!players[c]->GetWeapon()->getCooldown()) {
+				//		if (players[c]->GetWeapon()->HitDetect(players[p])) {
+				//			if (players[p]->hitbox->GetType() == entity) {
+				//				std::cout << "Hit!\n";
+				//				audioEngine->PlayEvent("Hit");
+				//				players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
+				//				players[c]->GetWeapon()->setCooldown(true);
+				//			}
+				//		}
+				//	}
+				//}
+
+				
 			}
 		}
 
@@ -1144,21 +1163,21 @@ void TwoPlayer::Draw()
 			particle_engines[p].Draw(Cam[c]);
 		}
 
-		glDisable(GL_DEPTH_TEST);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		
-		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
-		
-		players[0]->GetWeapon()->hitbox->Draw(shaderObj, players[0]->GetWeapon()->getParentTransform());
-		players[1]->GetWeapon()->hitbox->Draw(shaderObj, players[1]->GetWeapon()->getParentTransform());
-		
-		players[0]->GetShield()->hitbox->Draw(shaderObj, players[0]->GetShield()->getParentTransform());
-		players[1]->GetShield()->hitbox->Draw(shaderObj, players[1]->GetShield()->getParentTransform());
-		
-		
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_DEPTH_TEST);
+		//glDisable(GL_DEPTH_TEST);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//
+		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		//
+		//players[0]->GetWeapon()->hitbox->Draw(shaderObj, players[0]->GetWeapon()->getParentTransform());
+		//players[1]->GetWeapon()->hitbox->Draw(shaderObj, players[1]->GetWeapon()->getParentTransform());
+		//
+		//players[0]->GetShield()->hitbox->Draw(shaderObj, players[0]->GetShield()->getParentTransform());
+		//players[1]->GetShield()->hitbox->Draw(shaderObj, players[1]->GetShield()->getParentTransform());
+		//
+		//
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//glEnable(GL_DEPTH_TEST);
 
 		Cam[c]->SetupPostLight(lightPass, 0);
 
@@ -1326,12 +1345,13 @@ void TwoPlayer::LoadScene()
 
 	//Capsule testing ********* PLAYER HITBOXES
 
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.5f, 2.6f, entity); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.5f, 2.6f, entity);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.4f, 2.3f, entity); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.4f, 2.3f, entity);
 
-	players.push_back(new Player(P1_MESH, playerMat1, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
+	players.push_back(new Player(P1_MESH, playerMat1, basicCapsuleHB, { 0.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
 	players[PLAYER_1]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
 	//players[PLAYER_1]->Rotate(glm::vec3(0.0f,90.0f,0.0f));
+
 	players.push_back(new Player(P2_MESH, playerMat2, basicCapsuleHB2)); // THIS IS PLAYER TWO
 	players[PLAYER_2]->hitbox->parentTransform(players[PLAYER_2]->GetTransform());
 
@@ -1393,6 +1413,8 @@ void TwoPlayer::LoadScene()
 	Material* BucklerMat = nullptr;
 
 	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.15f, 1.f);
+	swordCapsuleHB->SetScale(glm::vec3(1.0));
+
 	Hitbox* shieldSphereHB = new SphereHitbox(1.0f, COLLISION_TYPE::shield);
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
 
@@ -1426,6 +1448,7 @@ void TwoPlayer::LoadScene()
 			weapon = new Weapon(HammerMesh, HammerMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->SetRotation({90.0f, 90.0f, 0.0f});
 			weapon->Scale({1.2f, 1.2f, 1.2f});
+			
 			break;
 		// Spear
 		case WEAPON_SPEAR:
@@ -1453,8 +1476,11 @@ void TwoPlayer::LoadScene()
 			}
 
 			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.15f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
+			//weapon->Scale({ 0.9f, 0.9f, 0.9f });
 			weapon->Scale({ 0.9f, 0.9f, 0.9f });
+
 			weapon->SetRotation({ 0.0f, 90.0f, 90.0f });
+			
 			break;
 		}
 
@@ -1529,6 +1555,8 @@ void TwoPlayer::LoadScene()
 void TwoPlayer::Reset() {
 	for (int p = 0; p < players.size(); p++) {
 		players[p]->SetPosition({0.0f, -0.6, -20.0f + (40.0f * p) });
+		//players[p]->SetPosition({ 0.0f, -0.6, -2.0f + (1.8f * p) });
+
 		players[p]->SetRotation({0.0f, 180.0f * p, 0.0f});
 
 		players[p]->Reset();

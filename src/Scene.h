@@ -251,6 +251,8 @@ protected:
 	bool Target1 = false;
 	bool Target2 = false;
 
+	bool testBool = false; //Debug Boolean.
+
 	int CgradeI = 0;
 	bool CgradeIDown[3] = { false,false,false };
 	int lutloaded = 0;

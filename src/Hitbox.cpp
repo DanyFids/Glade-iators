@@ -557,6 +557,9 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 	//	other->height += 0.000001f;
 	//}
 
+	transform.scale = glm::vec3(1.0);
+	other->transform.scale = glm::vec3(1.0);
+
 	glm::vec3 tub = convertVec4(t * transform.GetWorldTransform() * glm::vec4(upperBound.x, upperBound.y, upperBound.z, 1.0f));
 	glm::vec3 tlb = convertVec4(t * transform.GetWorldTransform() * glm::vec4(lowerBound.x, lowerBound.y, lowerBound.z, 1.0f));
 
@@ -607,7 +610,7 @@ bool CapsuleHitbox::HitDetect(Object* th, CapsuleHitbox* other, Object* oth)
 
 	//Calculate Line Segment distance
 	{
-		constexpr auto SMALL_VALUE = 0.00000001;;
+		constexpr auto SMALL_VALUE = 0.00000001;
 
 		glm::vec3 LineA = tub - tlb; //u
 		glm::vec3 LineB = oub - olb; //v

@@ -98,6 +98,8 @@ class TwoPlayer: public PlayScene {
 	float deathtimer = DEATH_TIME;
 	bool winannounce = false;
 
+	
+
 	Object* morphyBoi;
 
 	WeaponType _Weapons[2];

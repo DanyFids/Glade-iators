@@ -378,10 +378,9 @@ void Player::Draw(Shader* shdr, std::vector<Camera*> cam, Shader* childShader)
 
 }
 
-void Player::dmgHP(float _dmg)
+void Player::dmgHP(float _dmg) 
 {
-	if(GetFrameState() != FrameStates::Roll)
-		health -= _dmg;
+	health -= _dmg;
 }
 
 void Player::dmgSTAM(float _dmg)
@@ -394,7 +393,7 @@ void Player::PlayAnim(std::string n, unsigned int c, float i, float s)
 {
 	_mesh->SetAnim(_mesh->GetSkeleton()->GetAnimByName(n), c, i, s);
 }
-
+ 
 void Player::Run()
 {
 	if (!run && state == walking && recov_timer <= 0.0f) {
@@ -457,8 +456,9 @@ void Player::Attack()
 void Player::Block()
 {
 	if (state != blocking && state != attacking) {
-		anim_lock = false;
-		PlayAnim("block",1,1,1.0f);
+		anim_lock = true;
+		PlayAnim("block", 0);
+		PlayAnim("idle", 1, 0.0f);
 		state = blocking;
 	}
 }

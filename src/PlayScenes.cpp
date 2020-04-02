@@ -1045,16 +1045,24 @@ void TwoPlayer::Update(float dt)
 							}
 						}
 						else //Clean hit.
-						{
-							players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
-							players[c]->GetWeapon()->setCooldown(true);
-							audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
-							audioEngine.LoadEvent("Hit", "{3830d309-eab3-4e2d-9cc2-2b00807daf5c}");
-							audioEngine.PlayEvent("Hit");
-						curScore += (20 * taunted[c] * comboMult[c]);
-						combo[c] = true;
-						comboTime[c] = MAX_COMBO;
-						comboMult[c] += 0.5f;
+						{ 
+							if (players[p]->GetFrameState() != FrameStates::Roll) {
+								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
+								players[c]->GetWeapon()->setCooldown(true);
+								audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+								audioEngine.LoadEvent("Hit", "{3830d309-eab3-4e2d-9cc2-2b00807daf5c}");
+								audioEngine.PlayEvent("Hit");
+								curScore += (20 * taunted[c] * comboMult[c]);
+								combo[c] = true;
+								comboTime[c] = MAX_COMBO;
+								comboMult[c] += 0.5f;
+							}
+							else {
+								curScore += (5 * taunted[p] * comboMult[p]);
+								combo[p] = true;
+								comboTime[p] = MAX_COMBO;
+								comboMult[p] += 0.5f;
+							}
 						}
 					}
 				

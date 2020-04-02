@@ -247,6 +247,8 @@ void Player::Update(float dt)
 
 	phys.move = glm::mat3(transform.GetRotEul()) * rp;
 
+	current_face_dir = baseFaceDir * glm::mat3( glm::mat3_cast(glm::quat(glm::angleAxis(glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f))) )  );
+
 	if (run) {
 		if (stamina > 0.0f && glm::length(phys.move) != 0.0f) {
 			phys.move *= 2.0f;
@@ -463,6 +465,35 @@ FrameStates Player::GetFrameState(unsigned int chnl)
 	return _mesh->GetFrameCode();
 }
 
+//For Blocking
+//FaceDir should be the direction opponent is facing, v2 is vector to player who is hitting
+bool Player::isInfront(glm::vec3 faceDir, glm::vec3 v2)
+{
+
+	//Use vec2's to eliminate any fuckiness with Y values.
+	glm::vec2 dir1 = { faceDir.x ,faceDir.z };
+	glm::vec2 dir2 = { v2.x,v2.z };
+
+	dir2 = glm::normalize(dir2);
+
+	//float angle = 1 
+	float tempDot = glm::dot(dir1, dir2);
+
+	float tempCos = (glm::acos( (glm::dot(dir1, dir2))));
+
+	float angle = glm::degrees(tempCos);
+
+	//Use the absolute value of 'agle' to catch -angle and +angle;
+	//blockAngle should be 1/2 of the desired cone.
+	if (glm::abs(angle) <= blockAngle) { // if our 'angle' is smaller than our blockingAngle (we are within the blockable area)
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 
 
 //Object* Attack::ABox = nullptr;
@@ -628,11 +659,12 @@ Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, std::vector<std::string> atks
 	stamina_cost = stam;
 }
 
-Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, Joint* p, SkelMesh* m) //Mesh, Material, Hitbox, Position, Anim_Names, Damage, Stamina Cost, Parent_joint, SkelMesh
+Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, float dmgRdc, Joint* p, SkelMesh* m) //Mesh, Material, Hitbox, Position, Anim_Names, Damage, Stamina Cost, Parent_joint, SkelMesh
 {
 	attack_anims = atks;
 	damage = dmg;
 	stamina_cost = stam;
+	dmgReduction = dmgRdc;
 
 	mesh = me;
 	material = ma;
@@ -644,6 +676,7 @@ Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<st
 
 	parent_joint = p;
 	parent_Mesh = m;
+	
 }
 
 std::string Weapon::GetAtkAnim(unsigned int c_id)

@@ -198,10 +198,8 @@ void Game::Initialize()
 		curScene = MainMenuScn;
 	}
 	else {
-
+		//curScene = OnePlayerScn;
 		//TwoPlayerScn = new TwoPlayer();
-		//curScene = TwoPlayerScn;
-		
 		curScene = MainMenuScn;
 	}
 }

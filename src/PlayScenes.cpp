@@ -998,31 +998,64 @@ void TwoPlayer::Update(float dt)
 			}
 
 			if (players[c] != players[p]) {
+
+
+				//Player Collision
 				if (players[c]->HitDetect(players[p])) {
 					std::cout << "Welp\n";
 				}
 
-				//problem -> weapon hitdetect is not seeing the shield
-				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) && !players[c]->GetWeapon()->getCooldown()) {
-					if (players[p]->GetShield()->hitbox->GetType() == COLLISION_TYPE::shield) {
-						std::cout << "Blocked!\n";
-						audioEngine->PlayEvent("Block");
-						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
-						players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
-					}
-				}
+				////problem -> weapon hitdetect is not seeing the shield
+				//if (players[p]->GetShield() != nullptr) {
+				//	if (players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) ) { // players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield() && players[c]->GetWeapon()->getCooldown() == false)
+				//			std::cout << "Blocked!\n";
+				//
+				//			players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
+				//			players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+				//		
+				//	}
+				//}
+				//else
+				//{
+				//
+				//	//Weapon blocking
+				//}
 
 				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
 
-					if (players[p]->hitbox->GetType() == entity) {
+					if (players[p]->hitbox->GetType() == entity) { //Making sure we hit the right hitbox
 						std::cout << "Hit!\n";
+
+						if (players[p]->GetFrameState() == FrameStates::Block && players[p]->isInfront(players[p]->getFaceDir(), players[c]->GetPosition() - players[p]->GetPosition())) { //Are we blocking? Are we infront of the enemy?
+
+							std::cout << "Blocked!\n";
+
+							if (players[p]->GetShield() != nullptr) { //If he has a shield.
+
+								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
+								players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+
+								players[c]->GetWeapon()->setCooldown(true);
+							}
+							else { // Use weapons stuff
+
+								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - ( players[p]->GetWeapon()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
+								players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * ((players[p]->GetWeapon()->GetStaminaCost() + 15.0f) * 0.01f) );
+
+								players[c]->GetWeapon()->setCooldown(true);
+
+							}
+						}
+						else //Clean hit.
+						{
+							players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
+							players[c]->GetWeapon()->setCooldown(true);
 						audioEngine->PlayEvent("Hit");
 						curScore += (5 * taunted[c] * comboMult[c]);
 						combo[c] = true;
 						comboTime[c] = MAX_COMBO;
 						comboMult[c] += 0.5f;
-						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
-						players[c]->GetWeapon()->setCooldown(true);
+						}
 					}
 
 					
@@ -1329,11 +1362,14 @@ void TwoPlayer::LoadScene()
 
 	//Capsule testing ********* PLAYER HITBOXES
 
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.3f, 5.2f, entity); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.3f, 5.2f, entity);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.25f, 5.2f, entity); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.25f, 5.2f, entity);
 
 	players.push_back(new Player(P1_MESH, playerMat, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
 	players[PLAYER_1]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
+
+	players[PLAYER_1]->Rotate(glm::vec3(0, 0, 0));
+
 	//players[PLAYER_1]->Rotate(glm::vec3(0.0f,90.0f,0.0f));
 	players.push_back(new Player(P2_MESH, playerMat, basicCapsuleHB2)); // THIS IS PLAYER TWO
 	players[PLAYER_2]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());

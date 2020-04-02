@@ -1056,6 +1056,7 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 				}
 			}
 
+			static bool lb_p[2] = { false, false };
 			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
 
 				//block1 = true;
@@ -1066,37 +1067,32 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 
 				//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
 				//audioEngine->PlayEvent("Block");
-				players[player]->Block();
+				if (!players[player]->IsLocked()) {
+					players[player]->Block();
 
-				switch (player) {
-				case 0:
-					guardButton1 = true;
-					break;
-				case 1:
-					guardButton2 = true;
-					break;
+					switch (player) {
+					case 0:
+						guardButton1 = true;
+						break;
+					case 1:
+						guardButton2 = true;
+						break;
+					}
 				}
+				lb_p[player] = true;
+
 				//std::cout << "Parry God\n";
 			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE) {
+			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && lb_p[player]) {
+				lb_p[player] = false;
 
-
-				switch (player) {
-				case 0:
-					if (guardButton1) {
-						players[player]->Idle();
-						//players[player]->SetState();
-						guardButton1 = false;
-					}
-					break;
-				case 1:
-					if (guardButton2) {
-						players[player]->Idle();
-						//players[player]->SetState();
-						guardButton2 = false;
-					}
-					break;
+				if (players[player]->GetState() == blocking && players[player]->GetFrameState() == Hold) {
+					((SkelMesh*)players[player]->GetMesh())->NextFrame(0);
 				}
+				else {
+					players[player]->Idle();
+				}
+				
 
 				//players[player]->DestroyChild(0);
 			}

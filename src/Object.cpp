@@ -456,7 +456,7 @@ void Player::Attack()
 void Player::Block()
 {
 	if (state != blocking && state != attacking) {
-		anim_lock = true;
+		anim_lock = false;
 		PlayAnim("block", 0);
 		PlayAnim("idle", 1, 0.0f);
 		state = blocking;

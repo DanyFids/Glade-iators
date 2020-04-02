@@ -1021,7 +1021,7 @@ void TwoPlayer::Update(float dt)
 					if (players[p]->hitbox->GetType() == entity) { //Making sure we hit the right hitbox
 						std::cout << "Hit!\n";
 
-						if (players[p]->GetFrameState() == FrameStates::Block && players[p]->isInfront(players[p]->getFaceDir(), players[c]->GetPosition() - players[p]->GetPosition())) { //Are we blocking? Are we infront of the enemy?
+						if (players[p]->GetFrameState() == FrameStates::Hold && players[p]->GetState() == blocking &&  players[p]->isInfront(players[p]->getFaceDir(), players[c]->GetPosition() - players[p]->GetPosition())) { //Are we blocking? Are we infront of the enemy?
 
 							std::cout << "Blocked!\n";
 
@@ -1033,7 +1033,7 @@ void TwoPlayer::Update(float dt)
 								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
 								players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
 
-								players[c]->GetWeapon()->setCooldown(true);
+								players[c]->GetWeapon()->setCooldown(true); 
 							}
 							else { // Use weapons stuff
 

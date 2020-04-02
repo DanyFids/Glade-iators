@@ -96,7 +96,7 @@ class TwoPlayer: public PlayScene {
 	const float MAX_SCORE = 500.0f;
 	float curScore = MAX_SCORE;
 	float scoreSub = 1.0f;
-	const float INCREASE_TIME = 7.5f;
+	const float INCREASE_TIME = 7.0f;
 	float subIncreaser = INCREASE_TIME;
 	
 	const float MAX_TAUNT = 15.0f;

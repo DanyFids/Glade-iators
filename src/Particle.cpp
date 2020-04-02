@@ -1,13 +1,10 @@
 #include "Particle.h"
-#include <GLM/gtc/matrix_transform.hpp>
-#include<GLM/gtc/quaternion.hpp>
 #include "Mesh.h"
 #include "Texture.h"
 #include "Shader.h"
 #include "Game.h"
 #include "Camera.h"
 
-const int ParticleEngine::MAX_PARTICLES = 2046;
 
 void Particle::FireUpdate(float dt, Particle &p)
 {
@@ -39,9 +36,9 @@ unsigned int ParticleEngine::PARTICLE_VAO = 0;
 
 void ParticleEngine::INIT()
 {
-	std::vector<Part> points;
-	for (int p = 0; p < MAX_PARTICLES; p++) {
-		points.push_back(Part());
+	std::vector<glm::vec3> points;
+	for (int p = 0; p < 512; p++) {
+		points.push_back(glm::vec3(0.0f));
 	}
 
 	glGenVertexArrays(1, &PARTICLE_VAO);
@@ -49,14 +46,10 @@ void ParticleEngine::INIT()
 
 	glGenBuffers(1, &PARTICLE_VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, PARTICLE_VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Part) * points.size(), points.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * points.size(), points.data(), GL_STATIC_DRAW);
 
-	Part* temp = nullptr;
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Part), &(temp->pos));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Part), &(temp->size));
-	glEnableVertexAttribArray(1);
 }
 
 ParticleEngine::ParticleEngine(glm::vec3 position, glm::vec2 size, int max, float l, Material* mat, ParticleEngineBehavior eb, ParticleBehavior pb)
@@ -116,9 +109,10 @@ void ParticleEngine::Draw(Camera* Cam)
 
 	shdr->SetI("num_particles", particles.size());
 
-	std::vector<Part> parts;
 	for (int p = 0; p < particles.size(); p++) {
-		parts.push_back({particles[p].position, particles[p].size});
+		std::string name = "[" + std::to_string(p) + "]";
+		shdr->SetVec3("pos" + name, particles[p].position);
+		shdr->SetVec2("size" + name, particles[p].size);
 	}
 
 	glActiveTexture(GL_TEXTURE0);
@@ -126,8 +120,7 @@ void ParticleEngine::Draw(Camera* Cam)
 	shdr->SetI("tex", 0);
 	
 	glBindVertexArray(PARTICLE_VAO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Part) * parts.size(), parts.data(), GL_DYNAMIC_DRAW);
-	glDrawArrays(GL_POINTS, 0, parts.size());
+	glDrawArrays(GL_POINTS, 0, particles.size());
 	glBindVertexArray(0);
 }
 
@@ -156,211 +149,31 @@ void ParticleEngine::FireEngineBehavior(float dt, ParticleEngine& e)
 void ParticleEngine::AudienceEngineBehavior(float dt, ParticleEngine& e)
 {
 	if (e.e_init) {
-		std::vector<glm::vec3> section_positions, particle_pos;
-		
-		// rows of 5 (1-3)
-		// 1
-		{
-			glm::vec3 tmp = glm::vec3(-48.17f, 4.6392f, 0.0f);
-			tmp.z = -1.6743f;
-			section_positions.push_back(tmp);
-			tmp.z = -0.52971f;
-			section_positions.push_back(tmp);
-			tmp.z = 0.59977f;
-			section_positions.push_back(tmp);
-			tmp.z = 1.7321f;
-			section_positions.push_back(tmp);
-			tmp.z = 2.8433f;
-			section_positions.push_back(tmp);
-		}
-		// 2
-		{
-			glm::vec3 tmp = glm::vec3(-51.043f, 5.7355f, 0.0f);
-			tmp.z = -1.6743f;
-			section_positions.push_back(tmp);
-			tmp.z = -0.52971f;
-			section_positions.push_back(tmp);
-			tmp.z = 0.59977f;
-			section_positions.push_back(tmp);
-			tmp.z = 1.7321f;
-			section_positions.push_back(tmp);
-			tmp.z = 2.8433f;
-			section_positions.push_back(tmp);
-		}
-		// 3
-		{
-			glm::vec3 tmp = glm::vec3(-53.948f, 6.8877f, 0.0f);
-			tmp.z = -1.6743f;
-			section_positions.push_back(tmp);
-			tmp.z = -0.52971f;
-			section_positions.push_back(tmp);
-			tmp.z = 0.59977f;
-			section_positions.push_back(tmp);
-			tmp.z = 1.7321f;
-			section_positions.push_back(tmp);
-			tmp.z = 2.8433f;
-			section_positions.push_back(tmp);
-		}
-		// 6 rows (4-6)
-		// 4
-		{
-			glm::vec3 tmp = glm::vec3(-56.822f, 7.984f, 0.0f);
-			tmp.z = -2.2912f;
-			section_positions.push_back(tmp);
-			tmp.z = -1.1466f;
-			section_positions.push_back(tmp);
-			tmp.z = -0.017152f;
-			section_positions.push_back(tmp);
-			tmp.z = 1.1152f;
-			section_positions.push_back(tmp);
-			tmp.z = 2.2263f;
-			section_positions.push_back(tmp);
-			tmp.z = 3.3972f;
-			section_positions.push_back(tmp);
-		}
-		// 5
-		{
-			glm::vec3 tmp = glm::vec3(-59.874f, 9.0191f, 0.0f);
-			tmp.z = -2.2912f;
-			section_positions.push_back(tmp);
-			tmp.z = -1.1466f;
-			section_positions.push_back(tmp);
-			tmp.z = -0.017152f;
-			section_positions.push_back(tmp);
-			tmp.z = 1.1152f;
-			section_positions.push_back(tmp);
-			tmp.z = 2.2263f;
-			section_positions.push_back(tmp);
-			tmp.z = 3.3972f;
-			section_positions.push_back(tmp);
-		}
-		// 6
-		{
-			glm::vec3 tmp = glm::vec3(-62.829f, 10.117f, 0.0f);
-			tmp.z = -2.2912f;
-			section_positions.push_back(tmp);
-			tmp.z = -1.1466f;
-			section_positions.push_back(tmp);
-			tmp.z = -0.017152f;
-			section_positions.push_back(tmp);
-			tmp.z = 1.1152f;
-			section_positions.push_back(tmp);
-			tmp.z = 2.2263f;
-			section_positions.push_back(tmp);
-			tmp.z = 3.3972f;
-			section_positions.push_back(tmp);
-		}
-		// 7 rows (7-9)
-		// 7
-		{
-			glm::vec3 tmp = glm::vec3(-65.751f, 11.278f, 0.0f);
-			tmp.z = -2.8381f;
-			section_positions.push_back(tmp);
-			tmp.z = -1.6743f;
-			section_positions.push_back(tmp);
-			tmp.z = -0.52971f;
-			section_positions.push_back(tmp);
-			tmp.z = 0.59977f;
-			section_positions.push_back(tmp);
-			tmp.z = 1.7321f;
-			section_positions.push_back(tmp);
-			tmp.z = 2.8433f;
-			section_positions.push_back(tmp);
-			tmp.z = 3.9482f;
-			section_positions.push_back(tmp);
-		}
-		// 8
-		{
-			glm::vec3 tmp = glm::vec3(-68.764f, 12.332f, 0.0f);
-			tmp.z = -2.8381f;
-			section_positions.push_back(tmp);
-			tmp.z = -1.6743f;
-			section_positions.push_back(tmp);
-			tmp.z = -0.52971f;
-			section_positions.push_back(tmp);
-			tmp.z = 0.59977f;
-			section_positions.push_back(tmp);
-			tmp.z = 1.7321f;
-			section_positions.push_back(tmp);
-			tmp.z = 2.8433f;
-			section_positions.push_back(tmp);
-			tmp.z = 3.9482f;
-			section_positions.push_back(tmp);
-		}
-		// 9
-		{
-			glm::vec3 tmp = glm::vec3(-71.651f, 13.435f, 0.0f);
-			tmp.z = -2.8381f;
-			section_positions.push_back(tmp);
-			tmp.z = -1.6743f;
-			section_positions.push_back(tmp);
-			tmp.z = -0.52971f;
-			section_positions.push_back(tmp);
-			tmp.z = 0.59977f;
-			section_positions.push_back(tmp);
-			tmp.z = 1.7321f;
-			section_positions.push_back(tmp);
-			tmp.z = 2.8433f;
-			section_positions.push_back(tmp);
-			tmp.z = 3.9482f;
-			section_positions.push_back(tmp);
-		}
-		// 8 rows (10-11)
-		// 10
-		{
-			glm::vec3 tmp = glm::vec3(-74.605f, 14.563f, 0.0f);
-			tmp.z = -3.4014f;
-			section_positions.push_back(tmp);
-			tmp.z = -2.2579f;
-			section_positions.push_back(tmp);
-			tmp.z = -1.1298f;
-			section_positions.push_back(tmp);
-			tmp.z = 0.014786f;
-			section_positions.push_back(tmp);
-			tmp.z = 1.1443f;
-			section_positions.push_back(tmp);
-			tmp.z = 2.2766f;
-			section_positions.push_back(tmp);
-			tmp.z = 3.3877f;
-			section_positions.push_back(tmp);
-			tmp.z = 4.5204f;
-			section_positions.push_back(tmp);
-		}
-		// 11
-		{
-			glm::vec3 tmp = glm::vec3(-77.353f, 15.642f, 0.0f);
-			tmp.z = -3.4014f;
-			section_positions.push_back(tmp);
-			tmp.z = -2.2579f;
-			section_positions.push_back(tmp);
-			tmp.z = -1.1298f;
-			section_positions.push_back(tmp);
-			tmp.z = 0.014786f;
-			section_positions.push_back(tmp);
-			tmp.z = 1.1443f;
-			section_positions.push_back(tmp);
-			tmp.z = 2.2766f;
-			section_positions.push_back(tmp);
-			tmp.z = 3.3877f;
-			section_positions.push_back(tmp);
-			tmp.z = 4.5204f;
-			section_positions.push_back(tmp);
-		}
-
-		// Oh boy get ready!
-		glm::vec3 rot = glm::vec3(0.0f, 12.4f, 0.0f);
-		
-		for (int s = 0; s < 29; s++) {
-			glm::vec3 tmp_rot = rot * (float)s;
-			glm::mat3 rot_mat = glm::mat3_cast(glm::angleAxis(glm::radians(tmp_rot.y), glm::vec3(0.0f, 1.0f, 0.0f)));
-
-			for (int c = 0; c < section_positions.size(); c++) {
-				glm::vec3 tmp = rot_mat * section_positions[c];
-
-				particle_pos.push_back(tmp);
-				e.particles.push_back(Particle(tmp, glm::vec3(), e.particle_l, e.particle_size, e.particle_b));
-			}
-		}
+		e.particles = {
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b),
+			Particle({}, {0.0f, 0.0f, 0.0f}, e.particle_l, e.particle_size, e.particle_b)
+		};
 
 		e.e_init = false;
 	}

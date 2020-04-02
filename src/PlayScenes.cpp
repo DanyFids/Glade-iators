@@ -352,7 +352,12 @@ void OnePlayer::Update(float dt)
 
 void OnePlayer::Draw()
 {
-	ClearBuffs();
+	main_pass->Clear();
+	light_buff->Clear();
+	particle_buff->Clear();
+	for (int c = 0; c < post_pass.size(); c++) {
+		post_pass[c]->buff->Clear();
+	}
 
 	glCullFace(GL_FRONT);
 
@@ -407,7 +412,7 @@ void OnePlayer::Draw()
 	skelShader->SetB("enable_s", enable_spec);
 	skelShader->SetB("enable_r", enable_rim);*/
 
-	main_pass[0]->Use();
+	main_pass->Use();
 
 	for (int c = 0; c < Cam.size(); c++) {
 		Cam[c]->SetupCam(shaderObj);
@@ -417,6 +422,10 @@ void OnePlayer::Draw()
 		Cam[c]->SetupCam(morphShader);
 		//morphyBoi->Draw(morphShader, Cam);
 		test_player->Draw(skelShader, Cam, shaderObj);
+		
+		glDisable(GL_DEPTH_TEST);
+		((SkelMesh*)(players[PLAYER_1]->GetMesh()))->DrawSkeleton( players[PLAYER_1]->GetTransform().GetWorldTransform(), shaderObj);
+		glEnable(GL_DEPTH_TEST);
 
 		//glDisable(GL_DEPTH_TEST);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -439,24 +448,20 @@ void OnePlayer::Draw()
 	lightPass->SetI("num_cams", Cam.size());
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, main_pass[0]->GetOutput(1));
+	glBindTexture(GL_TEXTURE_2D, main_pass->GetOutput(1));
 	lightPass->SetI("normals", 0);
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, main_pass[0]->GetDepth());
+	glBindTexture(GL_TEXTURE_2D, main_pass->GetDepth());
 	lightPass->SetI("depth", 1);
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, main_pass[0]->GetOutput(2));
+	glBindTexture(GL_TEXTURE_2D, main_pass->GetOutput(2));
 	lightPass->SetI("spec", 2);
 
-	light_buff[0]->Use();
+	light_buff->Use();
 
 	Game::QUAD->Draw(lightPass);
 
-	particle_buff[0]->Use();
-	glDisable(GL_DEPTH_TEST);
-	((SkelMesh*)(test_player->GetMesh()))->DrawSkeleton(test_player->GetTransform().GetWorldTransform(), shaderObj);
-	glEnable(GL_DEPTH_TEST);
-
+	particle_buff->Use();
 	for (int c = 0; c < Cam.size(); c++) {
 		fire->Draw(Cam[c]);
 	}
@@ -472,23 +477,23 @@ void OnePlayer::Draw()
 
 	switch (toggle) {
 	case CG_DEPTH:
-		glBindTexture(GL_TEXTURE_2D, main_pass[0]->GetDepth());
+		glBindTexture(GL_TEXTURE_2D, main_pass->GetDepth());
 		break;
 	case CG_LIGHTS:
-		glBindTexture(GL_TEXTURE_2D, light_buff[0]->GetOutput());
+		glBindTexture(GL_TEXTURE_2D, light_buff->GetOutput());
 		break;
 	case CG_COLOR:
-		glBindTexture(GL_TEXTURE_2D, main_pass[0]->GetOutput());
+		glBindTexture(GL_TEXTURE_2D, main_pass->GetOutput());
 		break;
 	case CG_NORMALS:
-		glBindTexture(GL_TEXTURE_2D, main_pass[0]->GetOutput(1));
+		glBindTexture(GL_TEXTURE_2D, main_pass->GetOutput(1));
 		break;
 	case CG_OUTPUT:
 		if (post_pass.size() > 0) {
 			glBindTexture(GL_TEXTURE_2D, post_pass.at(post_pass.size() - 1)->buff->GetOutput());
 		}
 		else {
-			glBindTexture(GL_TEXTURE_2D, light_buff[0]->GetOutput(0));
+			glBindTexture(GL_TEXTURE_2D, light_buff->GetOutput(0));
 		}
 		break;
 	}
@@ -533,13 +538,13 @@ void OnePlayer::Draw()
 
 void OnePlayer::LoadScene()
 {
-	main_pass[0] = new FrameBuffer();
-	main_pass[0]->AddComponent();
-	main_pass[0]->AddComponent();
+	main_pass = new FrameBuffer();
+	main_pass->AddComponent();
+	main_pass->AddComponent();
 
-	light_buff[0] = new FrameBuffer();
+	light_buff = new FrameBuffer();
 
-	particle_buff[0] = new FrameBuffer(main_pass[0]->GetDepth(), true);
+	particle_buff = new FrameBuffer(main_pass->GetDepth(), true);
 
 	// Post processing passes 
 
@@ -566,7 +571,7 @@ void OnePlayer::LoadScene()
 	//post_pass.push_back(new LutColorCorrection(new LUT("LUTs/jungle.cube"), LUT_TEST->DIFF));
 
 	// Sampler2d INPUT
-	post_pass.push_back(new PostProcess({ main_pass[0]->GetOutput(), light_buff[0]->GetOutput(), particle_buff[0]->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge.frag")));
+	post_pass.push_back(new PostProcess({ main_pass->GetOutput(), light_buff->GetOutput(), particle_buff->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge.frag")));
 
 	Joint::init();
 	//{91f62782-35bd-42df-85a1-8f359308dd0c}
@@ -618,7 +623,7 @@ void OnePlayer::LoadScene()
 	GladiatorMesh->SetAnim(gladiatorSkel->GetAnimByName("breathe"), 3, 0.34f, 0.5f);
 
 	SkelMesh* P1_mesh = new SkelMesh(*GladiatorMesh2);
-	SkelMesh* P2_mesh = new SkelMesh(*GladiatorMesh2);
+	SkelMesh* P2_mesh = new SkelMesh(*GladiatorMesh);
 
 	gladiatorSkel->WriteTree();
 	gladiatorSkel2->WriteTree();
@@ -658,8 +663,8 @@ void OnePlayer::LoadScene()
 	players.push_back(new Player(P1_mesh, playerMat, basicCapsuleHB, { 4.0f, 0.0f, 0.0f })); // P1
 	players.push_back(new Player(P2_mesh, D20Tex, basicCapsuleHB2)); //P2
 
-	GladiatorMesh2->SetAnim(GladiatorMesh2->GetSkeleton()->GetAnimByName("walk"), 0);
-	GladiatorMesh2->SetFrame(0, 0);
+	GladiatorMesh->SetAnim(1, 0);
+	GladiatorMesh->SetFrame(0, 0);
 	P1_mesh->SetIntensity(1, 0.5f);
 	//players[PLAYER_1]->Rotate(glm::vec3(25, 0, 0));
 	//shieldSphereHB->SetScale({0.2f, 1.0f, 0.1f});
@@ -672,7 +677,7 @@ void OnePlayer::LoadScene()
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 
 
-	test_player = new Player(GladiatorMesh2, defaultTex, basicCapsuleHB3, { 0.0f, 0.0f, 0.0f });
+	test_player = new Player(GladiatorMesh, defaultTex, basicCapsuleHB3, { 0.0f, 0.0f, 0.0f });
 	//test_player->Scale(glm::vec3(1.2f));
 
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
@@ -930,9 +935,7 @@ void OnePlayer::Load_Lights_From_File(std::string f)
 void OnePlayer::ResizeCams()
 {
 	Scene::ResizeCams();
-	main_pass[0]->Resize();
-	light_buff[0]->Resize();
-	particle_buff[0]->Resize();
+	main_pass->Resize();
 
 	for (int c = 0; c < post_pass.size(); c++) {
 		post_pass[c]->buff->Resize();
@@ -1000,14 +1003,14 @@ void TwoPlayer::Update(float dt)
 				}
 
 				//problem -> weapon hitdetect is not seeing the shield
-				//if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) && !players[c]->GetWeapon()->getCooldown()) {
-				//	if (players[p]->GetShield()->hitbox->GetType() == COLLISION_TYPE::shield) {
-				//		std::cout << "Blocked!\n";
-				//		audioEngine->PlayEvent("Block");
-				//		players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
-				//		players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
-				//	}
-				//}
+				if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) && !players[c]->GetWeapon()->getCooldown()) {
+					if (players[p]->GetShield()->hitbox->GetType() == COLLISION_TYPE::shield) {
+						std::cout << "Blocked!\n";
+						audioEngine->PlayEvent("Block");
+						players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
+						players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+					}
+				}
 
 				if (players[c]->GetFrameState() == FrameStates::Attack && players[c]->GetWeapon()->HitDetect(players[p]) && !players[c]->GetWeapon()->getCooldown()) {
 
@@ -1079,10 +1082,6 @@ void TwoPlayer::Update(float dt)
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
 	}
-
-	for (int p = 0; p < particle_engines.size(); p++) {
-		particle_engines[p].Update(dt);
-	}
 	
 	shaderObj->SetVec3("indexColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -1113,14 +1112,12 @@ void TwoPlayer::Update(float dt)
 				RoundCount = 1;
 				P1wins = 0;
 				P2wins = 0;
-				Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
 			}
-
-			scoreSub = 1.0f; 
+			scoreSub = 1.0f;
 			curScore = MAX_SCORE;
-			//Game::CURRENT->setScene(SCENES::PLAY_SCENE);
+			Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 			//setScene(MainMenu);
-			Reset();
+
 		}
 	}
 
@@ -1140,18 +1137,32 @@ void TwoPlayer::Update(float dt)
 	}
 }
 
+int PlayScene::P2wins = 0;
+int PlayScene::P1wins = 0;
+int PlayScene::RoundCount = 1;
+
 void TwoPlayer::Draw()
 {
-	ClearBuffs();
-
 	glCullFace(GL_FRONT);
+
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, sun->GetFrameBuffer());
+	glClear(GL_DEPTH_BUFFER_BIT);
+	sun->SetupDepthShader(sunShader);
+
+	RenderScene(sunShader, sunShader);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, sun->GetDepthMap());
+
 	for (int l = 0; l < lights.size(); l++) {
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		glBindFramebuffer(GL_FRAMEBUFFER, lights[l]->GetFrameBuffer());
 		glClear(GL_DEPTH_BUFFER_BIT);
 		lights[l]->SetupDepthShader(depthShader);
-		lights[l]->SetupDepthShader(skelDepth);
-		RenderScene(depthShader, skelDepth);
+		RenderScene(depthShader, depthShader);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glActiveTexture(GL_TEXTURE4 + l);
@@ -1159,20 +1170,22 @@ void TwoPlayer::Draw()
 	}
 	glCullFace(GL_BACK);
 
+	sun->SetupLight(shaderObj);
+	sun->SetupLight(morphShader);
+	sun->SetupLight(skelShader);
+
 	for (int c = 0; c < lights.size(); c++) {
 		lights[c]->SetupLight(shaderObj, c);
 		lights[c]->SetupLight(morphShader, c);
 		lights[c]->SetupLight(skelShader, c);
-		lights[c]->SetupLight(lightPass, c);
+
 	}
 	shaderObj->SetI("num_lights", lights.size());
 	morphShader->SetI("num_lights", lights.size());
 	skelShader->SetI("num_lights", lights.size());
-	lightPass->SetI("num_lights", lights.size());
+
 
 	for (int c = 0; c < Cam.size(); c++) {
-		main_pass[c]->Use();
-
 		Cam[c]->SetupCam(shaderObj);
 		Cam[c]->SetupCam(skelShader);
 
@@ -1180,58 +1193,23 @@ void TwoPlayer::Draw()
 		Cam[c]->SetupCam(morphShader);
 		//morphyBoi->Draw(morphShader, Cam);
 
-		particle_buff[c]->Use();
-
-		for (int p = 0; p < particle_engines.size(); p++) {
-			particle_engines[p].Draw(Cam[c]);
-		}
-
 		glDisable(GL_DEPTH_TEST);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		
-		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
-		
-		players[0]->GetWeapon()->hitbox->Draw(shaderObj, players[0]->GetWeapon()->getParentTransform());
-		players[1]->GetWeapon()->hitbox->Draw(shaderObj, players[1]->GetWeapon()->getParentTransform());
-		
-		players[0]->GetShield()->hitbox->Draw(shaderObj, players[0]->GetShield()->getParentTransform());
-		players[1]->GetShield()->hitbox->Draw(shaderObj, players[1]->GetShield()->getParentTransform());
-		
-		
+		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		//
+		//weapons[0]->hitbox->Draw(shaderObj, weapons[0]->getParentTransform());
+		//weapons[1]->hitbox->Draw(shaderObj, weapons[1]->getParentTransform());
+		//
+		//shields[0]->hitbox->Draw(shaderObj, shields[0]->getParentTransform());
+		//shields[1]->hitbox->Draw(shaderObj, shields[1]->getParentTransform());
+
+
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_DEPTH_TEST);
 
-		Cam[c]->SetupPostLight(lightPass, 0);
-
-		lightPass->SetI("num_cams", 1);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		glBindTexture(GL_TEXTURE_2D, main_pass[c]->GetOutput(1));
-		lightPass->SetI("normals", 0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, main_pass[c]->GetDepth());
-		lightPass->SetI("depth", 1);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, main_pass[c]->GetOutput(2));
-		lightPass->SetI("spec", 2);
-
-		light_buff[c]->Use();
-		lightPass->Use();
-
-		Game::QUAD->Draw(lightPass);
 	}
-
-	for (int c = 0; c < post_pass.size(); c++) {
-		post_pass[c]->Draw();
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, post_pass.at(post_pass.size() - 1)->buff->GetOutput());
-	POST_OUT->SetI("INPUT", 0);
-
-	Game::QUAD->Draw(POST_OUT);
 
 	glViewport(0, 0, Game::SCREEN.x, Game::SCREEN.y);
 
@@ -1262,20 +1240,6 @@ void TwoPlayer::Draw()
 
 void TwoPlayer::LoadScene()
 {
-	Cam = {
-		new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y)), // Cam 1
-		new Camera(glm::vec3(2.0f, 0.0f, -4.0f), glm::vec4(0,0, Game::SCREEN.x, Game::SCREEN.y)) // Cam 2
-	};
-
-	for (int c = 0; c < Cam.size(); c++) {
-		main_pass[c] = new FrameBuffer();
-		main_pass[c]->AddComponent();
-		main_pass[c]->AddComponent();
-		light_buff[c] = new FrameBuffer();
-		particle_buff[c] = new FrameBuffer(main_pass[c]->GetDepth(), true);
-	}
-
-	post_pass.push_back(new PostProcess({ main_pass[0]->GetOutput(), light_buff[0]->GetOutput(), particle_buff[0]->GetOutput(), main_pass[1]->GetOutput(), light_buff[1]->GetOutput(), particle_buff[1]->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge2.frag")));
 
 	//audioEngine.Init();
 
@@ -1299,25 +1263,24 @@ void TwoPlayer::LoadScene()
 
 	}
 
+
+
+
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
-	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Geo_pass.frag");
+	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Basic_Shader.frag");
 	depthShader = new Shader("Shaders/depth_shader.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
-	skelShader = new Shader("Shaders/skeleton_shader.vert", "Shaders/Geo_pass.frag");
-	skelDepth = new Shader("Shaders/depth_skel.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
-	lightPass = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/light_pass.frag");
-
+	skelShader = new Shader("Shaders/skeleton_shader.vert", "Shaders/Basic_Shader.frag");
 
 	Material* DiceTex = new Material("dice-texture.png", "d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
 	//Material* SwordTex = new Material("sword-texture.png", "sword-norm.png");
 	Material* defaultTex = new Material("default-texture.png", "default-normal.png");
-	Material* playerMat1 = new Material("TreeTextureRED.png");
-	Material* playerMat2 = new Material("TreeTextureBLU.png");
+	Material* playerMat = new Material("TreeTexture.png");
 
 	Material* arenaTex = new Material("CaulitreeumTexture.png");
-	Material* floorTex = new Material("sand.png", "sandnormal.png");
+	Material* floorTex = new Material("ArenaFloorTexture.png");
 
 	Material* mainUI = new Material("hpbarcool.png");
 	Material* hpBarMat = new Material("yuck.png");
@@ -1326,7 +1289,7 @@ void TwoPlayer::LoadScene()
 	Material* blackBarMat = new Material("black.png");
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 155.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.4f, 0.7f, 0.9f);
-	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f },  0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
+	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }, 0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	lights.push_back(new PointLight({ -4.0f, 4.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
 	beacons.push_back(glm::vec3(glm::vec3(1, 1, 1)));
@@ -1360,22 +1323,20 @@ void TwoPlayer::LoadScene()
 	SkelMesh* P1_MESH = new SkelMesh("Base_Gladiator.obj", gladiatorSkel, "PlayerWeightMap.png");
 	SkelMesh* P2_MESH = new SkelMesh(*P1_MESH);
 
-	gladiatorSkel->WriteTree();
-
 	Hitbox* basicCubeHB = new CubeHitbox(1.0f, 1.0f, 1.0f);
 	Hitbox* basicSphereHB = new SphereHitbox(0.70f);
 	Hitbox* BlockyBoiHB = new CubeHitbox(0.5f, 1.8f, 0.5f);
 
 	//Capsule testing ********* PLAYER HITBOXES
 
-	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.5f, 2.6f, entity); //radius + height
-	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.5f, 2.6f, entity);
+	Hitbox* basicCapsuleHB = new CapsuleHitbox(0.3f, 5.2f, entity); //radius + height
+	Hitbox* basicCapsuleHB2 = new CapsuleHitbox(0.3f, 5.2f, entity);
 
-	players.push_back(new Player(P1_MESH, playerMat1, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
+	players.push_back(new Player(P1_MESH, playerMat, basicCapsuleHB, { -3.0f, -0.6f, 0.0f })); // THIS IS PLAYER ONE
 	players[PLAYER_1]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
 	//players[PLAYER_1]->Rotate(glm::vec3(0.0f,90.0f,0.0f));
-	players.push_back(new Player(P2_MESH, playerMat2, basicCapsuleHB2)); // THIS IS PLAYER TWO
-	players[PLAYER_2]->hitbox->parentTransform(players[PLAYER_2]->GetTransform());
+	players.push_back(new Player(P2_MESH, playerMat, basicCapsuleHB2)); // THIS IS PLAYER TWO
+	players[PLAYER_2]->hitbox->parentTransform(players[PLAYER_1]->GetTransform());
 
 	//players[PLAYER_2]->Scale({ 0.75f,0.75f,0.75f });
 	players[PLAYER_2]->Move({ 0.0f, -0.6f, 0.0f });
@@ -1404,22 +1365,18 @@ void TwoPlayer::LoadScene()
 	die->Move({ 8.0f, 1.0f, 19.0f });
 	//terrain.push_back(die);
 
-	for (int x = 0; x < 8; x++) {
-		for (int y = 0; y < 8; y++) {
-			Object* Arenafloor = new Object(Game::QUAD, floorTex, basicCubeHB);
-			Arenafloor->Move({ -80.0f + (20.0f * x), -0.65, -80.0f + (20.0f * y) });
-			Arenafloor->Scale({ 10.0, 10.0f, 10.0f });
-			Arenafloor->Rotate({ -90,0,0 });
-
-			terrain.push_back(Arenafloor);
-		}
-	}
+	Object* Arenafloor = new Object(Game::QUAD, floorTex, basicCubeHB);
+	Arenafloor->Move({ 0.0f, -0.65, 0.0f });
+	Arenafloor->Scale({ 80.0, 80.0f, 80.0f });
+	Arenafloor->Rotate({ -90,0,0 }); 
 
 	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0, 0.45, 0));
 
 	Colitreeum->Scale(glm::vec3(0.65f, 0.65f, 0.65f));
 
 	terrain.push_back(Colitreeum);
+
+	terrain.push_back(Arenafloor);
 
 
 	Mesh* SwordMesh = nullptr;
@@ -1434,7 +1391,7 @@ void TwoPlayer::LoadScene()
 	Material* ShieldMat = nullptr;
 	Material* BucklerMat = nullptr;
 
-	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.15f, 1.f);
+	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.09f, 12.8f);
 	Hitbox* shieldSphereHB = new SphereHitbox(1.0f, COLLISION_TYPE::shield);
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
 
@@ -1457,33 +1414,10 @@ void TwoPlayer::LoadScene()
 		}
 		
 		switch (_Weapons[p]) {
-		case WEAPON_HAMMER:
-			if (HammerMesh == nullptr) {
-				HammerMesh = new Mesh("Weapons/Warhammer_Maul.obj");
-			}
-
-			if (HammerMat == nullptr) {
-				HammerMat = new Material("Weapons/tex/warhammer.png");
-			}
-			weapon = new Weapon(HammerMesh, HammerMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
-			weapon->SetRotation({90.0f, 90.0f, 0.0f});
-			weapon->Scale({1.2f, 1.2f, 1.2f});
-			break;
-		// Spear
 		case WEAPON_SPEAR:
-			if (SpearMesh == nullptr) {
-				SpearMesh = new Mesh("Weapons/Spear.obj");
-			}
-
-			if (SpearMat == nullptr) {
-				SpearMat = new Material("Weapons/tex/spear.png");
-			}
-			weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
-			weapon->SetRotation({ 90.0f, 90.0f, 0.0f });
 
 			break;
 
-		// Sword
 		case WEAPON_SWORD:
 		default:
 			if (SwordMesh == nullptr) {
@@ -1494,27 +1428,13 @@ void TwoPlayer::LoadScene()
 				SwordMat = new Material("Weapons/tex/sword.png");
 			}
 
-			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.15f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->Scale({ 0.9f, 0.9f, 0.9f });
 			weapon->SetRotation({ 0.0f, 90.0f, 90.0f });
 			break;
 		}
 
 		switch (_Shields[p]) {
-		case SHIELD_BUCKLER:
-			if (BucklerMesh == nullptr) {
-				BucklerMesh = new Mesh("Weapons/Buckler.obj");
-			}
-
-			if (BucklerMat == nullptr) {
-				BucklerMat = new Material("Weapons/tex/buckler.png");
-			}
-
-			shield = new Shield(BucklerMesh, BucklerMat, shieldSphereHB, { -0.30f, 0.1f, 0.05f }, 0.6f, 0.25f, gladiatorSkel->Find("l_hand"), mesh);
-			shield->SetRotation({ 0.0f, 0.0f, 270.0f });
-			shield->Scale({0.85f, 0.85f, 0.85f});
-			break;
-
 		case SHIELD_LARGE:
 		default:
 			if (ShieldMesh == nullptr) {
@@ -1525,9 +1445,9 @@ void TwoPlayer::LoadScene()
 				ShieldMat = new Material("Weapons/tex/shield.png");
 			}
 
-			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { -0.25f, 0.1f, 0.05f }, 0.6f, 0.25f, gladiatorSkel->Find("l_arm2"), mesh);
-			shield->Scale(glm::vec3(0.85f));
-			shield->SetRotation({ 0.0f, 0.0f, 265.0f });
+			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { 0.095f, 0.115f, 0.0f }, 0.6f, 0.25f, gladiatorSkel->Find("l_hand"), mesh);
+			shield->Scale({ 1, 1, 1 });
+			shield->SetRotation({ 0.0f, 0.0f, 270.0f });
 			break;
 		}
 
@@ -1537,6 +1457,11 @@ void TwoPlayer::LoadScene()
 		players[p]->SetShield(shield);
 		players[p]->addChild(shield);
 	}
+
+	Cam = {
+		new Camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec4(0,0, Game::SCREEN.x / 2, Game::SCREEN.y)), // Cam 1
+		new Camera(glm::vec3(2.0f, 0.0f, -4.0f), glm::vec4(Game::SCREEN.x / 2,0, Game::SCREEN.x / 2, Game::SCREEN.y)) // Cam 2
+	};
 
 	UI* hpBG = new UI(260, 10, { 55.0f, 554.5f, -1.0f }, blackBarMat);
 	UI* stamBG = new UI(260, 10, { 55.0f, 534.50f, -1.0f }, blackBarMat);
@@ -1556,41 +1481,8 @@ void TwoPlayer::LoadScene()
 		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(492.5, 537.5), stamBarMat, stamBG2)
 	};
 
-	Material* test_particle = new Material("redPlayer.png");
-
-	particle_engines = {
-		ParticleEngine(glm::vec3(), glm::vec2(1.0f, 1.65f), ParticleEngine::MAX_PARTICLES, 100000.f, test_particle, {ParticleEngine::AudienceEngineBehavior}, {Particle::AudienceUpdate})
-	};
-
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 	morphyBoi = new Object(new MorphMesh(frames), defaultTex, basicCubeHB, glm::vec3(15.0f, 1.0f, 2.0f));
 
-	Reset();
-}
-
-void TwoPlayer::Reset() {
-	for (int p = 0; p < players.size(); p++) {
-		players[p]->SetPosition({0.0f, -0.6, -20.0f + (40.0f * p) });
-		players[p]->SetRotation({0.0f, 180.0f * p, 0.0f});
-
-		players[p]->Reset();
-	}
-
-	deathtimer = DEATH_TIME;
-
-	winannounce = false;
-}
-
-void TwoPlayer::ResizeCams()
-{
-	Scene::ResizeCams();
-	for (int c = 0; c < Cam.size(); c++) {
-		main_pass[c]->Resize();
-		light_buff[c]->Resize();
-		particle_buff[c]->Resize();
-	}
-
-	for (int c = 0; c < post_pass.size(); c++) {
-		post_pass[c]->buff->Resize();
-	}
+	
 }

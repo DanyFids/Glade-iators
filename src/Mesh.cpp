@@ -45,12 +45,6 @@ Mesh::Mesh(float vert[], int num_vert, unsigned int indi[], int num_indi) {
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), &(temp_vert->tex_uv));
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), &(temp_vert->tangent));
-	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), &(temp_vert->biTan));
-	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(5, 1, GL_INT, GL_FALSE, sizeof(Vertex), &(temp_vert->id));
-	glEnableVertexAttribArray(5);
 
 	num_indices = num_indi;
 
@@ -141,7 +135,6 @@ void Mesh::Draw(Shader* shader)
 	glBindVertexArray(vao);
 
 	glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, 0);
-	glGetError();
 
 	glBindVertexArray(0);
 }
@@ -753,7 +746,7 @@ void SkelMesh::Update(float dt)
 {
 	for (int c = 0; c < num_channels; c++) {
 		if (anim[c] >= 0 && anim[c] < skeleton->GetNumAnims()) {
-			if (skeleton->anim_ft[anim[c]] > 0.0f && skeleton->AnimStates[anim[c]][curFrame[c]] != FrameStates::Hold) {
+			if (skeleton->anim_ft[anim[c]] > 0.0f) {
 				anim_time[c] += dt * play_spd[c];
 
 				if (anim_time[c] > skeleton->anim_ft[anim[c]]) {
@@ -841,14 +834,6 @@ void SkelMesh::NextFrame(unsigned int chnl)
 void SkelMesh::DrawSkeleton(glm::mat4 global, Shader* shdr)
 {
 	skeleton->DrawSkeleton(global, anim[0], curFrame[0], shdr);
-}
-
-void SkelMesh::GetChnlInfo(int*& anims, int*& frames, float*& intensities, int& num_channels)
-{
-	anims = anim;
-	frames = curFrame;
-	intensities = chnl_intensity;
-	num_channels = this->num_channels;
 }
 
 FrameStates SkelMesh::GetFrameCode(unsigned int chnl)

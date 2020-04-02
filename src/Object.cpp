@@ -98,12 +98,7 @@ void Object::DrawChild(Shader* shader, glm::mat4 parent)
 	glm::mat4 par_j = glm::mat4(1.0f);
 
 	if (parent_joint != nullptr && parent_Mesh != nullptr) {
-		int* a, * f, c;
-		float* i;
-
-		parent_Mesh->GetChnlInfo(a, f, i, c);
-
-		par_j = parent_joint->TransformTo(a, f, i, c);
+		par_j = parent_joint->TransformTo(parent_Mesh->GetAnim(), parent_Mesh->GetFrame());
 	}
 
 	glm::mat4 model = parent * par_j * transform.GetWorldTransform();
@@ -244,10 +239,6 @@ Player::Player(SkelMesh* me, Material* ma, Hitbox* hb, glm::vec3 pos) : Object(m
 
 void Player::Update(float dt)
 {
-	if (health <= 0.0f && state != dying) {
-		Die();
-	}
-
 	if (recov_timer > 0.0f) {
 		recov_timer -= dt;
 	}
@@ -395,7 +386,7 @@ void Player::PlayAnim(std::string n, unsigned int c, float i, float s)
 
 void Player::Run()
 {
-	if (!run && state == walking && recov_timer <= 0.0f) {
+	if (!run && recov_timer <= 0.0f) {
 		run = true;
 	}
 }
@@ -465,23 +456,6 @@ void Player::Taunt()
 	anim_lock = true;
 	_mesh->SetAnim(_mesh->GetSkeleton()->GetAnimByName("dab"), 0);
 	state = rolling;
-}
-
-void Player::Die()
-{
-	state = dying;
-	PlayAnim("die", 0);
-	_mesh->SetIntensity(1, 0.0f);
-	_mesh->SetIntensity(2, 0.0f);
-	_mesh->SetIntensity(3, 0.0f);
-}
-
-void Player::Reset()
-{
-	health = MAX_HEALTH;
-	stamina = MAX_STAMINA;
-
-	Idle();
 }
 
 FrameStates Player::GetFrameState(unsigned int chnl)

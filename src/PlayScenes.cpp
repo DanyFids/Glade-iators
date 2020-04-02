@@ -684,7 +684,7 @@ void OnePlayer::LoadScene()
 
 	std::vector<std::string> OneHand_LC = { "sword_1", "sword_2" };
 
-	Weapon* Hurt_Sword = new Weapon(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel2->Find("r_hand"), P1_mesh);
+	Weapon* Hurt_Sword = new Weapon(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f,0.20f, gladiatorSkel2->Find("r_hand"), P1_mesh);
 
 	weapons.push_back(Hurt_Sword);
 	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel2->Find("l_hand"), P1_mesh));
@@ -1464,7 +1464,7 @@ void TwoPlayer::LoadScene()
 				SwordMat = new Material("Weapons/tex/sword.png");
 			}
 
-			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f,0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->Scale({ 0.9f, 0.9f, 0.9f });
 			weapon->SetRotation({ 0.0f, 90.0f, 90.0f });
 			break;

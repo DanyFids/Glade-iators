@@ -767,7 +767,7 @@ void OnePlayer::LoadScene()
 		//new CrowdBar((Player*)players[PLAYER_1], glm::vec2(395, 550), crowdBarMat, crowdBG2)
 	};
 
-	fire = new ParticleEngine({ 1.0f, 0.0f, 1.0f }, {0.5f, 0.5f}, 4, 1.0f, new Material("redPlayer.png"), { ParticleEngine::FireEngineBehavior }, { Particle::FireUpdate });
+	fire = new ParticleEngine({ 1.0f, 0.0f, 1.0f }, { 0.5f, 0.5f }, 4, 1.0f, { {new Material("redPlayer.png")} }, { ParticleEngine::FireEngineBehavior }, { Particle::FireUpdate });
 
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };
 
@@ -1144,21 +1144,21 @@ void TwoPlayer::Draw()
 			particle_engines[p].Draw(Cam[c]);
 		}
 
-		glDisable(GL_DEPTH_TEST);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		
-		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
-		
-		players[0]->GetWeapon()->hitbox->Draw(shaderObj, players[0]->GetWeapon()->getParentTransform());
-		players[1]->GetWeapon()->hitbox->Draw(shaderObj, players[1]->GetWeapon()->getParentTransform());
-		
-		players[0]->GetShield()->hitbox->Draw(shaderObj, players[0]->GetShield()->getParentTransform());
-		players[1]->GetShield()->hitbox->Draw(shaderObj, players[1]->GetShield()->getParentTransform());
-		
-		
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_DEPTH_TEST);
+		//glDisable(GL_DEPTH_TEST);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//
+		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		//
+		//players[0]->GetWeapon()->hitbox->Draw(shaderObj, players[0]->GetWeapon()->getParentTransform());
+		//players[1]->GetWeapon()->hitbox->Draw(shaderObj, players[1]->GetWeapon()->getParentTransform());
+		//
+		//players[0]->GetShield()->hitbox->Draw(shaderObj, players[0]->GetShield()->getParentTransform());
+		//players[1]->GetShield()->hitbox->Draw(shaderObj, players[1]->GetShield()->getParentTransform());
+		//
+		//
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//glEnable(GL_DEPTH_TEST);
 
 		Cam[c]->SetupPostLight(lightPass, 0);
 
@@ -1198,7 +1198,6 @@ void TwoPlayer::Draw()
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Draw(glm::vec2(SCREEN_WIDTH, SCREEN_HEIGHT));
 	}
-	glEnable(GL_DEPTH_TEST);
 
 	if (players[0]->GetHP() <= 0 && players[1]->GetHP() <= 0)
 	{
@@ -1215,7 +1214,7 @@ void TwoPlayer::Draw()
 		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 1 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
 
 	}
-	
+	glEnable(GL_DEPTH_TEST);
 }
 
 void TwoPlayer::LoadScene()
@@ -1373,7 +1372,7 @@ void TwoPlayer::LoadScene()
 		}
 	}
 
-	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0, 0.45, 0));
+	Object* Colitreeum = new Object(arena, arenaTex, basicSphereHB, glm::vec3(0.f, 0.f, 0.f));
 
 	Colitreeum->Scale(glm::vec3(0.65f, 0.65f, 0.65f));
 
@@ -1396,7 +1395,7 @@ void TwoPlayer::LoadScene()
 	Hitbox* shieldSphereHB = new SphereHitbox(1.0f, COLLISION_TYPE::shield);
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
 
-	std::vector<std::string> OneHand_LC = {"sword_1", "sword_2"};
+	std::vector<std::string> OneHand_LC = {"sword_1", "sword_2", "sword_3"};
 
 	//Object* P1_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P1_MESH);
 	//Object* P2_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P2_MESH);
@@ -1514,10 +1513,33 @@ void TwoPlayer::LoadScene()
 		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(492.5, 537.5), stamBarMat, stamBG2)
 	};
 
-	Material* test_particle = new Material("redPlayer.png");
+	Material* toddMed = new Material("particles/toddMED.png");
+	Material* ladyMed = new Material("particles/ladyMED.png");
+	Material* chadMed = new Material("particles/chadMED.png");
+
+	std::vector<std::vector<Material*>> crowd_mats = {
+		{
+		new Material("particles/toddLOW.png"),
+		toddMed,
+		new Material("particles/toddHIGH.png"),
+		toddMed
+		},
+		{
+		new Material("particles/ladyLOW.png"),
+		ladyMed,
+		new Material("particles/ladyHIGH.png"),
+		ladyMed
+		},
+		{
+		new Material("particles/chadLOW.png"),
+		chadMed,
+		new Material("particles/chadHIGH.png"),
+		chadMed
+		}
+	};
 
 	particle_engines = {
-		ParticleEngine(glm::vec3(), glm::vec2(1.0f, 1.65f), ParticleEngine::MAX_PARTICLES, 100000.f, test_particle, {ParticleEngine::AudienceEngineBehavior}, {Particle::AudienceUpdate})
+		ParticleEngine(glm::vec3(), glm::vec2(1.0f, 1.65f), ParticleEngine::MAX_PARTICLES, 100000.f, crowd_mats, {ParticleEngine::AudienceEngineBehavior}, {Particle::AudienceUpdate})
 	};
 
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };

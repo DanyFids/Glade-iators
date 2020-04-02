@@ -105,7 +105,7 @@ std::string TextRenderer::GenerateName()
 		" Robb", " Gottem", " Birch", " Ball", " Nut", " Pine", " Cottonwood", " Cane", " Sassafras", " Leafsson", " Soil", " Root", " Rootsson", " Greenheart", " Wisteria", 
 		" Needle", " Leafs", " Sugar", " Enemy", " Rowan", " Asher", " Cassia", " Flora", " Peachy",  " Elmore", " Hazelton", " Speedwagon", " Gladed", " Foliage", " Flowers", 
 		" Peppervine", " Honeysuckle", " Peppercorn", " Doe", " Tarragon", " Wana", " Chervil", " Vera", " Catnip", " Rhubarb", " Cheese", 
-		" Grippa", "Cena", "Charming" };
+		" Grippa", " Cena", " Charming" };
 
 	int FirstName = rand() % 51;
 	int LastName = rand() % 54;

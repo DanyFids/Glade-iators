@@ -57,9 +57,13 @@ void ParticleEngine::INIT()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Part), &(temp->size));
 	glEnableVertexAttribArray(1);
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(Part), &(temp->variation));
+	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(3, 1, GL_INT, sizeof(Part), &(temp->frame));
+	glEnableVertexAttribArray(3);
 }
 
-ParticleEngine::ParticleEngine(glm::vec3 position, glm::vec2 size, int max, float l, Material* mat, ParticleEngineBehavior eb, ParticleBehavior pb)
+ParticleEngine::ParticleEngine(glm::vec3 position, glm::vec2 size, int max, float l, std::vector<std::vector<Material*>> mat, ParticleEngineBehavior eb, ParticleBehavior pb)
 {
 	max_particles = max;
 	engine_b = eb;
@@ -118,12 +122,18 @@ void ParticleEngine::Draw(Camera* Cam)
 
 	std::vector<Part> parts;
 	for (int p = 0; p < particles.size(); p++) {
-		parts.push_back({particles[p].position, particles[p].size});
+		parts.push_back({particles[p].position, particles[p].size, particles[p].variation, particles[p].frame});
 	}
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, Tex->DIFF);
-	shdr->SetI("tex", 0);
+	int id = 0;
+	for (int v = 0; v < Tex.size(); v++) {
+		for (int f = 0; f < Tex[v].size(); f++) {
+			glActiveTexture(GL_TEXTURE0 + id);
+			glBindTexture(GL_TEXTURE_2D, Tex[v][f]->DIFF);
+			shdr->SetI("tex[" + std::to_string(v) + "][" + std::to_string(f) + "]", id);
+			id++;
+		}
+	}
 	
 	glBindVertexArray(PARTICLE_VAO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Part) * parts.size(), parts.data(), GL_DYNAMIC_DRAW);
@@ -358,7 +368,15 @@ void ParticleEngine::AudienceEngineBehavior(float dt, ParticleEngine& e)
 				glm::vec3 tmp = rot_mat * section_positions[c];
 
 				particle_pos.push_back(tmp);
-				e.particles.push_back(Particle(tmp, glm::vec3(), e.particle_l, e.particle_size, e.particle_b));
+				Particle temp = Particle(tmp, glm::vec3(), e.particle_l, e.particle_size, e.particle_b);
+
+				int variation = rand() % e.Tex.size();
+				int start_f = rand() % e.Tex[variation].size();
+
+				temp.variation = variation;
+				temp.frame = start_f;
+
+				e.particles.push_back(temp);
 			}
 		}
 

@@ -687,7 +687,7 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 				else {
 					ready[controller] = true;
 					//Everything below is debug
-					//ready[1] = true;
+					ready[1] = true;
 					//ChangingScn = true;
 					//Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 				}

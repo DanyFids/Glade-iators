@@ -93,7 +93,7 @@ class TwoPlayer: public PlayScene {
 	Shader* lightPass;
 	Shader* sunShader;
 
-	const float MAX_SCORE = 100.0f;
+	const float MAX_SCORE = 500.0f;
 	float curScore = MAX_SCORE;
 	float scoreSub = 1.0f;
 	const float INCREASE_TIME = 7.5f;

@@ -1045,7 +1045,7 @@ void TwoPlayer::Update(float dt)
 							players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
 							players[c]->GetWeapon()->setCooldown(true);
 						audioEngine->PlayEvent("Hit");
-						curScore += (5 * taunted[c] * comboMult[c]);
+						curScore += (10 * taunted[c] * comboMult[c]);
 						combo[c] = true;
 						comboTime[c] = MAX_COMBO;
 						comboMult[c] += 0.5f;

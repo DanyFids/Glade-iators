@@ -1689,13 +1689,15 @@ void TwoPlayer::LoadScene()
 
 	std::vector<std::string> OneHand_LC = {"sword_1", "sword_2", "sword_3"};
 	std::vector<std::string> Spear1H_LC = { "1HSpear1", "1HSpear2", "1HSpear3" };
+	std::vector<std::string> Spear2H_LC = { "2HSpear1", "2HSpear2"};
+	std::vector<std::string> Hammer_LC = { "Hammer1", "Hammer2", "Hammer3" };
 
 	//Object* P1_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P1_MESH);
 	//Object* P2_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P2_MESH);
 
 	for (int p = 0; p <= PLAYER_2; p++) {
-		Weapon* weapon;
-		Shield* shield;
+		Weapon* weapon = nullptr;
+		Shield* shield = nullptr;
 
 		SkelMesh* mesh;
 
@@ -1715,7 +1717,7 @@ void TwoPlayer::LoadScene()
 			if (HammerMat == nullptr) {
 				HammerMat = new Material("Weapons/tex/warhammer.png");
 			}
-			weapon = new Weapon(HammerMesh, HammerMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, "", "", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(HammerMesh, HammerMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Hammer_LC, "HammerIdle", "2HBlock", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->SetRotation({90.0f, 90.0f, 0.0f});
 			weapon->Scale({1.2f, 1.2f, 1.2f});
 			
@@ -1729,7 +1731,16 @@ void TwoPlayer::LoadScene()
 			if (SpearMat == nullptr) {
 				SpearMat = new Material("Weapons/tex/spear.png");
 			}
-			weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, "", "", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			if (_Shields[p] == SHIELD_NONE)
+			{
+				weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Spear2H_LC, "2HSpearIdle", "2HBlock", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+
+			}
+			else
+			{
+				weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, "", "", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+
+			}
 			weapon->SetRotation({ 90.0f, 90.0f, 0.0f });
 
 			break;

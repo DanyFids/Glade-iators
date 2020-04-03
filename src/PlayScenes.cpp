@@ -1140,7 +1140,7 @@ void TwoPlayer::Update(float dt)
 								else { // Use weapons stuff
 
 									players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetWeapon()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
-									players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * 1.2f);
+									players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * 2.0f);
 
 									players[c]->GetWeapon()->setCooldown(true);
 
@@ -1151,6 +1151,11 @@ void TwoPlayer::Update(float dt)
 							} 
 							else if (players[p]->GetFrameState() == FrameStates::Deflect) {
 								players[c]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+								//curScore += (5 * taunted[c] * comboMult[c]);
+								//combo[c] = true;
+								//comboTime[c] = MAX_COMBO;
+								//comboMult[c] += 0.5f;
+
 								if (players[c]->GetStam() <= 0)
 									players[c]->Deflected();
 							}

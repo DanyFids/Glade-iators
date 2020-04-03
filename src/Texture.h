@@ -15,13 +15,24 @@ public:
 	Material(std::string d, std::string n = "default-normal.png", std::string s = "default-texture.png");
 };
 
+class Camera;
+class Shader;
+class Mesh;
+
 class Skybox {
 public:
+	static Shader* SHADER;
+	static Mesh* CUBE;
+
 	unsigned int SKY;
 
-	std::string sky_file;
+	std::vector<std::string> sky_file;
 
-	Skybox(std::string f);
+	Skybox(std::string front, std::string right, std::string back, std::string left, std::string top, std::string bot);
+
+	static void INIT();
+
+	void Draw(Camera* cam);
 };
 
 class LUT {

@@ -47,7 +47,7 @@ public:
 	~FrameBuffer();
 
 	void Use();
-	void Clear();
+	void Clear(glm::vec3 color = glm::vec3(0.0f, 0.0f, 0.0f));
 
 	unsigned int GetBuffer() { return ID; }
 	unsigned int GetOutput(int c = 0) { return OUT[c]; }

@@ -966,6 +966,107 @@ void TwoPlayer::InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt)
 	if(glfwJoystickPresent(GLFW_JOYSTICK_2) && glfwJoystickIsGamepad(GLFW_JOYSTICK_2)) {
 		ControllerInput(GLFW_JOYSTICK_2, PLAYER_2, dt);
 	}
+
+	static bool p_p = false;
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS && !p_p) {
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		p_p = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE) {
+		p_p = false;
+	}
+
+	static bool p_2 = false;
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS && !p_2) {
+		disable_lights = !disable_lights;
+		p_2 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE) {
+		p_2 = false;
+	}
+
+	static bool p_3 = false;
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS && !p_3) {
+		disable_tex = !disable_tex;
+		p_3 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE) {
+		p_3 = false;
+	}
+
+	static bool p_lb = false;
+	if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS && !p_lb) {
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+
+		post_pass.push_back(new PostProcess({ post_pass.at(0)->buff->GetOutput() }, highlightshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(1)->buff->GetOutput() }, horgausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(2)->buff->GetOutput() }, vergausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(3)->buff->GetOutput(),post_pass.at(0)->buff->GetOutput() }, bloomshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(4)->buff->GetOutput() }, highlightshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(5)->buff->GetOutput() }, horgausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(6)->buff->GetOutput() }, vergausshader));
+		post_pass.push_back(new PostProcess({ post_pass.at(7)->buff->GetOutput(),post_pass.at(0)->buff->GetOutput() }, bloomshader));
+
+		p_lb = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_RELEASE) {
+		p_lb = false;
+	}
+
+	static bool p_rb = false;
+	if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS && !p_rb) {
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new PostProcess({ post_pass.at(0)->buff->GetOutput() }, pixelshader));
+		p_rb = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_7) == GLFW_RELEASE) {
+		p_rb = false;
+	}
+
+	static bool p_8 = false;
+	if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS && !p_8) {
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new LutColorCorrection(lut_hot, post_pass.at(0)->buff->GetOutput()));
+
+		p_8 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_8) == GLFW_RELEASE) {
+		p_8 = false;
+	}
+
+	static bool p_9 = false;
+	if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS && !p_9) {
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new LutColorCorrection(lut_cool, post_pass.at(0)->buff->GetOutput()));
+
+		p_9 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_9) == GLFW_RELEASE) {
+		p_9 = false;
+	}
+
+	static bool p_0 = false;
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS && !p_0) {
+		while (post_pass.size() > 1) {
+			post_pass.pop_back();
+		}
+		post_pass.push_back(new LutColorCorrection(lut_custom, post_pass.at(0)->buff->GetOutput()));
+
+		p_0 = true;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_0) == GLFW_RELEASE) {
+		p_0 = false;
+	}
 }
 
 void TwoPlayer::Update(float dt)
@@ -1220,6 +1321,10 @@ void TwoPlayer::Draw()
 		Cam[c]->SetupCam(shaderObj);
 		Cam[c]->SetupCam(skelShader);
 
+		shaderObj->SetB("CG_DISABLE_TEX", disable_tex);
+		skelShader->SetB("CG_DISABLE_TEX", disable_tex);
+
+		Sky->Draw(Cam[c]);
 		RenderScene(shaderObj, skelShader);
 		Cam[c]->SetupCam(morphShader);
 		//morphyBoi->Draw(morphShader, Cam);
@@ -1245,25 +1350,26 @@ void TwoPlayer::Draw()
 		//
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		//glEnable(GL_DEPTH_TEST);
+		if (!disable_lights) {
+			Cam[c]->SetupPostLight(lightPass, 0);
 
-		Cam[c]->SetupPostLight(lightPass, 0);
+			lightPass->SetI("num_cams", 1);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+			glBindTexture(GL_TEXTURE_2D, main_pass[c]->GetOutput(1));
+			lightPass->SetI("normals", 0);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, main_pass[c]->GetDepth());
+			lightPass->SetI("depth", 1);
+			glActiveTexture(GL_TEXTURE2);
+			glBindTexture(GL_TEXTURE_2D, main_pass[c]->GetOutput(2));
+			lightPass->SetI("spec", 2);
 
-		lightPass->SetI("num_cams", 1);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		glBindTexture(GL_TEXTURE_2D, main_pass[c]->GetOutput(1));
-		lightPass->SetI("normals", 0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, main_pass[c]->GetDepth());
-		lightPass->SetI("depth", 1);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, main_pass[c]->GetOutput(2));
-		lightPass->SetI("spec", 2);
+			light_buff[c]->Use();
+			lightPass->Use();
 
-		light_buff[c]->Use();
-		lightPass->Use();
-
-		Game::QUAD->Draw(lightPass);
+			Game::QUAD->Draw(lightPass);
+		}
 	}
 
 	for (int c = 0; c < post_pass.size(); c++) {
@@ -1351,6 +1457,14 @@ void TwoPlayer::LoadScene()
 	skelDepth = new Shader("Shaders/depth_skel.vert", "Shaders/depth_shader.frag", "Shaders/depthGeo.glsl");
 	lightPass = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/light_pass.frag");
 
+	//Post Process Shaders
+	highlightshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Highlights.frag");
+	vergausshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/GausBlur.frag");
+	vergausshader->SetB("isHorizontal", false);
+	horgausshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/GausBlur.frag");
+	horgausshader->SetB("isHorizontal", true);
+	bloomshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Bloom.frag");
+	pixelshader = new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Pixelation.frag");
 
 	Material* DiceTex = new Material("dice-texture.png", "d6-normal.png");
 	Material* D20Tex = new Material("d20-texture.png");
@@ -1367,6 +1481,10 @@ void TwoPlayer::LoadScene()
 	Material* stamBarMat = new Material("blue.png");
 	Material* crowdBarMat = new Material("crowdbar.png");
 	Material* blackBarMat = new Material("black.png");
+
+	lut_cool = new LUT("LUTs/Bluedabadee.cube");
+	lut_hot = new LUT("LUTs/ThatsHotBBY.cube");
+	lut_custom = new LUT("LUTs/EdgeLord.cube");
 
 	sun = new DirectionalLight(glm::normalize(glm::vec3(5.0f, 155.0f, 5.0f)), { 1.0f, 1.0f, 1.0f }, 0.4f, 0.7f, 0.9f);
 	lights.push_back(new PointLight({ 0.5f, 30.0f, 0.5f }, { 1.0f, 1.0f, 1.0f },  0.3f, 0.5f, 1.0f, 0.014f, 0.0007f));
@@ -1385,6 +1503,9 @@ void TwoPlayer::LoadScene()
 
 	Mesh* BsMesh = new Mesh("d6.obj");
 	Material* BsMat = new Material("missing_tex.png");
+
+	Sky = new Skybox("skybox/front.png", "skybox/right.png", "skybox/back.png", "skybox/left.png", "skybox/top.png", "skybox/bottom.png");
+
 
 	DUUDE = new SplineMan(BsMesh, BsMat, basicCubeHB, glm::vec3(1, 1, 1), beacons);
 
@@ -1514,7 +1635,7 @@ void TwoPlayer::LoadScene()
 			if (HammerMat == nullptr) {
 				HammerMat = new Material("Weapons/tex/warhammer.png");
 			}
-			weapon = new Weapon(HammerMesh, HammerMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(HammerMesh, HammerMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, "", "", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->SetRotation({90.0f, 90.0f, 0.0f});
 			weapon->Scale({1.2f, 1.2f, 1.2f});
 			
@@ -1528,7 +1649,7 @@ void TwoPlayer::LoadScene()
 			if (SpearMat == nullptr) {
 				SpearMat = new Material("Weapons/tex/spear.png");
 			}
-			weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, "", "", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->SetRotation({ 90.0f, 90.0f, 0.0f });
 
 			break;
@@ -1544,7 +1665,7 @@ void TwoPlayer::LoadScene()
 				SwordMat = new Material("Weapons/tex/sword.png");
 			}
 
-			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.15f), OneHand_LC, 15.0f, 25.0f,0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.15f), OneHand_LC, "", "", 15.0f, 25.0f,0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->Scale({ 0.9f, 0.9f, 0.9f });
 
 			weapon->SetRotation({ 0.0f, 90.0f, 90.0f });
@@ -1553,6 +1674,9 @@ void TwoPlayer::LoadScene()
 		}
 
 		switch (_Shields[p]) {
+		case SHIELD_NONE:
+
+			break;
 		case SHIELD_BUCKLER:
 			if (BucklerMesh == nullptr) {
 				BucklerMesh = new Mesh("Weapons/Buckler.obj");
@@ -1586,8 +1710,10 @@ void TwoPlayer::LoadScene()
 
 		players[p]->SetWeapon(weapon);
 		players[p]->addChild(weapon);
-		players[p]->SetShield(shield);
-		players[p]->addChild(shield);
+		if (shield != nullptr) {
+			players[p]->SetShield(shield);
+			players[p]->addChild(shield);
+		}
 	}
 
 	UI* hpBG = new UI(260, 10, { 55.0f, 554.5f, -1.0f }, blackBarMat);
@@ -1611,6 +1737,9 @@ void TwoPlayer::LoadScene()
 	Material* toddMed = new Material("particles/toddMED.png");
 	Material* ladyMed = new Material("particles/ladyMED.png");
 	Material* chadMed = new Material("particles/chadMED.png");
+	Material* nickMed = new Material("particles/nickMED.png");
+	Material* stacyMed = new Material("particles/stacyMED.png");
+	Material* kyleMed = new Material("particles/kyleMED.png");
 
 	std::vector<std::vector<Material*>> crowd_mats = {
 		{
@@ -1630,11 +1759,32 @@ void TwoPlayer::LoadScene()
 		chadMed,
 		new Material("particles/chadHIGH.png"),
 		chadMed
+		},
+		{
+		new Material("particles/nickLOW.png"),
+		nickMed,
+		new Material("particles/nickHIGH.png"),
+		nickMed
+		},
+		{
+		new Material("particles/stacyLOW.png"),
+		stacyMed,
+		new Material("particles/stacyHIGH.png"),
+		stacyMed
+		},
+		{
+		new Material("particles/kyleLOW.png"),
+		kyleMed,
+		new Material("particles/kyleHIGH.png"),
+		kyleMed
 		}
 	};
 
+	Material* rock_part = new Material("particles/rock.png");
+
 	particle_engines = {
-		ParticleEngine(glm::vec3(), glm::vec2(1.0f, 1.65f), ParticleEngine::MAX_PARTICLES, 0.15f, crowd_mats, {ParticleEngine::AudienceEngineBehavior}, {Particle::AudienceUpdate})
+		ParticleEngine(glm::vec3(), glm::vec2(1.0f, 1.65f), ParticleEngine::MAX_PARTICLES, 0.15f, crowd_mats, {ParticleEngine::AudienceEngineBehavior}, {Particle::AudienceUpdate}),
+		ParticleEngine(glm::vec3(), glm::vec2(0.5f, 0.5f), 40, 5.0f, {{rock_part}}, { ParticleEngine::RockEngine }, {Particle::RockUpdate})
 	};
 
 	std::vector<std::string> frames = { "wobble/wobble1.obj", "wobble/wobble2.obj", "wobble/wobble3.obj", "wobble/wobble4.obj" };

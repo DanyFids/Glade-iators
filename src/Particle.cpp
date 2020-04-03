@@ -6,6 +6,8 @@
 #include "Shader.h"
 #include "Game.h"
 #include "Camera.h"
+#include "Lerp.h"
+#include "Constants.h"
 
 const int ParticleEngine::MAX_PARTICLES = 2046;
 
@@ -19,6 +21,23 @@ void Particle::FireUpdate(float dt, Particle &p)
 void Particle::AudienceUpdate(float dt, Particle& p)
 {
 	p.life -= dt;
+}
+
+void Particle::RockUpdate(float dt, Particle& p)
+{
+
+	p.life -= dt;
+	p.position += p.velocity * dt;
+	p.velocity += glm::vec3(0.0f, GRAVITY, 0.0f) * dt;
+	if (p.position.y <= 0.0f) {
+		p.position.y = 0.0f;
+		p.velocity = p.velocity / 2.f;
+		p.velocity.y = -p.velocity.y * 0.66f;
+	}
+
+	if (glm::length(p.velocity) <= 0.1f) {
+		p.life = 0.0f;
+	}
 }
 
 Particle::Particle(glm::vec3 pos, glm::vec3 vel, float l, glm::vec2 s, ParticleBehavior b)
@@ -141,6 +160,11 @@ void ParticleEngine::Draw(Camera* Cam)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Part) * parts.size(), parts.data(), GL_DYNAMIC_DRAW);
 	glDrawArrays(GL_POINTS, 0, parts.size());
 	glBindVertexArray(0);
+}
+
+void ParticleEngine::UpdateMaxParticles(int density)
+{
+	max_particles = density;
 }
 
 void ParticleEngine::FireEngineBehavior(float dt, ParticleEngine& e)
@@ -360,7 +384,7 @@ void ParticleEngine::AudienceEngineBehavior(float dt, ParticleEngine& e)
 		}
 
 		// Oh boy get ready!
-		glm::vec3 rot = glm::vec3(0.0f, 12.4f, 0.0f);
+		glm::vec3 rot = glm::vec3(0.0f, 12.385f, 0.0f);
 		
 		for (int s = 0; s < 29; s++) {
 			glm::vec3 tmp_rot = rot * (float)s;
@@ -396,6 +420,41 @@ void ParticleEngine::AudienceEngineBehavior(float dt, ParticleEngine& e)
 
 				//e.particles[p].frame = (e.particles[p].frame < e.Tex[e.particles[p].variation].size() - 1) ? e.particles[p].frame++ : 0;
 				e.particles[p].life = e.particle_l;
+			}
+		}
+	}
+}
+
+void ParticleEngine::RockEngine(float dt, ParticleEngine& e)
+{
+	if (e.e_init) {
+		e.e_init = false;
+	}
+	else {
+		if (e.particles.size() < e.max_particles) {
+			float degree = (float)(rand() % 36001) / 100.0f;
+			glm::mat3 rot_mat = glm::mat3_cast(glm::angleAxis(glm::radians(degree), glm::vec3(0.0f, 1.0f, 0.0f)));
+
+			glm::vec3 front = glm::vec3(-48.17f, 4.6392f, 0.0f);
+			glm::vec3 back = glm::vec3(-77.353f, 15.642f, 0.0f);
+			float t = (float)(rand() % 1001) / 1000.0f;
+			glm::vec3 pos = rot_mat * lerp(front, back, t);
+
+			glm::vec3 vel = glm::normalize(-pos);
+			float speed = (float)(rand() % 201  + 100) / 10.0f;
+			vel = glm::vec3(vel.x, 0.0f, vel.z) * speed;
+			vel.y = (float)(rand() % 76  + 25) / 10;
+
+			float size = ((float)(rand() % 11) / 10.0f) + 0.2f;
+
+			Particle tmp = Particle(pos, vel, e.particle_l, e.particle_size * size, e.particle_b);
+
+			e.particles.push_back(tmp);
+		}
+
+		for (int p = 0; p < e.particles.size(); p++) {
+			if (e.particles[p].life <= 0.0f) {
+				e.particles.erase(e.particles.begin() + p);
 			}
 		}
 	}

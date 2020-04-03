@@ -1142,7 +1142,7 @@ void PlayScene::ClearBuffs()
 {
 	for (int c = 0; c < Cam.size(); c++) {
 		main_pass[c]->Clear();
-		light_buff[c]->Clear();
+		light_buff[c]->Clear(glm::vec3(1.0f, 1.0f, 1.0f));
 		particle_buff[c]->Clear();
 		//merge_buff->Clear();
 	}

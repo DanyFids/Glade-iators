@@ -39,6 +39,7 @@ public:
 	// Behaviors
 	static void FireUpdate(float dt, Particle& p);
 	static void AudienceUpdate(float dt, Particle& p);
+	static void RockUpdate(float dt, Particle& p);
 };
 
 class ParticleEngine {
@@ -68,8 +69,10 @@ public:
 
 	virtual void Update(float dt);
 	virtual void Draw(Camera* Cam);
+	virtual void UpdateMaxParticles(int density);
 
 	// behaviors
 	static void FireEngineBehavior(float dt, ParticleEngine& e);
 	static void AudienceEngineBehavior(float dt, ParticleEngine& e);
+	static void RockEngine(float dt, ParticleEngine& e);
 };

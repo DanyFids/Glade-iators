@@ -10,3 +10,5 @@ const float PLAYER_SPEED = 10.0f;
 const float MOUSE_SENSITIVITY = 0.3f;
 
 const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
+
+const float GRAVITY = -9.8f;

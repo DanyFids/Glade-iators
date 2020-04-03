@@ -93,6 +93,14 @@ class TwoPlayer: public PlayScene {
 	Shader* lightPass;
 	Shader* sunShader;
 
+	//Post process Shaders
+	Shader* vergausshader;
+	Shader* horgausshader;
+	Shader* highlightshader;
+	Shader* bloomshader;
+	Shader* pixelshader;
+
+
 	const float MAX_SCORE = 100.0f;
 	float curScore = MAX_SCORE;
 	float scoreSub = 1.0f;
@@ -120,6 +128,17 @@ class TwoPlayer: public PlayScene {
 
 	WeaponType _Weapons[2];
 	ShieldType _Shields[2];
+
+	Skybox* Sky;
+
+	LUT* lut_hot;
+	LUT* lut_cool;
+	LUT* lut_custom;
+
+
+	// CG BOOLS
+	bool disable_lights = false;
+	bool disable_tex = false;
 
 public:
 	TwoPlayer(WeaponType p1_weapon = WEAPON_SWORD, ShieldType p1_shield = SHIELD_LARGE, WeaponType p2_weapon = WEAPON_SWORD, ShieldType p2_shield = SHIELD_LARGE);

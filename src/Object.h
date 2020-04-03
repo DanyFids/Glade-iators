@@ -160,7 +160,7 @@ class Player : public Object {
 
 	unsigned int atk_combo = 0;
 
-	const float blockAngle = 55;
+	const float blockAngle = 65;
 
 	SkelMesh* _mesh;
 

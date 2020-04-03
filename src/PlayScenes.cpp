@@ -1122,27 +1122,37 @@ void TwoPlayer::Update(float dt)
 					if (players[p]->hitbox->GetType() == entity) { //Making sure we hit the right hitbox
 						std::cout << "Hit!\n";
 
-						if (players[p]->GetFrameState() == FrameStates::Hold && players[p]->GetState() == blocking && players[p]->isInfront(players[p]->getFaceDir(), players[c]->GetPosition() - players[p]->GetPosition())) { //Are we blocking? Are we infront of the enemy?
+						if (players[p]->GetState() == blocking && players[p]->isInfront(players[p]->getFaceDir(), players[c]->GetPosition() - players[p]->GetPosition())) { //Are we blocking? Are we infront of the enemy?
 
-							std::cout << "Blocked!\n";
+							if (players[p]->GetFrameState() == FrameStates::Hold) {
+								std::cout << "Blocked!\n"; 
 
-							if (players[p]->GetShield() != nullptr) { //If he has a shield.
+								if (players[p]->GetShield() != nullptr) { //If he has a shield.
 
-								audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
-								audioEngine.LoadEvent("Block", "{1058aacd-0878-4ea8-be1c-e68f1e06cbc4}");
-								audioEngine.PlayEvent("Block");
-								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
-								players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+									audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+									audioEngine.LoadEvent("Block", "{1058aacd-0878-4ea8-be1c-e68f1e06cbc4}");
+									audioEngine.PlayEvent("Block");
+									players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage())); 
+									players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
 
-								players[c]->GetWeapon()->setCooldown(true); 
-							}
-							else { // Use weapons stuff
+									players[c]->GetWeapon()->setCooldown(true);
+								}
+								else { // Use weapons stuff
 
-								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - ( players[p]->GetWeapon()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
-								players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * ((players[p]->GetWeapon()->GetStaminaCost() + 15.0f) * 0.01f) );
+									players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetWeapon()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
+									players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * 1.2f);
 
-								players[c]->GetWeapon()->setCooldown(true);
+									players[c]->GetWeapon()->setCooldown(true);
 
+								}
+
+								if (players[p]->GetStam() < 0.0f)
+									players[p]->Deflected();
+							} 
+							else if (players[p]->GetFrameState() == FrameStates::Deflect) {
+								players[c]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+								if (players[c]->GetStam() <= 0)
+									players[c]->Deflected();
 							}
 						}
 						else //Clean hit.
@@ -1741,7 +1751,7 @@ void TwoPlayer::LoadScene()
 				BucklerMat = new Material("Weapons/tex/buckler.png");
 			}
 
-			shield = new Shield(BucklerMesh, BucklerMat, shieldSphereHB, { -0.30f, 0.1f, 0.05f }, "blockB", 0.6f, 0.25f, gladiatorSkel->Find("l_hand"), mesh);
+			shield = new Shield(BucklerMesh, BucklerMat, shieldSphereHB, { -0.30f, 0.1f, 0.05f }, "blockB", 0.5f, 1.4f, gladiatorSkel->Find("l_hand"), mesh);
 			shield->SetRotation({ 0.0f, 0.0f, 270.0f });
 			shield->Scale({0.85f, 0.85f, 0.85f});
 			break;
@@ -1756,7 +1766,7 @@ void TwoPlayer::LoadScene()
 				ShieldMat = new Material("Weapons/tex/shield.png");
 			}
 
-			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { -0.25f, 0.1f, 0.05f }, "blockS", 0.6f, 0.25f, gladiatorSkel->Find("l_arm2"), mesh);
+			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { -0.25f, 0.1f, 0.05f }, "blockS", 0.8f, 0.60f, gladiatorSkel->Find("l_arm2"), mesh);
 			shield->Scale(glm::vec3(0.85f));
 			shield->SetRotation({ 0.0f, 0.0f, 265.0f });
 			break;

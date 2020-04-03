@@ -256,7 +256,7 @@ void Player::Update(float dt)
 
 	phys.move = glm::mat3(transform.GetRotEul()) * rp;
 
-	current_face_dir = baseFaceDir * glm::mat3( glm::mat3_cast(glm::quat(glm::angleAxis(glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f))) )  );
+	current_face_dir = glm::mat3_cast(glm::quat(glm::angleAxis(glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)))) * baseFaceDir;
 
 	if (run) {
 		if (stamina > 0.0f && glm::length(phys.move) != 0.0f) {
@@ -494,7 +494,6 @@ void Player::Deflected()
 	state = deflected;
 	PlayAnim("parried", 0);
 	anim_lock = true;
-	PlayAnim("idle", 1, 0.0f);
 }
 
 void Player::Reset()

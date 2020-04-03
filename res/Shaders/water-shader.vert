@@ -1,4 +1,4 @@
-#version 330
+#version 430
 #define M_PI 3.1415926535897932384626433832795
 // Heavily inspired by:
 // https://catlikecoding.com/unity/tutorials/flow/waves/

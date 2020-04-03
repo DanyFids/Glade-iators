@@ -694,9 +694,9 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 			}
 			else if (menuSpot[controller] == 10) {
 				//Randomize
-				changeW[controller] = true;
+				changeW[controller] = true; 
 				changeS[controller] = true;
-				weapon[controller] = (int)rand() % 2;
+				weapon[controller] = (int)rand() % 2; 
 				shield[controller] = (int)rand() % 2;
 			}
 			else if (controller == 0) {

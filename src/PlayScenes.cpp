@@ -679,13 +679,13 @@ void OnePlayer::LoadScene()
 
 	std::vector<std::string> OneHand_LC = { "sword_1", "sword_2" };
 
-	Weapon* Hurt_Sword = new Weapon(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f,0.20f, gladiatorSkel2->Find("r_hand"), P1_mesh);
+	//Weapon* Hurt_Sword = new Weapon(sword_mesh, defaultTex, swordCapsuleHB, glm::vec3(-0.12f, -0.04f, -0.27f), OneHand_LC, 15.0f, 25.0f,0.20f, gladiatorSkel2->Find("r_hand"), P1_mesh);
 
-	weapons.push_back(Hurt_Sword);
+	//weapons.push_back(Hurt_Sword);
 	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel2->Find("l_hand"), P1_mesh));
 
-	weapons[0]->Scale({ 0.9f, 0.9f, 0.9f });
-	weapons[0]->SetRotation({ 0.0f, 90.0f, 90.0f });
+	//weapons[0]->Scale({ 0.9f, 0.9f, 0.9f });
+	//weapons[0]->SetRotation({ 0.0f, 90.0f, 90.0f });
 
 	shields[0]->SetPosition({ 0.f, 0.f, 0.0f });
 	shields[0]->Scale({ 0.8f, 0.8f, 0.8f });
@@ -693,8 +693,8 @@ void OnePlayer::LoadScene()
 
 	//shields[0]->hitbox->SetPosition(glm::vec3(0.0f, 0.3f, 0.0f));
 	//glm::vec3 test = shields[0]->hitbox->GetTransform().position;
-	players[PLAYER_1]->SetWeapon(Hurt_Sword);
-	players[PLAYER_1]->addChild(Hurt_Sword);
+	//players[PLAYER_1]->SetWeapon(Hurt_Sword);
+	//players[PLAYER_1]->addChild(Hurt_Sword);
 	players[PLAYER_1]->addChild(shields[0]);
 	//sword->addChild(swordCapsuleHB);
 
@@ -1764,7 +1764,7 @@ void TwoPlayer::LoadScene()
 				BucklerMat = new Material("Weapons/tex/buckler.png");
 			}
 
-			shield = new Shield(BucklerMesh, BucklerMat, shieldSphereHB, { -0.30f, 0.1f, 0.05f }, 0.6f, 0.25f, gladiatorSkel->Find("l_hand"), mesh);
+			shield = new Shield(BucklerMesh, BucklerMat, shieldSphereHB, { -0.30f, 0.1f, 0.05f }, "", 0.6f, 0.25f, gladiatorSkel->Find("l_hand"), mesh);
 			shield->SetRotation({ 0.0f, 0.0f, 270.0f });
 			shield->Scale({0.85f, 0.85f, 0.85f});
 			break;
@@ -1779,7 +1779,7 @@ void TwoPlayer::LoadScene()
 				ShieldMat = new Material("Weapons/tex/shield.png");
 			}
 
-			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { -0.25f, 0.1f, 0.05f }, 0.6f, 0.25f, gladiatorSkel->Find("l_arm2"), mesh);
+			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { -0.25f, 0.1f, 0.05f }, "", 0.6f, 0.25f, gladiatorSkel->Find("l_arm2"), mesh);
 			shield->Scale(glm::vec3(0.85f));
 			shield->SetRotation({ 0.0f, 0.0f, 265.0f });
 			break;

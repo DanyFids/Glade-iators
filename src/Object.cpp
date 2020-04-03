@@ -457,7 +457,7 @@ void Player::Block()
 {
 	if (state != blocking && state != attacking) {
 		anim_lock = false;
-		PlayAnim(this->GetShield()->GetBlock(), 0);
+		PlayAnim(this->GetWeapon()->GetBlock(), 0);
 		PlayAnim("walk", 1, 0.0f);
 		state = blocking;
 	}

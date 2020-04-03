@@ -1292,7 +1292,7 @@ void TwoPlayer::Update(float dt)
 			//setScene(MainMenu);
 			Reset();
 		}
-	}
+	} 
 
 	// Crowd Stuff
 	subIncreaser -= dt;
@@ -1310,7 +1310,7 @@ void TwoPlayer::Update(float dt)
 	if (curScore > MAX_SCORE)
 		curScore = MAX_SCORE;
 
-	if (curScore > 0) 
+	//if (curScore > 0) 
 	curScore -= dt * scoreSub;
 
 	if (CrowdBoi != nullptr) {
@@ -1766,7 +1766,7 @@ void TwoPlayer::LoadScene()
 				BucklerMat = new Material("Weapons/tex/buckler.png");
 			}
 
-			shield = new Shield(BucklerMesh, BucklerMat, shieldSphereHB, { -0.30f, 0.1f, 0.05f }, "", 0.6f, 0.25f, gladiatorSkel->Find("l_hand"), mesh);
+			shield = new Shield(BucklerMesh, BucklerMat, shieldSphereHB, { -0.30f, 0.1f, 0.05f }, "blockB", 0.6f, 0.25f, gladiatorSkel->Find("l_hand"), mesh);
 			shield->SetRotation({ 0.0f, 0.0f, 270.0f });
 			shield->Scale({0.85f, 0.85f, 0.85f});
 			break;
@@ -1781,7 +1781,7 @@ void TwoPlayer::LoadScene()
 				ShieldMat = new Material("Weapons/tex/shield.png");
 			}
 
-			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { -0.25f, 0.1f, 0.05f }, "", 0.6f, 0.25f, gladiatorSkel->Find("l_arm2"), mesh);
+			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { -0.25f, 0.1f, 0.05f }, "blockS", 0.6f, 0.25f, gladiatorSkel->Find("l_arm2"), mesh);
 			shield->Scale(glm::vec3(0.85f));
 			shield->SetRotation({ 0.0f, 0.0f, 265.0f });
 			break;

@@ -457,7 +457,7 @@ void Player::Block()
 {
 	if (state != blocking && state != attacking) {
 		anim_lock = false;
-		PlayAnim("blockS", 0);
+		PlayAnim(this->GetShield()->GetBlock(), 0);
 		PlayAnim("walk", 1, 0.0f);
 		state = blocking;
 	}
@@ -478,6 +478,18 @@ void Player::Hitstun()
 	anim_lock = true;
 	PlayAnim("hitstun", 0);
 	PlayAnim("idle", 1, 0.0f);
+}
+
+void Player::Deflect()
+{
+	state = deflect;
+	PlayAnim("parry", 0);
+}
+
+void Player::Deflected()
+{
+	state = deflected;
+	PlayAnim("parried", 0);
 }
 
 void Player::Reset()

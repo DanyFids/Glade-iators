@@ -133,7 +133,7 @@ public:
 };
 
 enum PLAYER_STATE {
-	idle, walking, attacking, blocking, rolling, taunting, dying, hitstun
+	idle, walking, attacking, blocking, rolling, taunting, dying, hitstun, deflect, deflected
 };
 
 enum COLLISION_TYPE {
@@ -209,6 +209,8 @@ public:
 	void Taunt();
 	void Die();
 	void Hitstun();
+	void Deflect();
+	void Deflected();
 
 	void Reset();
 	PLAYER_STATE GetState() {return state;}

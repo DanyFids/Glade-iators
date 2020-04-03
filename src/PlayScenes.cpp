@@ -1046,6 +1046,8 @@ void TwoPlayer::Update(float dt)
 						}
 						else //Clean hit.
 						{ 
+							static bool rollCool[2] = { false, false };
+
 							if (players[p]->GetFrameState() != FrameStates::Roll) {
 								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
 								players[p]->Hitstun();
@@ -1058,11 +1060,17 @@ void TwoPlayer::Update(float dt)
 								comboTime[c] = MAX_COMBO;
 								comboMult[c] += 0.5f;
 							}
+							else if(players[p]->GetState() == rolling){
+								if (!rollCool[p]) {
+									curScore += (5 * taunted[p] * comboMult[p]);
+									combo[p] = true;
+									comboTime[p] = MAX_COMBO;
+									comboMult[p] += 0.5f;
+									rollCool[p] = true;
+								}
+							}
 							else {
-								curScore += (5 * taunted[p] * comboMult[p]);
-								combo[p] = true;
-								comboTime[p] = MAX_COMBO;
-								comboMult[p] += 0.5f;
+								rollCool[p] = false;
 							}
 						}
 					}

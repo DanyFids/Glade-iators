@@ -1372,21 +1372,21 @@ void TwoPlayer::Draw()
 			particle_engines[p].Draw(Cam[c]);
 		}
 
-		glDisable(GL_DEPTH_TEST);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		
-		players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
-		players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
-		
-		players[0]->GetWeapon()->hitbox->Draw(shaderObj, players[0]->GetWeapon()->getParentTransform());
-		players[1]->GetWeapon()->hitbox->Draw(shaderObj, players[1]->GetWeapon()->getParentTransform());
-		
-		//players[0]->GetShield()->hitbox->Draw(shaderObj, players[0]->GetShield()->getParentTransform());
-		//players[1]->GetShield()->hitbox->Draw(shaderObj, players[1]->GetShield()->getParentTransform());
-		
-		
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glEnable(GL_DEPTH_TEST);
+		//glDisable(GL_DEPTH_TEST);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		//
+		//players[0]->hitbox->Draw(shaderObj, players[PLAYER_1]->GetTransform().GetWorldTransform());
+		//players[1]->hitbox->Draw(shaderObj, players[PLAYER_2]->GetTransform().GetWorldTransform());
+		//
+		//players[0]->GetWeapon()->hitbox->Draw(shaderObj, players[0]->GetWeapon()->getParentTransform());
+		//players[1]->GetWeapon()->hitbox->Draw(shaderObj, players[1]->GetWeapon()->getParentTransform());
+		//
+		////players[0]->GetShield()->hitbox->Draw(shaderObj, players[0]->GetShield()->getParentTransform());
+		////players[1]->GetShield()->hitbox->Draw(shaderObj, players[1]->GetShield()->getParentTransform());
+		//
+		//
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		//glEnable(GL_DEPTH_TEST);
 		if (!disable_lights) {
 			Cam[c]->SetupPostLight(lightPass, 0);
 
@@ -1721,7 +1721,7 @@ void TwoPlayer::LoadScene()
 			if (HammerMat == nullptr) {
 				HammerMat = new Material("Weapons/tex/warhammer.png");
 			}
-			weapon = new Weapon(HammerMesh, HammerMat, HammerCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Hammer_LC, "HammerIdle", "2HBlock", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(HammerMesh, HammerMat, HammerCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Hammer_LC, "HammerIdle", "2HBlock", 25.0f, 40.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->SetRotation({90.0f, 90.0f, 0.0f});
 			weapon->Scale({1.2f, 1.2f, 1.2f});
 			
@@ -1737,11 +1737,11 @@ void TwoPlayer::LoadScene()
 			}
 			if (_Shields[p] == SHIELD_NONE)
 			{
-				weapon = new Weapon(SpearMesh, SpearMat, SpearCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Spear2H_LC, "2HSpearIdle", "2HBlock", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+				weapon = new Weapon(SpearMesh, SpearMat, SpearCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Spear2H_LC, "2HSpearIdle", "2HBlock", 20, 28.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			}
 			else
 			{
-				weapon = new Weapon(SpearMesh, SpearMat, SpearCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Spear1H_LC, "idle", "", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+				weapon = new Weapon(SpearMesh, SpearMat, SpearCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Spear1H_LC, "idle", "", 18, 32.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			}
 			weapon->SetRotation({ 90.0f, 90.0f, 0.0f });
 

@@ -666,6 +666,8 @@ SkelMesh::SkelMesh(std::string f, Skeleton* s, std::string w): Mesh(f.c_str())
 	int joints;
 
 	int nrChnls;
+	stbi_set_flip_vertically_on_load(true);
+
 	unsigned char* temp = stbi_load(w.c_str(), &joints, &verts, &nrChnls, 0);
 
 	weightMap = new float*[verts];

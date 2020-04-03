@@ -71,6 +71,8 @@ public:
 	virtual void Draw(Camera* Cam);
 	virtual void UpdateMaxParticles(int density);
 
+	void ClearParticles();
+
 	// behaviors
 	static void FireEngineBehavior(float dt, ParticleEngine& e);
 	static void AudienceEngineBehavior(float dt, ParticleEngine& e);

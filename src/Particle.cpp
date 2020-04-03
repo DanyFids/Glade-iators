@@ -167,6 +167,13 @@ void ParticleEngine::UpdateMaxParticles(int density)
 	max_particles = density;
 }
 
+void ParticleEngine::ClearParticles()
+{
+	while (particles.size() > 0) {
+		particles.pop_back();
+	}
+}
+
 void ParticleEngine::FireEngineBehavior(float dt, ParticleEngine& e)
 {
 	for (int p = 0; p < e.particles.size(); p++) {

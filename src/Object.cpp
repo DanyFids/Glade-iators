@@ -256,6 +256,32 @@ void Player::Update(float dt)
 
 	phys.move = glm::mat3(transform.GetRotEul()) * rp;
 
+	if (glm::length(transform.position + phys.move) >= 42.f) {
+		float x = 1.0f;
+		float z = 1.0f;
+		while (x > 0.0f) {
+			x -= 0.1f;
+			if (x < 0.0f)
+				x = 0.0f;
+			z = 1.0f;
+			while (z > 0.0f) {
+				z -= 0.1f;
+				if (z < 0.0f)
+					z = 0.0f;
+				if (glm::length(transform.position + glm::vec3(lerp(0.0f, phys.move.x, x), phys.move.y, lerp(0.0f, phys.move.z, z))) <= 42.f) {
+					break;
+				}
+			}
+
+			if (glm::length(transform.position + glm::vec3(lerp(0.0f, phys.move.x, x), phys.move.y, lerp(0.0f, phys.move.z, z))) <= 42.f) {
+				break;
+			}
+		}
+		float spd = glm::length(phys.move);
+
+		phys.move = glm::vec3(lerp(0.0f, phys.move.x, x), phys.move.y, lerp(0.0f, phys.move.z, z));
+	}
+
 	current_face_dir = baseFaceDir * glm::mat3( glm::mat3_cast(glm::quat(glm::angleAxis(glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f))) )  );
 
 	if (run) {

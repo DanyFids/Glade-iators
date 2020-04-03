@@ -111,7 +111,7 @@ Skybox::Skybox(std::string front, std::string right, std::string back, std::stri
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
 
-	stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(false);
 	
 	int width, height, nrChannels;
 	unsigned char* data;

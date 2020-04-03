@@ -1280,6 +1280,14 @@ void TwoPlayer::Update(float dt)
 		curScore = MAX_SCORE;
 
 	curScore -= dt * scoreSub;
+
+	if (curScore < 0.0f) {
+		particle_engines[1].UpdateMaxParticles(40);
+	}
+	else {
+		particle_engines[1].UpdateMaxParticles(0);
+	}
+
 	if (CrowdBoi != nullptr) {
 		CrowdBoi->setScore(curScore);
 	}
@@ -1802,6 +1810,8 @@ void TwoPlayer::Reset() {
 
 		players[p]->Reset();
 	}
+
+	particle_engines[1].ClearParticles();
 
 	deathtimer = DEATH_TIME;
 

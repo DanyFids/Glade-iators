@@ -166,8 +166,8 @@ class Player : public Object {
 
 	PLAYER_STATE state = idle;
 
-	Weapon* weapon;
-	Shield* shield;
+	Weapon* weapon = nullptr;
+	Shield* shield = nullptr;
 
 	glm::vec3 last_root_pos = glm::vec3(0.0f);
 

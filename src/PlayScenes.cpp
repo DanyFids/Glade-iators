@@ -1284,6 +1284,7 @@ void TwoPlayer::Update(float dt)
 				RoundCount = 1;
 				P1wins = 0;
 				P2wins = 0;
+				audioEngine.Shutdown();
 				Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
 			}
 			scoreSub = 1.0f;
@@ -1687,6 +1688,7 @@ void TwoPlayer::LoadScene()
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
 
 	std::vector<std::string> OneHand_LC = {"sword_1", "sword_2", "sword_3"};
+	std::vector<std::string> Spear1H_LC = { "1HSpear1", "1HSpear2", "1HSpear3" };
 
 	//Object* P1_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P1_MESH);
 	//Object* P2_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P2_MESH);

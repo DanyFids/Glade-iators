@@ -768,6 +768,7 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 				ChangingScn = true;
 				Game::CURRENT->Loadouts(weapon[PLAYER_1], weapon[PLAYER_2], shield[PLAYER_1], shield[PLAYER_2]);
 				musicaudioEngine.Shutdown();
+				Musicinit = false;
 				Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 			}
 		}

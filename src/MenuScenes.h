@@ -22,7 +22,6 @@ protected:
 	float menu_time = 3.0f;
 
 public:
-	static bool Musicinit;
 	MainMenu();
 	// Inherited via Scene
 	virtual void InputHandle(GLFWwindow* window, glm::vec2 mousePos, float dt) override;

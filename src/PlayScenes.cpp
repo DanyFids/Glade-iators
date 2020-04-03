@@ -1404,8 +1404,8 @@ void TwoPlayer::Draw()
 		//players[0]->GetWeapon()->hitbox->Draw(shaderObj, players[0]->GetWeapon()->getParentTransform());
 		//players[1]->GetWeapon()->hitbox->Draw(shaderObj, players[1]->GetWeapon()->getParentTransform());
 		//
-		//players[0]->GetShield()->hitbox->Draw(shaderObj, players[0]->GetShield()->getParentTransform());
-		//players[1]->GetShield()->hitbox->Draw(shaderObj, players[1]->GetShield()->getParentTransform());
+		////players[0]->GetShield()->hitbox->Draw(shaderObj, players[0]->GetShield()->getParentTransform());
+		////players[1]->GetShield()->hitbox->Draw(shaderObj, players[1]->GetShield()->getParentTransform());
 		//
 		//
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -1668,6 +1668,10 @@ void TwoPlayer::LoadScene()
 	Material* BucklerMat = nullptr;
 
 	Hitbox* swordCapsuleHB = new CapsuleHitbox(0.15f, 1.f);
+	Hitbox* SpearCapsuleHB = new CapsuleHitbox(0.1f, 0.5f);
+	Hitbox* HammerCapsuleHB = new CapsuleHitbox(0.2f, 0.001f);
+	SpearCapsuleHB->SetPosition(glm::vec3(0,1.3,0));
+	HammerCapsuleHB->SetPosition(glm::vec3(0.05, 1.3, -0.16));
 	swordCapsuleHB->SetScale(glm::vec3(1.0));
 
 	Hitbox* shieldSphereHB = new SphereHitbox(1.0f, COLLISION_TYPE::shield);
@@ -1703,7 +1707,7 @@ void TwoPlayer::LoadScene()
 			if (HammerMat == nullptr) {
 				HammerMat = new Material("Weapons/tex/warhammer.png");
 			}
-			weapon = new Weapon(HammerMesh, HammerMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Hammer_LC, "HammerIdle", "2HBlock", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(HammerMesh, HammerMat, HammerCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Hammer_LC, "HammerIdle", "2HBlock", 25.0f, 40.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->SetRotation({90.0f, 90.0f, 0.0f});
 			weapon->Scale({1.2f, 1.2f, 1.2f});
 			
@@ -1719,13 +1723,11 @@ void TwoPlayer::LoadScene()
 			}
 			if (_Shields[p] == SHIELD_NONE)
 			{
-				weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Spear2H_LC, "2HSpearIdle", "2HBlock", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
-
+				weapon = new Weapon(SpearMesh, SpearMat, SpearCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Spear2H_LC, "2HSpearIdle", "2HBlock", 20, 28.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			}
 			else
 			{
-				weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, "", "", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
-
+				weapon = new Weapon(SpearMesh, SpearMat, SpearCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Spear1H_LC, "idle", "", 18, 32.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			}
 			weapon->SetRotation({ 90.0f, 90.0f, 0.0f });
 
@@ -1742,7 +1744,7 @@ void TwoPlayer::LoadScene()
 				SwordMat = new Material("Weapons/tex/sword.png");
 			}
 
-			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.15f), OneHand_LC, "", "", 15.0f, 25.0f,0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(SwordMesh, SwordMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.15f), OneHand_LC, "idle", "", 15.0f, 25.0f,0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->Scale({ 0.9f, 0.9f, 0.9f });
 
 			weapon->SetRotation({ 0.0f, 90.0f, 90.0f });

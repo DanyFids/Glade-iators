@@ -448,7 +448,7 @@ void Player::Idle()
 {
 	if (state != idle) {
 		anim_lock = false;
-		PlayAnim("idle");
+		PlayAnim(weapon->GetIdleAnim());
 		_mesh->SetIntensity(1, 0.0f);
 		state = idle;
 
@@ -507,7 +507,7 @@ void Player::Hitstun()
 	state = hitstun;
 	anim_lock = true;
 	PlayAnim("hitstun", 0);
-	PlayAnim("idle", 1, 0.0f);
+	PlayAnim(weapon->GetIdleAnim(), 1, 0.0f);
 }
 
 void Player::Deflect()

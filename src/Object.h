@@ -246,13 +246,16 @@ private:
 	float damage, stamina_cost, dmgReduction;
 
 	std::vector<std::string> attack_anims;
+	std::string block, idle;
 	
 	bool cooldown = false;
 public:
 	Weapon(Mesh* me, Material* ma, Hitbox* hb, std::vector<std::string> atks, float dmg, float stam);
-	Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, float dmgRdc, Joint* p = nullptr, SkelMesh* m = nullptr);
+	Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, std::string idle, std::string block, float dmg, float stam, float dmgRdc, Joint* p = nullptr, SkelMesh* m = nullptr);
 
 	std::string GetAtkAnim(unsigned int c_id = 0);
+	std::string GetIdleAnim() { return idle; }
+	std::string GetBlockAnim() { return idle; }
 	unsigned int GetNumLightAttacks() {return attack_anims.size();}
 	
 	float GetDamage() { return damage; }
@@ -294,10 +297,11 @@ private:
 	float dmgReduction, stamina_cost;
 
 	bool ParryCooldown = false;
+	std::string block;
 public:
-	Shield(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, float dmgRdc, float stam, Joint* p = nullptr, SkelMesh* m = nullptr);
+	Shield(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::string block, float dmgRdc, float stam, Joint* p = nullptr, SkelMesh* m = nullptr);
 
-
+	std::string GetBlock() { return block; }
 	virtual bool HitDetect(Object* other);
 	float GetReduction() { return dmgReduction; }
 	float GetStaminaCost() { return stamina_cost; }

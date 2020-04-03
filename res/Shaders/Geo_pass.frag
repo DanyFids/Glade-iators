@@ -11,6 +11,8 @@ in vec4 fragLightPos[10];
 
 uniform vec4 indexColor;
 
+uniform bool CG_DISABLE_TEX;
+
 struct Material{
 	sampler2D diffuse;
 	sampler2D specular;
@@ -21,7 +23,11 @@ struct Material{
 uniform Material material;
 
 void main(){
-	vec4 objColor = texture(material.diffuse, texCoord);
+	vec4 objColor;
+	if(CG_DISABLE_TEX)
+		objColor = vec4(1.0, 1.0, 1.0, 1.0);
+	else
+		objColor = texture(material.diffuse, texCoord);
 	vec3 specVal = vec3(texture(material.specular, texCoord));
 	vec3 normTex = vec3(texture(material.normal, texCoord));
 	

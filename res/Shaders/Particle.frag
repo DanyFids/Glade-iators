@@ -3,7 +3,7 @@ layout (location = 1) in vec2 TexCoords;
 layout (location = 2) flat in int _var;
 layout (location = 3) flat in int _fra;
 
-const int MAX_VAR = 4;
+const int MAX_VAR = 6;
 const int MAX_FRAMES = 4;
 
 out vec4 color;

@@ -85,6 +85,11 @@ void main(){
 	if(texCoord.x <= 1.0 / num_cams) cid = 0;
 	else cid = 1;
 	
+	if(texture(normals, texCoord).xyz == vec3(0.0,0.0,0.0)){
+		outColor = vec4(1.0, 1.0, 1.0, 1.0);
+		return;
+	}
+
 	vec3 fragPos = GetWorldPos(texCoord).xyz;
 	vec3 viewDir = normalize(cam[cid].position - fragPos.xyz);
 	vec3 norm = (texture(normals, texCoord).xyz - 0.5) * 2;
@@ -119,7 +124,7 @@ void main(){
 
 		float shadow = ShadowCalc(fragPos, c);
 	
-		result += p_ambient + shadow * (p_diffuse + p_specular) * attenuation;
+		result += p_ambient + shadow * (p_diffuse + p_specular + p_rim) * attenuation;
 		//pointColor = vec3(shadow, shadow, shadow);
 	}
 

@@ -562,7 +562,7 @@ Attack::Attack(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, unsigned int P
 //}
 
 
-Shield::Shield(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, float dmgRdc, float stam, Joint* p, SkelMesh* m)
+Shield::Shield(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::string block, float dmgRdc, float stam, Joint* p, SkelMesh* m)
 {
 	dmgReduction = dmgRdc;
 	stamina_cost = stam;
@@ -577,6 +577,8 @@ Shield::Shield(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, float dmgRdc, 
 
 	parent_joint = p;
 	parent_Mesh = m;
+
+	this->block = block;
 }
 
 bool Shield::HitDetect(Object* other)
@@ -694,7 +696,7 @@ Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, std::vector<std::string> atks
 	stamina_cost = stam;
 }
 
-Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, float dmg, float stam, float dmgRdc, Joint* p, SkelMesh* m) //Mesh, Material, Hitbox, Position, Anim_Names, Damage, Stamina Cost, Parent_joint, SkelMesh
+Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, std::string idle, std::string block, float dmg, float stam, float dmgRdc, Joint* p, SkelMesh* m) //Mesh, Material, Hitbox, Position, Anim_Names, Damage, Stamina Cost, Parent_joint, SkelMesh
 {
 	attack_anims = atks;
 	damage = dmg;
@@ -711,6 +713,9 @@ Weapon::Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<st
 
 	parent_joint = p;
 	parent_Mesh = m;
+
+	this->idle = idle;
+	this->block = block;
 	
 }
 

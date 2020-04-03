@@ -87,15 +87,15 @@ void FrameBuffer::Use()
 	glBindFramebuffer(GL_FRAMEBUFFER, ID);
 }
 
-void FrameBuffer::Clear()
+void FrameBuffer::Clear(glm::vec3 color)
 {
 	Use();
 
 	if (clear_alpha) {
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(color.r, color.g, color.b, 0.0f);
 	}
 	else {
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(color.r, color.g, color.b, 1.0f);
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

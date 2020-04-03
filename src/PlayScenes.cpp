@@ -1200,7 +1200,8 @@ void TwoPlayer::Update(float dt)
 		if (glfwJoystickPresent(c) && glfwJoystickIsGamepad(c)) {
 			Cam[c]->Move(players[c]->phys.move, dt);
 
-			players[c]->ApplyMove();
+			if(players[c]->GetState() != dying)
+				players[c]->ApplyMove();
 
 			Cam[c]->SetTarget(players[c]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f));
 		}
@@ -1479,43 +1480,6 @@ void TwoPlayer::LoadScene()
 	audioEngine.Init();
 
 
-
-	switch (RoundCount)
-	{
-	case 1:
-		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
-		audioEngine.LoadEvent("Round1", "{287449cd-0f8c-4e01-b817-f7de974921f7}");
-		audioEngine.PlayEvent("Round1");
-
-		//audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
-		//audioEngine.LoadEvent("Engine_Start", "{329a5270-2532-46b0-9b28-7f1f2b627efa}");
-		//audioEngine.LoadEvent("Engine_Running_2", "{25d4404c-7bfe-49cc-a5d6-4c558667375d}");
-		//audioEngine.LoadEvent("GlassBreak", "{0cda6a63-08d1-49f6-9d08-aa9890357558}");
-		//
-		//audioEngine.PlayEvent("Engine_Running_2");
-		break;
-	case 2:
-		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
-		audioEngine.LoadEvent("Round2", "{a95cb409-79f2-4131-9f69-7530899d00fd}");
-		audioEngine.PlayEvent("Round2");
-		break;
-	case 3:
-		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
-		audioEngine.LoadEvent("Round3", "{8ac23920-72c4-4867-8ae6-c36fb8de6214}");
-		audioEngine.PlayEvent("Round3");
-		break;
-	case 4:
-		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
-		audioEngine.LoadEvent("Round4", "{1b41bcb5-c7e2-4032-9c7f-ea1f7fe37002}");
-		audioEngine.PlayEvent("Round4");
-		break;
-	case 5:
-		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
-		audioEngine.LoadEvent("FinalRound", "{c692a986-0db6-40d6-8b67-b9a049bdc6a3}");
-		audioEngine.PlayEvent("FinalRound");
-		break;
-
-	}
 	audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
 	audioEngine.LoadEvent("BiggerBiggerCrowed", "{a36c2fde-3e9f-4557-8e4c-8a516095b57e}");
 	audioEngine.PlayEvent("BiggerBiggerCrowed");
@@ -1895,6 +1859,43 @@ void TwoPlayer::Reset() {
 	}
 
 	deathtimer = DEATH_TIME;
+
+	switch (RoundCount)
+	{
+	case 1:
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round1", "{287449cd-0f8c-4e01-b817-f7de974921f7}");
+		audioEngine.PlayEvent("Round1");
+
+		//audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		//audioEngine.LoadEvent("Engine_Start", "{329a5270-2532-46b0-9b28-7f1f2b627efa}");
+		//audioEngine.LoadEvent("Engine_Running_2", "{25d4404c-7bfe-49cc-a5d6-4c558667375d}");
+		//audioEngine.LoadEvent("GlassBreak", "{0cda6a63-08d1-49f6-9d08-aa9890357558}");
+		//
+		//audioEngine.PlayEvent("Engine_Running_2");
+		break;
+	case 2:
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round2", "{a95cb409-79f2-4131-9f69-7530899d00fd}");
+		audioEngine.PlayEvent("Round2");
+		break;
+	case 3:
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round3", "{8ac23920-72c4-4867-8ae6-c36fb8de6214}");
+		audioEngine.PlayEvent("Round3");
+		break;
+	case 4:
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round4", "{1b41bcb5-c7e2-4032-9c7f-ea1f7fe37002}");
+		audioEngine.PlayEvent("Round4");
+		break;
+	case 5:
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("FinalRound", "{c692a986-0db6-40d6-8b67-b9a049bdc6a3}");
+		audioEngine.PlayEvent("FinalRound");
+		break;
+
+	}
 
 	winannounce = false;
 }

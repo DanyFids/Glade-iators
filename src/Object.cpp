@@ -493,6 +493,8 @@ void Player::Deflected()
 {
 	state = deflected;
 	PlayAnim("parried", 0);
+	anim_lock = true;
+	PlayAnim("idle", 1, 0.0f);
 }
 
 void Player::Reset()

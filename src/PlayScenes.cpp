@@ -1021,7 +1021,7 @@ void TwoPlayer::Update(float dt)
 					if (players[p]->hitbox->GetType() == entity) { //Making sure we hit the right hitbox
 						std::cout << "Hit!\n";
 
-						if (players[p]->GetFrameState() == FrameStates::Hold && players[p]->GetState() == blocking &&  players[p]->isInfront(players[p]->getFaceDir(), players[c]->GetPosition() - players[p]->GetPosition())) { //Are we blocking? Are we infront of the enemy?
+						if (players[p]->GetFrameState() == FrameStates::Hold && players[p]->GetState() == blocking && players[p]->isInfront(players[p]->getFaceDir(), players[c]->GetPosition() - players[p]->GetPosition())) { //Are we blocking? Are we infront of the enemy?
 
 							std::cout << "Blocked!\n";
 
@@ -1048,10 +1048,11 @@ void TwoPlayer::Update(float dt)
 						{ 
 							if (players[p]->GetFrameState() != FrameStates::Roll) {
 								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
+								players[p]->Hitstun();
 								players[c]->GetWeapon()->setCooldown(true);
 								audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
 								audioEngine.LoadEvent("Hit", "{3830d309-eab3-4e2d-9cc2-2b00807daf5c}");
-								audioEngine.PlayEvent("Hit");
+								audioEngine.PlayEvent("Hit"); 
 								curScore += (20 * taunted[c] * comboMult[c]);
 								combo[c] = true;
 								comboTime[c] = MAX_COMBO;

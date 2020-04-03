@@ -457,8 +457,8 @@ void Player::Block()
 {
 	if (state != blocking && state != attacking) {
 		anim_lock = false;
-		PlayAnim("block", 0);
-		PlayAnim("idle", 1, 0.0f);
+		PlayAnim("blockS", 0);
+		PlayAnim("walk", 1, 0.0f);
 		state = blocking;
 	}
 }
@@ -470,6 +470,14 @@ void Player::Die()
 	_mesh->SetIntensity(1, 0.0f);
 	_mesh->SetIntensity(2, 0.0f);
 	_mesh->SetIntensity(3, 0.0f);
+}
+
+void Player::Hitstun()
+{
+	state = hitstun;
+	anim_lock = true;
+	PlayAnim("hitstun", 0);
+	PlayAnim("idle", 1, 0.0f);
 }
 
 void Player::Reset()

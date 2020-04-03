@@ -926,884 +926,184 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 	GLFWgamepadstate state;
 	if (glfwGetGamepadState(controller, &state)) {
 		//Checking to see if its actually a menu or a gamescene
-			glm::vec2 rot = glm::vec2(0.0f, 0.0f);
+		glm::vec2 rot = glm::vec2(0.0f, 0.0f);
 
-			glm::vec3 player_head = players[player]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f);
-			if (!players[player]->GetCamLock()) {
-				Cam[player]->SetPosition(player_head);
-				if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] < -0.2) {
-					rot.y = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
-				}
-				else {
-					rot.y = 0.0f;
-				}
-				if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] < -0.2) {
-					rot.x = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
-				}
-				else {
-					rot.x = 0.0f;
-				}
-
-				Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
+		glm::vec3 player_head = players[player]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f);
+		if (!players[player]->GetCamLock()) {
+			Cam[player]->SetPosition(player_head);
+			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] < -0.2) {
+				rot.y = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
 			}
 			else {
-				unsigned int other = (player == PLAYER_1) ? PLAYER_2 : PLAYER_1;
-
-				glm::vec3 mid = lerp(players[player]->GetPosition(), players[other]->GetPosition(), 0.5f) + glm::vec3(0.0f, 1.5f, 0.0f);
-				glm::vec3 dir = glm::normalize((player_head + glm::vec3(0.0f, 1.0f, 0.0f)) - mid);
-
-				Cam[player]->SetPosition(player_head + (dir * Cam[player]->GetRadius()) + glm::vec3(0.0f, 1.0f, 0.0f));
-				Cam[player]->SetTarget(mid + glm::vec3(0.0f, 1.5f, 0.0f));
+				rot.y = 0.0f;
+			}
+			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] < -0.2) {
+				rot.x = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
+			}
+			else {
+				rot.x = 0.0f;
 			}
 
-			glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
-			glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
-			glm::vec3 camF = Cam[player]->GetDirection();
-			glm::vec3 camR = Cam[player]->GetRight();
+			Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
+		}
+		else {
+			unsigned int other = (player == PLAYER_1) ? PLAYER_2 : PLAYER_1;
 
-			glm::vec2 axisPos = glm::vec2(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X], state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
+			glm::vec3 mid = lerp(players[player]->GetPosition(), players[other]->GetPosition(), 0.5f) + glm::vec3(0.0f, 1.5f, 0.0f);
+			glm::vec3 dir = glm::normalize((player_head + glm::vec3(0.0f, 1.0f, 0.0f)) - mid);
 
-			if (glm::length(axisPos) > dead_zone)
-			{
-				if (players[player]->GetFrameState() == FrameStates::Neutral || players[player]->GetFrameState() == FrameStates::Block) {
-					t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-					//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-					t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
-				}
-				//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-				if (players[player]->GetState() < PLAYER_STATE::walking && players[player]->GetFrameState() == FrameStates::Neutral && !players[player]->IsLocked()) {
-					players[player]->PlayAnim("walk", 0, glm::length(axisPos));
-					players[player]->PlayAnim("idle", 1, 1.0f);
-					players[player]->SetState(walking);
-				}
-				else if (!players[player]->IsLocked() && players[player]->GetState() == walking) {
-					((SkelMesh*)players[player]->GetMesh())->SetIntensity(0, glm::length(axisPos));
-					//((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f);
-				}
+			Cam[player]->SetPosition(player_head + (dir * Cam[player]->GetRadius()) + glm::vec3(0.0f, 1.0f, 0.0f));
+			Cam[player]->SetTarget(mid + glm::vec3(0.0f, 1.5f, 0.0f));
+		}
+
+		glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 camF = Cam[player]->GetDirection();
+		glm::vec3 camR = Cam[player]->GetRight();
+
+		glm::vec2 axisPos = glm::vec2(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X], state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
+
+		if (glm::length(axisPos) > dead_zone)
+		{
+			if (players[player]->GetFrameState() == FrameStates::Neutral || players[player]->GetState() == blocking) {
+				t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+				//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+				t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 			}
-			else if (players[player]->GetState() == PLAYER_STATE::walking) {
-				players[player]->Idle();
+			//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+			if (players[player]->GetState() < PLAYER_STATE::walking && players[player]->GetFrameState() == FrameStates::Neutral && !players[player]->IsLocked()) {
+				players[player]->PlayAnim("walk", 0, glm::length(axisPos));
+				players[player]->PlayAnim("idle", 1, 1.0f);
+				players[player]->SetState(walking);
 			}
-
-			if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
-				//players[player]->phys.move = glm::normalize(t) * 10.f * dt;
-				glm::vec3 dir = glm::normalize(t);
-
-				float newRot;
-
-				newRot = -(std::atan2f(dir.z, dir.x)) * (180 / M_PI) + 90;
-
-				//std::cout << newRot << std::endl;
-
-				players[player]->SetRotation({ 0.0f, newRot, 0.0f });
-
-				//std::cout << "move\n";
+			else if (!players[player]->IsLocked() && players[player]->GetState() == walking) {
+				((SkelMesh*)players[player]->GetMesh())->SetIntensity(0, glm::length(axisPos));
+				//((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f);
 			}
-
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
-				((Player*)players[player])->Run();
+			else if(players[player]->GetFrameState() == Hold && players[player]->GetState() == blocking){
+				((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 0.5f * glm::length(axisPos));
 			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
-				((Player*)players[player])->StopRun();
-			}
+		}
+		else if (players[player]->GetState() == PLAYER_STATE::walking) {
+			players[player]->Idle();
+		}
+		else if (players[player]->GetState() == blocking) {
+			((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 0.0f);
+		}
 
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_Y] == GLFW_PRESS) {
-				((Player*)players[player])->Taunt();
-				
-			}
+		if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
+			//players[player]->phys.move = glm::normalize(t) * 10.f * dt;
+			glm::vec3 dir = glm::normalize(t);
 
-			static bool r_stick_down[2] = { false, false };
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && !r_stick_down[player]) {
-				players[player]->ToggleCamLock();
-				r_stick_down[player] = true;
-			}
-			else if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_RELEASE) {
-				r_stick_down[player] = false;
-			}
+			float newRot;
 
-			static bool rb_p[2] = { false, false };
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS && !rb_p[player])
-			{
-				if (players[player]->GetStam() > 0.0f) {
+			newRot = -(std::atan2f(dir.z, dir.x)) * (180 / M_PI) + 90;
 
-					//glm::vec3 p1 = glm::vec3();
-					//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-					//p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+			//std::cout << newRot << std::endl;
 
+			players[player]->SetRotation({ 0.0f, newRot, 0.0f });
 
+			//std::cout << "move\n";
+		}
 
-					//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
+			((Player*)players[player])->Run();
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
+			((Player*)players[player])->StopRun();
+		}
 
-					//std::cout << "OOF\n";
-					//players[player]->dmgSTAM(15.0f);
-					players[player]->Attack();
-					atk1 = true;
-					rb_p[player] = true;
-				}
-			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_RELEASE)
-			{
-				atk1 = false;
-				rb_p[player] = false;
-			}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_Y] == GLFW_PRESS) {
+			((Player*)players[player])->Taunt();
 
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS)
-			{
-				if (players[player]->GetStam() > 0.0f) {
-					players[player]->Roll();
-					dodge1 = false;
-					dodge1t = 0.1;
-				}
-			}
+		}
 
-			static bool lb_p[2] = { false, false };
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
+		static bool r_stick_down[2] = { false, false };
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && !r_stick_down[player]) {
+			players[player]->ToggleCamLock();
+			r_stick_down[player] = true;
+		}
+		else if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_RELEASE) {
+			r_stick_down[player] = false;
+		}
 
-				//block1 = true;
+		static bool rb_p[2] = { false, false };
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS && !rb_p[player])
+		{
+			if (players[player]->GetStam() > 0.0f) {
 
 				//glm::vec3 p1 = glm::vec3();
 				//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 				//p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
 
-				//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
-				//audioEngine->PlayEvent("Block");
-				if (!players[player]->IsLocked()) {
-					players[player]->Block();
 
-					switch (player) {
-					case 0:
-						guardButton1 = true;
-						break;
-					case 1:
-						guardButton2 = true;
-						break;
-					}
-				}
-				lb_p[player] = true;
 
-				//std::cout << "Parry God\n";
-			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && lb_p[player]) {
-				lb_p[player] = false;
+				//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
 
-				if (players[player]->GetState() == blocking && players[player]->GetFrameState() == Hold) {
-					((SkelMesh*)players[player]->GetMesh())->NextFrame(0);
-				}
-				else {
-					players[player]->Idle();
-				}
-				
-
-				//players[player]->DestroyChild(0);
+				//std::cout << "OOF\n";
+				//players[player]->dmgSTAM(15.0f);
+				players[player]->Attack();
+				atk1 = true;
+				rb_p[player] = true;
 			}
 		}
-//<<<<<<< HEAD
-//
-//		/********************/
-//		/* MENU STUFF BELOW */
-//		/********************/
-//		else
-//		{
-//
-//		/*****************/
-//		/* Menu Movement */
-//		/*****************/
-//			if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] > 0.2 && menu_time[controller] <= 0 && !arrowUsed && !_Abutton[controller])
-//			{
-//				menuSpot[controller]--;
-//				if (controller == 0) {
-//					switch (menuSpot[controller]) {
-//					case -4:
-//						play_Button->ChangeTex(buttonPlayRed);
-//						exit_Button->ChangeTex(buttonExit);
-//						break;
-//					case -1:
-//						settings_Button->ChangeTex(buttonSettingsRed);
-//						play_Button->ChangeTex(buttonPlay);
-//						break;
-//					case -2:
-//						credits_Button->ChangeTex(buttonCreditsRed);
-//						settings_Button->ChangeTex(buttonSettings);
-//						break;
-//					case -3:
-//						exit_Button->ChangeTex(buttonExitRed);
-//						credits_Button->ChangeTex(buttonCredits);
-//						break;
-//					case 6:
-//						random1_Button->ChangeTex(buttonRandomRed);
-//						if (menuSpot[1] == 7) {
-//							ready_Button->ChangeTex(buttonReadyBlue);
-//						}
-//						else {
-//							ready_Button->ChangeTex(buttonReady);
-//						}
-//						break;
-//					case 9:
-//						weapon1_Button->ChangeTex(backDropRed);
-//						random1_Button->ChangeTex(buttonRandom);
-//						break;
-//					case 8:
-//						shield1_Button->ChangeTex(backDropRed);
-//						weapon1_Button->ChangeTex(backDropMain);
-//						break;
-//					case 7:
-//						ready_Button->ChangeTex(buttonReadyRed);
-//						shield1_Button->ChangeTex(backDropMain);
-//						break;
-//					}
-//				}
-//				else {
-//					switch (menuSpot[controller]) {
-//					case 6:
-//						random2_Button->ChangeTex(buttonRandomBlue);
-//						if (menuSpot[0] == 7) {
-//							ready_Button->ChangeTex(buttonReadyRed);
-//						}
-//						else {
-//							ready_Button->ChangeTex(buttonReady);
-//						}
-//						break;
-//					case 9:
-//						weapon2_Button->ChangeTex(backDropBlue);
-//						random2_Button->ChangeTex(buttonRandom);
-//						break;
-//					case 8:
-//						shield2_Button->ChangeTex(backDropBlue);
-//						weapon2_Button->ChangeTex(backDropMain);
-//						break;
-//					case 7:
-//						ready_Button->ChangeTex(buttonReadyBlue);
-//						shield2_Button->ChangeTex(backDropMain);
-//						break;
-//					}
-//				}
-//				menu_time[controller] = MENU_TIME;
-//			}
-//			else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y] < -0.2 && menu_time[controller] <= 0 && !arrowUsed && !_Abutton[controller])
-//			{
-//				menuSpot[controller]++;
-//				if (controller == 0) {
-//					switch (menuSpot[controller]) {
-//					case 0:
-//						play_Button->ChangeTex(buttonPlayRed);
-//						settings_Button->ChangeTex(buttonSettings);
-//						break;
-//					case -1:
-//						settings_Button->ChangeTex(buttonSettingsRed);
-//						credits_Button->ChangeTex(buttonCredits);
-//						break;
-//					case -2:
-//						credits_Button->ChangeTex(buttonCreditsRed);
-//						exit_Button->ChangeTex(buttonExit);
-//						break;
-//					case 1:
-//						exit_Button->ChangeTex(buttonExitRed);
-//						play_Button->ChangeTex(buttonPlay);
-//						break;
-//					case 10:
-//						random1_Button->ChangeTex(buttonRandomRed);
-//						weapon1_Button->ChangeTex(backDropMain);
-//						break;
-//					case 9:
-//						weapon1_Button->ChangeTex(backDropRed);
-//						shield1_Button->ChangeTex(backDropMain);
-//						break;
-//					case 8:
-//						shield1_Button->ChangeTex(backDropRed);
-//						if (menuSpot[1] == 7) {
-//							ready_Button->ChangeTex(buttonReadyBlue);
-//						}
-//						else {
-//							ready_Button->ChangeTex(buttonReady);
-//						}
-//						break;
-//					case 11:
-//						ready_Button->ChangeTex(buttonReadyRed);
-//						random1_Button->ChangeTex(buttonRandom);
-//						break;
-//					}
-//				}
-//				else {
-//					switch (menuSpot[controller]) {
-//					case 10:
-//						random2_Button->ChangeTex(buttonRandomBlue);
-//						weapon2_Button->ChangeTex(backDropMain);
-//						break;
-//					case 9:
-//						weapon2_Button->ChangeTex(backDropBlue);
-//						shield2_Button->ChangeTex(backDropMain);
-//						break;
-//					case 8:
-//						shield2_Button->ChangeTex(backDropBlue);
-//						if (menuSpot[0] == 7) {
-//							ready_Button->ChangeTex(buttonReadyRed);
-//						}
-//						else {
-//							ready_Button->ChangeTex(buttonReady);
-//						}
-//						break;
-//					case 11:
-//						ready_Button->ChangeTex(buttonReadyBlue);
-//						random2_Button->ChangeTex(buttonRandom);
-//						break;
-//					}
-//				}
-//				menu_time[controller] = MENU_TIME;
-//			}
-//
-//			/************************/
-//			/* MENU SPOT CORRECTION */
-//			/************************/
-//			if (menuSpot[controller] < MIN_MENU)
-//			{
-//				menuSpot[controller] = MAX_MENU;
-//			}
-//			else if (menuSpot[controller] > MAX_MENU)
-//			{
-//				menuSpot[controller] = MIN_MENU;
-//			}
-//
-//			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
-//				_Abutton[controller] = true;
-//				menu_time[controller] = MENU_TIME;
-//			}
-//
-//			/************/ 
-//			/* Player 1 */
-//			/************/ 
-//			if (controller == 0) {
-//				switch (menuSpot[controller]) {
-//				case 20:
-//					if (menu_time[controller] <= 0 && arrowUsed) {
-//						if (rightArrow) {
-//							arrowUsed = false;
-//							arrow_Button3->ChangeTex(arrowBack);
-//						}
-//						else {
-//							arrowUsed = false;
-//							arrow_Button1->ChangeTex(arrow);
-//						}
-//					}
-//					//Resolutuion
-//					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
-//						resolution--;
-//						arrowUsed = true;
-//						rightArrow = false;
-//						arrow_Button1->ChangeTex(arrow2);
-//						menu_time[controller] = MENU_TIME;
-//					}
-//					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
-//						resolution++;
-//						arrowUsed = true;
-//						rightArrow = true;
-//						arrow_Button3->ChangeTex(arrowBack2);
-//						menu_time[controller] = MENU_TIME;
-//					}
-//					if (_Abutton[controller] && menu_time[controller] > 0) {
-//						resolution_Button->ChangeTex(buttonRes2);
-//					}
-//					else if (menu_time[controller] <= 0) {
-//						resolution_Button->ChangeTex(buttonResRed);
-//					}
-//					break;
-//				case 19:
-//					//Exit Button
-//					if (_Abutton[controller] && menu_time[controller] > 0) {
-//						exit_Button->ChangeTex(buttonExit2);
-//					}
-//					else if (menu_time[controller] <= 0) {
-//						exit_Button->ChangeTex(buttonExitRed);
-//					}
-//					break;
-//				case 10:
-//					//Random Button
-//					if (_Abutton[controller] && menu_time[controller] > 0) {
-//						random1_Button->ChangeTex(buttonRandom2);
-//					}
-//					else if (menu_time[controller] <= 0) {
-//						random1_Button->ChangeTex(buttonRandomRed);
-//					}
-//					break;
-//				case 9:
-//					if (menu_time[controller] <= 0 && arrowUsed) {
-//						if (rightArrow) {
-//							arrowUsed = false;
-//							arrow_Button3->ChangeTex(arrowBack);
-//						}
-//						else {
-//							arrowUsed = false;
-//							arrow_Button1->ChangeTex(arrow);
-//						}
-//					}
-//					//Swords
-//					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) { 
-//						weapon[controller]--;
-//						changeW[controller] = true;
-//						arrowUsed = true;
-//						rightArrow = false; 
-//						arrow_Button1->ChangeTex(arrow2);
-//						menu_time[controller] = MENU_TIME;
-//					}
-//					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
-//						weapon[controller]++;
-//						changeW[controller] = true;
-//						arrowUsed = true;
-//						rightArrow = true;
-//						arrow_Button3->ChangeTex(arrowBack2);
-//						menu_time[controller] = MENU_TIME;
-//					}
-//					break;
-//				case 8:
-//					if (menu_time[controller] <= 0 && arrowUsed) {
-//						if (rightArrow) {
-//							arrowUsed = false;
-//							arrow_Button4->ChangeTex(arrowBack);
-//						}
-//						else {
-//							arrowUsed = false;
-//							arrow_Button2->ChangeTex(arrow);
-//						}
-//					}
-//					//Shields
-//					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
-//						shield[controller]--;
-//						changeS[controller] = true;
-//						arrowUsed = true;
-//						rightArrow = false;
-//						arrow_Button2->ChangeTex(arrow2);
-//						menu_time[controller] = MENU_TIME;
-//					}
-//					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
-//						shield[controller]++;
-//						changeS[controller] = true;
-//						arrowUsed = true;
-//						rightArrow = true;
-//						arrow_Button4->ChangeTex(arrowBack2);
-//						menu_time[controller] = MENU_TIME;
-//					}
-//					break;
-//				case 7:
-//					//Ready Button
-//					if (_Abutton[controller] && menu_time[controller] > 0) {
-//						ready_Button->ChangeTex(buttonReady2);
-//					}
-//					else if (menu_time[controller] <= 0) {
-//						if (menuSpot[1] == 7) {
-//							ready_Button->ChangeTex(buttonReadyPurple);
-//						}
-//						else {
-//							ready_Button->ChangeTex(buttonReadyRed);
-//						}
-//					}
-//					break;
-//				case 0:
-//					//Play Button
-//					if (_Abutton[controller] && menu_time[controller] > 0) {
-//						play_Button->ChangeTex(buttonPlay2);
-//					}
-//					else if (menu_time[controller] <= 0) {
-//						play_Button->ChangeTex(buttonPlayRed);
-//					}
-//					break;
-//				case -1:
-//					//Settings Button
-//					if (_Abutton[controller] && menu_time[controller] > 0) {
-//						settings_Button->ChangeTex(buttonSettings2);
-//					}
-//					else if (menu_time[controller] <= 0) {
-//						settings_Button->ChangeTex(buttonSettingsRed);
-//					}
-//					break;
-//				case -2:
-//					//Credits Button
-//					if (_Abutton[controller] && menu_time[controller] > 0) {
-//						credits_Button->ChangeTex(buttonCredits2);
-//					}
-//					else if (menu_time[controller] <= 0) {
-//						credits_Button->ChangeTex(buttonCreditsRed);
-//					}
-//					break;
-//				case -3:
-//					//Exit Button
-//					if (_Abutton[controller] && menu_time[controller] > 0) {
-//						exit_Button->ChangeTex(buttonExit2);
-//					}
-//					else if (menu_time[controller] <= 0) {
-//						exit_Button->ChangeTex(buttonExitRed);
-//					}
-//					break;
-//				}
-//				//std::cout << weapon[0] << std::endl;
-//				//IMAGE CHANGE
-//				if (weapon[controller] > MAX_W)
-//					weapon[controller] = MIN_W;
-//				if (weapon[controller] < MIN_W)
-//					weapon[controller] = MAX_W;
-//
-//				if (shield[controller] > MAX_S)
-//					shield[controller] = MIN_S;
-//				if (shield[controller] < MIN_S)
-//					shield[controller] = MAX_S;
-//
-//				if (changeW[controller]) {
-//					switch (weapon[controller]) {
-//					case 0:
-//						wOne->ChangeTex(swordIcon);
-//						wOne_p1->ChangeTex(hammerIcon);
-//						wOne_p2->ChangeTex(spearIcon);
-//						WeaponName[controller] = "Sword";
-//						changeW[controller] = false;
-//						break;
-//					case 1:
-//						wOne->ChangeTex(spearIcon);
-//						wOne_p1->ChangeTex(swordIcon);
-//						wOne_p2->ChangeTex(hammerIcon);
-//						WeaponName[controller] = "Spear";
-//						changeW[controller] = false;
-//						break;
-//					case 2:
-//						wOne->ChangeTex(hammerIcon);
-//						wOne_p1->ChangeTex(spearIcon);
-//						wOne_p2->ChangeTex(swordIcon);
-//						WeaponName[controller] = "Maul";
-//						changeW[controller] = false;
-//						break;
-//						//More Weapon Cases
-//				//	case 3:
-//				//		wOne->ChangeTex(tridentIcon);
-//				//		wOne_p1->ChangeTex(hammerIcon);
-//				//		wOne_p2->ChangeTex(daggerIcon);
-//				//		WeaponName[controller] = "Trident";
-//				//		changeW[controller] = false;
-//				//		break;
-//				//	case 4:
-//				//		wOne->ChangeTex(daggerIcon);
-//				//		wOne_p1->ChangeTex(tridentIcon);
-//				//		wOne_p2->ChangeTex(swordIcon);
-//				//		WeaponName[controller] = "Dagger";
-//				//		changeW[controller] = false;
-//				//		break;
-//					}
-//				}
-//				if (changeS[controller]) {
-//					switch (shield[controller]) {
-//					case 0:
-//						sOne->ChangeTex(shieldIcon);
-//						sOne_p1->ChangeTex(nothingIcon);
-//						sOne_p2->ChangeTex(bucklerIcon);
-//						ShieldName[controller] = "Shield";
-//						changeS[controller] = false;
-//						break;
-//					case 1:
-//						sOne->ChangeTex(bucklerIcon);
-//						sOne_p1->ChangeTex(shieldIcon);
-//						sOne_p2->ChangeTex(nothingIcon);
-//						ShieldName[controller] = "Buckler";
-//						changeS[controller] = false;
-//						break;
-//					case 2:
-//						sOne->ChangeTex(nothingIcon);
-//						sOne_p1->ChangeTex(bucklerIcon);
-//						sOne_p2->ChangeTex(shieldIcon);
-//						ShieldName[controller] = "No Shield";
-//						changeS[controller] = false;
-//						break;
-//					}
-//				}
-//			}
-//
-//			/************/
-//			/* Player 2 */
-//			/************/
-//			else {
-//				switch (menuSpot[controller]) {
-//				case 10:
-//					//Random Button
-//					if (_Abutton[controller] && menu_time[controller] > 0) {
-//						random2_Button->ChangeTex(buttonRandom2);
-//					}
-//					else if (menu_time[controller] <= 0) {
-//						random2_Button->ChangeTex(buttonRandomBlue);
-//					}
-//					break;
-//				case 9:
-//					if (menu_time[controller] <= 0 && arrowUsed) {
-//						if (rightArrow) {
-//							arrowUsed = false;
-//							arrow_Button7->ChangeTex(arrowBack);
-//						}
-//						else {
-//							arrowUsed = false;
-//							arrow_Button5->ChangeTex(arrow);
-//						}
-//					}
-//					//Swords
-//					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
-//						weapon[controller]--;
-//						changeW[controller] = true;
-//						arrowUsed = true;
-//						rightArrow = false;
-//						arrow_Button5->ChangeTex(arrow2);
-//						menu_time[controller] = MENU_TIME;
-//					}
-//					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
-//						weapon[controller]++;
-//						changeW[controller] = true;
-//						arrowUsed = true;
-//						rightArrow = true;
-//						arrow_Button7->ChangeTex(arrowBack2);
-//						menu_time[controller] = MENU_TIME;
-//					}
-//					break;
-//				case 8:
-//					if (menu_time[controller] <= 0 && arrowUsed) {
-//						if (rightArrow) {
-//							arrowUsed = false;
-//							arrow_Button8->ChangeTex(arrowBack);
-//						}
-//						else {
-//							arrowUsed = false;
-//							arrow_Button6->ChangeTex(arrow);
-//						}
-//					}
-//					//Shields
-//					if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] < -0.2 && menu_time[controller] <= 0) {
-//						shield[controller]--;
-//						changeS[controller] = true;
-//						arrowUsed = true;
-//						rightArrow = false;
-//						arrow_Button6->ChangeTex(arrow2);
-//						menu_time[controller] = MENU_TIME;
-//					}
-//					else if (state.axes[GLFW_GAMEPAD_AXIS_LEFT_X] > 0.2 && menu_time[controller] <= 0) {
-//						shield[controller]++;
-//						changeS[controller] = true;
-//						arrowUsed = true;
-//						rightArrow = true;
-//						arrow_Button8->ChangeTex(arrowBack2);
-//						menu_time[controller] = MENU_TIME;
-//					}
-//					break;
-//				case 7:
-//					//Ready Button
-//					if (_Abutton[controller] && menu_time[controller] > 0) {
-//						ready_Button->ChangeTex(buttonReady2);
-//					}
-//					else if (menu_time[controller] <= 0) {
-//						if (menuSpot[0] == 7) {
-//							ready_Button->ChangeTex(buttonReadyPurple);
-//						}
-//						else {
-//							ready_Button->ChangeTex(buttonReadyBlue);
-//						}
-//					}
-//					break;
-//				}
-//
-//				//IMAGE CHANGE
-//				if (weapon[controller] > MAX_W)
-//					weapon[controller] = MIN_W;
-//				if (weapon[controller] < MIN_W)
-//					weapon[controller] = MAX_W;
-//
-//				if (shield[controller] > MAX_S)
-//					shield[controller] = MIN_S;
-//				if (shield[controller] < MIN_S)
-//					shield[controller] = MAX_S;
-//
-//				if (changeW[controller]) {
-//					switch (weapon[controller]) {
-//					case 0:
-//						wTwo->ChangeTex(swordIcon);
-//						wTwo_p1->ChangeTex(hammerIcon);
-//						wTwo_p2->ChangeTex(spearIcon);
-//						WeaponName[controller] = "Sword";
-//						changeW[controller] = false;
-//						break;
-//					case 1:
-//						wTwo->ChangeTex(spearIcon);
-//						wTwo_p1->ChangeTex(swordIcon);
-//						wTwo_p2->ChangeTex(hammerIcon);
-//						WeaponName[controller] = "Spear";
-//						changeW[controller] = false;
-//						break;
-//					case 2:
-//						wTwo->ChangeTex(hammerIcon);
-//						wTwo_p1->ChangeTex(spearIcon);
-//						wTwo_p2->ChangeTex(swordIcon);
-//						WeaponName[controller] = "Maul";
-//						changeW[controller] = false;
-//						break;
-//						/***************************/
-//						/* Will Re-add later maybe */
-//						/***************************/
-//					//case 3:
-//					//	wTwo->ChangeTex(tridentIcon);
-//					//	wTwo_p1->ChangeTex(hammerIcon);
-//					//	wTwo_p2->ChangeTex(daggerIcon);
-//					//	WeaponName[controller] = "Trident";
-//					//	changeW[controller] = false;
-//					//	break;
-//					//case 4:
-//					//	wTwo->ChangeTex(daggerIcon);
-//					//	wTwo_p1->ChangeTex(tridentIcon);
-//					//	wTwo_p2->ChangeTex(swordIcon);
-//					//	WeaponName[controller] = "Dagger";
-//					//	changeW[controller] = false;
-//					//	break;
-//					}
-//				}
-//				if (changeS[controller]) {
-//					switch (shield[controller]) {
-//					case 0:
-//						sTwo->ChangeTex(shieldIcon);
-//						sTwo_p1->ChangeTex(nothingIcon);
-//						sTwo_p2->ChangeTex(bucklerIcon);
-//						ShieldName[controller] = "Shield";
-//						changeS[controller] = false;
-//						break;
-//					case 1:
-//						sTwo->ChangeTex(bucklerIcon);
-//						sTwo_p1->ChangeTex(shieldIcon);
-//						sTwo_p2->ChangeTex(nothingIcon);
-//						ShieldName[controller] = "Buckler";
-//						changeS[controller] = false;
-//						break;
-//					case 2:
-//						sTwo->ChangeTex(nothingIcon);
-//						sTwo_p1->ChangeTex(bucklerIcon);
-//						sTwo_p2->ChangeTex(shieldIcon);
-//						ShieldName[controller] = "No Shield";
-//						changeS[controller] = false;
-//						break;
-//					}
-//				}
-//			}
-//			
-//			/*********************/
-//			/* Button Management */
-//			/*         &         */
-//			/*  Scene Selection  */
-//			/*********************/
-//			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS && menu_time[controller] <= 0 && !ChangingScn) {
-//				_Bbutton[controller] = true;
-//			}
-//			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_RELEASE && _Bbutton[controller] && !ChangingScn) {
-//				if (MAX_MENU == 10 || MAX_MENU == 20) {
-//					_Bbutton[controller] = false;
-//					ChangingScn = true;
-//					isMenu = false;
-//					Game::CURRENT->setScene(SCENES::MAIN_MENU);
-//				}
-//			}
-//			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE && _Abutton[controller] && !ChangingScn) {
-//				_Abutton[controller] = false;
-//				//std::cout << menuSpot[controller] << std::endl;
-//				if (menuSpot[controller] == 7) {
-//					//Play
-//					readyChange[controller] = true;
-//					if (ready[controller])
-//						ready[controller] = false;
-//					else
-//					ready[controller] = true;
-//				}
-//				else if (menuSpot[controller] == 10) {
-//					//Randomize
-//					changeW[controller] = true;
-//					changeS[controller] = true;
-//					weapon[controller] = (int)rand() % 2;
-//					shield[controller] = (int)rand() % 2;
-//				}
-//				 
-//				else if (menuSpot[0] == 0) {
-//					//Character Scene
-//					ChangingScn = true;
-//					isMenu = false;
-//					Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
-//				}
-//				else if (menuSpot[0] == -1) {
-//					//Settings
-//				}
-//				else if (menuSpot[0] == -2) {
-//					//Credits
-//					Game::CURRENT->setScene(SCENES::CREDITS);
-//				}
-//				else if (menuSpot[0] == -3) {
-//					//Exit
-//					//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
-//					glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
-//				}
-//				else if (controller == 0) {
-//					if (menuSpot[0] == 0) {
-//						//Character Scene
-//						ChangingScn = true;
-//						isMenu = false;
-//						Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
-//					}
-//					else if (menuSpot[0] == -1) {
-//						//Settings
-//						ChangingScn = true;
-//						isMenu = false;
-//						Game::CURRENT->setScene(SCENES::SETTINGS_SCENE);
-//					}
-//					else if (menuSpot[0] == -2) {
-//						//Credits
-//					}
-//					else if (menuSpot[0] == -3) {
-//						//Exit
-//						//clean all Buffers & Shaders (destruct them) etc. (make full cleanup function)
-//						glfwSetWindowShouldClose(Game::CURRENT->GetWindow(), true);
-//					}
-//					else if (menuSpot[0] == 20) {
-//						switch (resolution) {
-//						case 0:
-//							Game::CURRENT->setSize(1920, 1080);
-//							break;
-//						case 1:
-//							Game::CURRENT->setSize(1600, 900);
-//							break;
-//						case 2:
-//							Game::CURRENT->setSize(1440, 810);
-//							break;
-//						case 3:
-//							Game::CURRENT->setSize(1280, 720);
-//							break;
-//						case 4:
-//							Game::CURRENT->setSize(1024, 576);
-//							break;
-//						}
-//					}
-//					else if (menuSpot[0] == 19) {
-//						ChangingScn = true;
-//						isMenu = false;
-//						Game::CURRENT->setScene(SCENES::MAIN_MENU);
-//					}
-//				}
-//
-//				if (controller == 0 && readyChange[controller]) {
-//					readyChange[controller] = false;
-//					if (ready[controller]) 
-//						p1Ready->ChangeTex(check);
-//					else
-//						p1Ready->ChangeTex(ehks);
-//				}
-//				if (controller == 1 && readyChange[controller]) {
-//					readyChange[controller] = false;
-//					if (ready[controller])
-//						p2Ready->ChangeTex(check);
-//					else
-//						p2Ready->ChangeTex(ehks);
-//				}
-//
-//				if (ready[0] && ready[1]) {
-//					ChangingScn = true;
-//					isMenu = false;
-//					Game::CURRENT->setScene(SCENES::PLAY_SCENE);
-//				}
-//				menu_time[controller] = MENU_TIME;
-//			}
-//		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_RELEASE)
+		{
+			atk1 = false;
+			rb_p[player] = false;
+		}
+
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS)
+		{
+			if (players[player]->GetStam() > 0.0f) {
+				players[player]->Roll();
+				dodge1 = false;
+				dodge1t = 0.1;
+			}
+		}
+
+		static bool lb_p[2] = { false, false };
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
+
+			//block1 = true;
+
+			//glm::vec3 p1 = glm::vec3();
+			//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+			//p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+
+			//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
+			//audioEngine->PlayEvent("Block");
+			if (!players[player]->IsLocked()) {
+				players[player]->Block();
+
+				switch (player) {
+				case 0:
+					guardButton1 = true;
+					break;
+				case 1:
+					guardButton2 = true;
+					break;
+				}
+			}
+			lb_p[player] = true;
+
+			//std::cout << "Parry God\n";
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && lb_p[player]) {
+			lb_p[player] = false;
+
+			if (players[player]->GetState() == blocking && players[player]->GetFrameState() == Hold) {
+				((SkelMesh*)players[player]->GetMesh())->NextFrame(0);
+			}
+			else {
+				players[player]->Idle();
+			}
+
+
+			//players[player]->DestroyChild(0);
+		}
 	}
+}
 
 
 bool PlayScene::loaded = false;

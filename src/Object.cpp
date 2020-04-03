@@ -256,6 +256,7 @@ void Player::Update(float dt)
 
 	phys.move = glm::mat3(transform.GetRotEul()) * rp;
 
+	current_face_dir = glm::mat3_cast(glm::quat(glm::angleAxis(glm::radians(transform.rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)))) * baseFaceDir;
 	if (glm::length(transform.position + phys.move) >= 42.f) {
 		float x = 1.0f;
 		float z = 1.0f;
@@ -404,10 +405,9 @@ void Player::Draw(Shader* shdr, std::vector<Camera*> cam, Shader* childShader)
 
 }
 
-void Player::dmgHP(float _dmg)
+void Player::dmgHP(float _dmg) 
 {
-	if(GetFrameState() != FrameStates::Roll)
-		health -= _dmg;
+	health -= _dmg;
 }
 
 void Player::dmgSTAM(float _dmg)
@@ -420,7 +420,7 @@ void Player::PlayAnim(std::string n, unsigned int c, float i, float s)
 {
 	_mesh->SetAnim(_mesh->GetSkeleton()->GetAnimByName(n), c, i, s);
 }
-
+ 
 void Player::Run()
 {
 	if (!run && state == walking && recov_timer <= 0.0f) {
@@ -467,10 +467,10 @@ void Player::Attack()
 		PlayAnim(this->weapon->GetAtkAnim(atk_combo), 0, 1.0f, 2.5f);
 		_mesh->SetIntensity(1, 0.0f);
 		this->dmgSTAM(weapon->GetStaminaCost());
-		state = attacking;
+		state = attacking; 
 	}
 	else if(GetFrameState() == FrameStates::Neutral && !anim_lock){
-		if (atk_combo < this->weapon->GetNumLightAttacks() - 1) {
+		if (atk_combo < this->weapon->GetNumLightAttacks() - 1) { 
 			weapon->setCooldown(false);
 			atk_combo++;
 			anim_lock = true;
@@ -484,7 +484,11 @@ void Player::Block()
 {
 	if (state != blocking && state != attacking) {
 		anim_lock = false;
-		PlayAnim("block",1,1,1.0f);
+		if (this->GetShield() == nullptr)
+			PlayAnim(this->GetWeapon()->GetBlock(), 0);
+		else 
+			PlayAnim(this->GetShield()->GetBlock(), 0);
+		PlayAnim("walk", 1, 0.0f);
 		state = blocking;
 	}
 }
@@ -496,6 +500,27 @@ void Player::Die()
 	_mesh->SetIntensity(1, 0.0f);
 	_mesh->SetIntensity(2, 0.0f);
 	_mesh->SetIntensity(3, 0.0f);
+}
+
+void Player::Hitstun()
+{
+	state = hitstun;
+	anim_lock = true;
+	PlayAnim("hitstun", 0);
+	PlayAnim("idle", 1, 0.0f);
+}
+
+void Player::Deflect()
+{
+	state = deflect;
+	PlayAnim("parry", 0);
+}
+
+void Player::Deflected()
+{
+	state = deflected;
+	PlayAnim("parried", 0);
+	anim_lock = true;
 }
 
 void Player::Reset()

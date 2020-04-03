@@ -87,7 +87,7 @@ public:
 class CrowdBar : public UI {
 	static const int HEIGHT;
 	static const int MAX_WIDTH;
-	const float MAX_TIME = 100.0f; 
+	const float MAX_TIME = 500.0f; 
 	float score = MAX_TIME;
 
 	Player* player;

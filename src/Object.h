@@ -133,7 +133,7 @@ public:
 };
 
 enum PLAYER_STATE {
-	idle, walking, attacking, blocking, rolling, taunting, dying
+	idle, walking, attacking, blocking, rolling, taunting, dying, hitstun, deflect, deflected
 };
 
 enum COLLISION_TYPE {
@@ -160,7 +160,7 @@ class Player : public Object {
 
 	unsigned int atk_combo = 0;
 
-	const float blockAngle = 55;
+	const float blockAngle = 65;
 
 	SkelMesh* _mesh;
 
@@ -171,7 +171,7 @@ class Player : public Object {
 
 	glm::vec3 last_root_pos = glm::vec3(0.0f);
 
-	const glm::vec3 baseFaceDir = glm::vec3(0, 0, -1);
+	const glm::vec3 baseFaceDir = glm::vec3(0, 0, 1);
 	glm::vec3 current_face_dir = glm::vec3(1);
 
 	bool camera_lock = false;
@@ -208,6 +208,9 @@ public:
 	void Block();
 	void Taunt();
 	void Die();
+	void Hitstun();
+	void Deflect();
+	void Deflected();
 
 	void Reset();
 	PLAYER_STATE GetState() {return state;}
@@ -215,7 +218,7 @@ public:
 	void SetWeapon(Weapon*& w) { weapon = w; }
 	void SetShield(Shield*& s) { shield = s; }
 	Shield* GetShield() { return shield; }
-	Weapon* GetWeapon() { return weapon; }
+	Weapon* GetWeapon() { return weapon; } 
 	FrameStates GetFrameState(unsigned int chnl = 0);
 	bool IsLocked() { return anim_lock; }
 
@@ -252,6 +255,7 @@ public:
 	Weapon(Mesh* me, Material* ma, Hitbox* hb, std::vector<std::string> atks, float dmg, float stam);
 	Weapon(Mesh* me, Material* ma, Hitbox* hb, glm::vec3 pos, std::vector<std::string> atks, std::string idle, std::string block, float dmg, float stam, float dmgRdc, Joint* p = nullptr, SkelMesh* m = nullptr);
 
+	std::string GetBlock() { return block; }
 	std::string GetAtkAnim(unsigned int c_id = 0);
 	std::string GetIdleAnim() { return idle; }
 	std::string GetBlockAnim() { return idle; }

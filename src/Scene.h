@@ -47,8 +47,11 @@ protected:
 
 	TextRenderer* Textcontroller = new TextRenderer();
 	
-	static Sound* audioEngine;
-	static bool AEinit;
+	static std::string Name1[3];
+	static std::string Name2[3];
+
+
+	static bool Musicinit;
 	
 	// Mouse Vars
 	float m_lastX = 400;
@@ -117,6 +120,8 @@ protected:
 	DirectionalLight* sun;
 
 	std::vector<UI*> ui;
+
+	Sound musicaudioEngine;
 
 	//MAIN MENU
 	Material* buttonPlay = new Material("playButton.png");

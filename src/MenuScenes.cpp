@@ -15,14 +15,14 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Camera.h"
-#include "Constants.h"
+#include "Constants.h" 
 #include "UI.h"
 #include "Lerp.h"
-#include "Light.h"
+#include "Light.h" 
 #include "Sound.h"
 #include "Game.h"
 #include "PostProcess.h"
-#include "Text.h"
+#include "Text.h" 
 
 
 MainMenu::MainMenu()
@@ -63,7 +63,8 @@ void MainMenu::Update(float dt)
 
 	static bool displayed = false;
 	static bool displayLogo = false;
-	//audioEngine.Update();
+
+	musicaudioEngine.Update();
 
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
@@ -167,6 +168,8 @@ void MainMenu::Draw()
 
 }
 
+bool MainMenu::Musicinit = false;
+
 void MainMenu::LoadScene()
 {
 	ChangingScn = true;
@@ -180,6 +183,16 @@ void MainMenu::LoadScene()
 	sunShader = new Shader("Shaders/sunDepth.vert", "Shaders/sunDepth.frag");
 
 	Material* blackBarMat = new Material("black.png");
+	if (Musicinit == false)
+	{
+		musicaudioEngine.Init();
+		Musicinit = true;
+		musicaudioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		musicaudioEngine.LoadEvent("BattleMusic", "{5d5be828-f39b-4d9e-9bf2-ea581daa0e20}");
+		musicaudioEngine.PlayEvent("BattleMusic");
+	}
+
+	
 
 	Material* gladeiatorsTitle = new Material("Title.png");
 
@@ -260,6 +273,8 @@ void CharacterC::Update(float dt)
 {
 
 	//audioEngine.Update();
+
+	musicaudioEngine.Update();
 
 	for (int u = 0; u < ui.size(); u++) {
 		ui[u]->Update(dt);
@@ -343,6 +358,9 @@ void CharacterC::Draw()
 
 }
 
+std::string Scene::Name1[3] = { "","","" };
+std::string Scene::Name2[3] = { "","","" };
+
 void CharacterC::LoadScene()
 {
 	ChangingScn = false;
@@ -353,6 +371,15 @@ void CharacterC::LoadScene()
 	MIN_MENU = 7;
 
 	srand(time(NULL));
+
+	if (Musicinit == false)
+	{
+		musicaudioEngine.Init();
+		Musicinit = true;
+		musicaudioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		musicaudioEngine.LoadEvent("BattleMusic", "{5d5be828-f39b-4d9e-9bf2-ea581daa0e20}");
+		musicaudioEngine.PlayEvent("BattleMusic");
+	}
 
 	Name1[0] = Textcontroller->GenerateTitle();
 	Name1[1] = Textcontroller->GenerateName();

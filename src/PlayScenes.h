@@ -94,17 +94,16 @@ class TwoPlayer: public PlayScene {
 	Shader* sunShader;
 
 	//Post process Shaders
-	Shader* vergausshader;
+	Shader* vergausshader; 
 	Shader* horgausshader;
 	Shader* highlightshader;
 	Shader* bloomshader;
 	Shader* pixelshader;
 
-
-	const float MAX_SCORE = 100.0f;
+	const float MAX_SCORE = 500.0f;
 	float curScore = MAX_SCORE;
 	float scoreSub = 1.0f;
-	const float INCREASE_TIME = 7.5f;
+	const float INCREASE_TIME = 7.0f;
 	float subIncreaser = INCREASE_TIME;
 	
 	const float MAX_TAUNT = 15.0f;
@@ -115,7 +114,6 @@ class TwoPlayer: public PlayScene {
 	float comboTime[2]{ MAX_COMBO, MAX_COMBO };
 	float comboMult[2]{ 1.0f, 1.0f };
 	bool combo[2]{ false, false };
-
 	//Sound audioEngine;
 	const float DEATH_TIME = 4.0f;
 	float deathtimer = DEATH_TIME;
@@ -125,6 +123,8 @@ class TwoPlayer: public PlayScene {
 
 	Object* morphyBoi;
 	CrowdBar* CrowdBoi = nullptr;
+
+	Sound audioEngine;
 
 	WeaponType _Weapons[2];
 	ShieldType _Shields[2];

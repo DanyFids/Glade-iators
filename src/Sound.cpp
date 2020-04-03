@@ -172,11 +172,11 @@ void Sound::LoadEvent(const std::string& strEventName, const std::string& strEve
 void Sound::PlayEvent(const std::string& strEventName)
 {
 	// If event not found, load the event
-	//auto tFoundIt = implementation->mEvents.find(strEventName);
-	//if (tFoundIt == implementation->mEvents.end())
-	//	return;
+	auto tFoundIt = implementation->mEvents.find(strEventName);
+	if (tFoundIt == implementation->mEvents.end())
+		return;
 
-	//tFoundIt->second->start();
+	tFoundIt->second->start(); 
 }
 
 void Sound::StopEvent(const std::string& strEventName, bool bImmediate)

@@ -138,6 +138,7 @@ void Game::Run()
 
 }
 
+
 void Game::Initialize()
 {
 	// Initialize GLFW
@@ -205,6 +206,8 @@ void Game::Initialize()
 	//Attack Init(0);
 	//Init.init();
 
+	
+
 	MainMenuScn = new MainMenu();
 
 	if (glfwJoystickPresent(GLFW_JOYSTICK_1) && glfwJoystickIsGamepad(GLFW_JOYSTICK_1) && 
@@ -215,9 +218,11 @@ void Game::Initialize()
 		curScene = MainMenuScn;
 	}
 	else {
-		//curScene = OnePlayerScn;
-		TwoPlayerScn = new TwoPlayer();
-		curScene = TwoPlayerScn;
+
+		//TwoPlayerScn = new TwoPlayer();
+		//curScene = TwoPlayerScn;
+		
+		curScene = MainMenuScn;
 	}
 }
 
@@ -352,6 +357,7 @@ void Game::InputHandle(float dt)
 
 	curScene->InputHandle(window, mousePos, dt);
 }
+
 
 void Game::Update(float dt)
 {

@@ -23,7 +23,7 @@ void MenuScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 
 void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 {
-
+	
 	/*****************/
 	/* Menu Movement */
 	/*****************/
@@ -687,7 +687,7 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 				else {
 					ready[controller] = true;
 					//Everything below is debug
-					//ready[1] = true;
+					ready[1] = true;
 					//ChangingScn = true;
 					//Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 				}
@@ -756,11 +756,19 @@ void MenuScene::ControllerInput(unsigned int controller, int player, float dt)
 		if (!ready[PLAYER_1] || !ready[PLAYER_2])
 			ready_timer = MAX_READY;
 
+
+		if (weapon[controller] == 2 && shield[controller] != 2) {
+			shield[controller] = 2;
+			changeS[controller] = true;
+		}
+
 		if (ready[PLAYER_1] && ready[PLAYER_2]) {
 			ready_timer -= dt;
 			if (ready_timer <= 0) {
 				ChangingScn = true;
 				Game::CURRENT->Loadouts(weapon[PLAYER_1], weapon[PLAYER_2], shield[PLAYER_1], shield[PLAYER_2]);
+				musicaudioEngine.Shutdown();
+				Musicinit = false;
 				Game::CURRENT->setScene(SCENES::PLAY_SCENE);
 			}
 		}
@@ -905,8 +913,7 @@ void PlayScene::KeyboardInput(GLFWwindow* window, glm::vec2 mousePos, int player
 
  
 
-bool PlayScene::AEinit = false;
-Sound* PlayScene::audioEngine = new Sound();
+
 
 void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 {
@@ -915,176 +922,159 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 	static bool guardButton1 = false;
 	static bool guardButton2 = false;
 
-	if (AEinit == false)
-	{
-		audioEngine->Init();
-		audioEngine->LoadBank("Master", FMOD_STUDIO_LOAD_BANK_NORMAL);
 
-		//// Load an event
-		audioEngine->LoadEvent("P2 Wins", "{94f1615e-0814-4af7-88bc-feb808703b6a}");
-		audioEngine->LoadEvent("P2 Wins", "{94f1615e-0814-4af7-88bc-feb808703b6a}");
-		audioEngine->LoadEvent("P1 Wins", "{1251a18c-193c-4301-8578-9d9329038cb4}");
-				   
-		audioEngine->LoadEvent("Round 1", "{67af2ee8-b62e-4a50-847a-4584747b5436}");
-		audioEngine->LoadEvent("Round 2", "{4e9ebd27-ddc1-4f38-875d-9194770b57c5}");
-		audioEngine->LoadEvent("Round 3", "{554f1588-e75d-4d2b-89ff-5387891cc5f5}");
-		audioEngine->LoadEvent("Round 4", "{765e00d8-6c31-4ff2-a40c-19119d9c615d}");
-		audioEngine->LoadEvent("Final Round", "{0c13e8a4-3ac6-466a-b2c1-99699876d4e3}");
-				   
-		audioEngine->LoadEvent("Block", "{f63a0013-8699-42f9-b6dc-23dd924031ce}");
-		audioEngine->LoadEvent("Hit", "{d7001405-ff86-4cab-9ea4-5189a22a4322}");
-		audioEngine->LoadEvent("SwingParry", "{0b3c9985-8103-4909-8f03-02e5dd6fcedb}");
-
-		audioEngine->LoadEvent("Glory", "{e99deb05-d8df-4a01-b317-af8ec3ede3bd}");
-
-		AEinit = true;
-	}
-
-	audioEngine->Update();
 
 	GLFWgamepadstate state;
 	if (glfwGetGamepadState(controller, &state)) {
 		//Checking to see if its actually a menu or a gamescene
-			glm::vec2 rot = glm::vec2(0.0f, 0.0f);
+		glm::vec2 rot = glm::vec2(0.0f, 0.0f);
 
-			glm::vec3 player_head = players[player]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f);
-			if (!players[player]->GetCamLock()) {
-				Cam[player]->SetPosition(player_head);
-				if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] < -0.2) {
-					rot.y = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
-				}
-				else {
-					rot.y = 0.0f;
-				}
-				if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] < -0.2) {
-					rot.x = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
-				}
-				else {
-					rot.x = 0.0f;
-				}
-
-				Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
+		glm::vec3 player_head = players[player]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f);
+		if (!players[player]->GetCamLock()) {
+			Cam[player]->SetPosition(player_head);
+			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y] < -0.2) {
+				rot.y = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_Y];
 			}
 			else {
-				unsigned int other = (player == PLAYER_1) ? PLAYER_2 : PLAYER_1;
-
-				glm::vec3 mid = lerp(players[player]->GetPosition(), players[other]->GetPosition(), 0.5f) + glm::vec3(0.0f, 1.5f, 0.0f);
-				glm::vec3 dir = glm::normalize((player_head + glm::vec3(0.0f, 1.0f, 0.0f)) - mid);
-
-				Cam[player]->SetPosition(player_head + (dir * Cam[player]->GetRadius()) + glm::vec3(0.0f, 1.0f, 0.0f));
-				Cam[player]->SetTarget(mid + glm::vec3(0.0f, 1.5f, 0.0f));
+				rot.y = 0.0f;
+			}
+			if (state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] > 0.2 || state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X] < -0.2) {
+				rot.x = -state.axes[GLFW_GAMEPAD_AXIS_RIGHT_X];
+			}
+			else {
+				rot.x = 0.0f;
 			}
 
-			glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
-			glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
-			glm::vec3 camF = Cam[player]->GetDirection();
-			glm::vec3 camR = Cam[player]->GetRight();
+			Cam[player]->Spin(rot * Cam[player]->GetRotateSpeed() * dt);
+		}
+		else {
+			unsigned int other = (player == PLAYER_1) ? PLAYER_2 : PLAYER_1;
 
-			glm::vec2 axisPos = glm::vec2(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X], state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
+			glm::vec3 mid = lerp(players[player]->GetPosition(), players[other]->GetPosition(), 0.5f) + glm::vec3(0.0f, 1.5f, 0.0f);
+			glm::vec3 dir = glm::normalize((player_head + glm::vec3(0.0f, 1.0f, 0.0f)) - mid);
 
-			if (glm::length(axisPos) > dead_zone)
-			{
-				if (players[player]->GetFrameState() == FrameStates::Neutral || players[player]->GetFrameState() == FrameStates::Block) {
-					t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-					//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-					t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
-				}
-				//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
-				if (players[player]->GetState() < PLAYER_STATE::walking && players[player]->GetFrameState() == FrameStates::Neutral && !players[player]->IsLocked()) {
-					players[player]->PlayAnim("walk", 0, glm::length(axisPos));
-					players[player]->PlayAnim("idle", 1, 1.0f);
-					players[player]->SetState(walking);
-				}
-				else if (!players[player]->IsLocked() && players[player]->GetState() == walking) {
-					((SkelMesh*)players[player]->GetMesh())->SetIntensity(0, glm::length(axisPos));
-					//((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f);
-				}
+			Cam[player]->SetPosition(player_head + (dir * Cam[player]->GetRadius()) + glm::vec3(0.0f, 1.0f, 0.0f));
+			Cam[player]->SetTarget(mid + glm::vec3(0.0f, 1.5f, 0.0f));
+		}
+
+		glm::vec3 t = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 yeet = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 camF = Cam[player]->GetDirection();
+		glm::vec3 camR = Cam[player]->GetRight();
+
+		glm::vec2 axisPos = glm::vec2(state.axes[GLFW_GAMEPAD_AXIS_LEFT_X], state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y]);
+
+		if (glm::length(axisPos) > dead_zone)
+		{
+			if (players[player]->GetFrameState() == FrameStates::Neutral || players[player]->GetState() == blocking) {
+				t -= glm::normalize(glm::vec3(camF.x, 0.0f, camF.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+				//yeet.z = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+				t += glm::normalize(glm::vec3(camR.x, 0.0f, camR.z)) * state.axes[GLFW_GAMEPAD_AXIS_LEFT_X];
 			}
-			else if (players[player]->GetState() == PLAYER_STATE::walking) {
-				players[player]->Idle();
+			//yeet.x = state.axes[GLFW_GAMEPAD_AXIS_LEFT_Y];
+			if (players[player]->GetState() < PLAYER_STATE::walking && players[player]->GetFrameState() == FrameStates::Neutral && !players[player]->IsLocked()) {
+				players[player]->PlayAnim("walk", 0, glm::length(axisPos));
+				players[player]->PlayAnim("idle", 1, 1.0f);
+				players[player]->SetState(walking);
 			}
-
-			if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
-				//players[player]->phys.move = glm::normalize(t) * 10.f * dt;
-				glm::vec3 dir = glm::normalize(t);
-
-				float newRot;
-
-				newRot = -(std::atan2f(dir.z, dir.x)) * (180 / M_PI) + 90;
-
-				//std::cout << newRot << std::endl;
-
-				players[player]->SetRotation({ 0.0f, newRot, 0.0f });
-
-				//std::cout << "move\n";
+			else if (!players[player]->IsLocked() && players[player]->GetState() == walking) {
+				((SkelMesh*)players[player]->GetMesh())->SetIntensity(0, glm::length(axisPos));
+				//((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 1.0f);
 			}
-
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
-				((Player*)players[player])->Run();
+			else if(players[player]->GetFrameState() == Hold && players[player]->GetState() == blocking){
+				((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 0.5f * glm::length(axisPos));
 			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
-				((Player*)players[player])->StopRun();
-			}
+		}
+		else if (players[player]->GetState() == PLAYER_STATE::walking) {
+			players[player]->Idle();
+		}
+		else if (players[player]->GetState() == blocking) {
+			((SkelMesh*)players[player]->GetMesh())->SetIntensity(1, 0.0f);
+		}
 
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_Y] == GLFW_PRESS) {
-				((Player*)players[player])->Taunt();
-				
-			}
+		if (t.x != 0.0f || t.y != 0.0f || t.z != 0.0f) {
+			//players[player]->phys.move = glm::normalize(t) * 10.f * dt;
+			glm::vec3 dir = glm::normalize(t);
 
-			static bool r_stick_down[2] = { false, false };
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && !r_stick_down[player]) {
-				players[player]->ToggleCamLock();
-				r_stick_down[player] = true;
-			}
-			else if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_RELEASE) {
-				r_stick_down[player] = false;
-			}
+			float newRot;
 
-			static bool rb_p[2] = { false, false };
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS && !rb_p[player])
-			{
-				if (players[player]->GetStam() > 0.0f) {
+			newRot = -(std::atan2f(dir.z, dir.x)) * (180 / M_PI) + 90;
 
-					//glm::vec3 p1 = glm::vec3();
-					//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
-					//p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+			//std::cout << newRot << std::endl;
 
+			players[player]->SetRotation({ 0.0f, newRot, 0.0f });
 
+			//std::cout << "move\n";
+		}
 
-					//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_PRESS) {
+			((Player*)players[player])->Run();
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_A] == GLFW_RELEASE) {
+			((Player*)players[player])->StopRun();
+		}
 
-					//std::cout << "OOF\n";
-					//players[player]->dmgSTAM(15.0f);
-					players[player]->Attack();
-					atk1 = true;
-					rb_p[player] = true;
-				}
-			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_RELEASE)
-			{
-				atk1 = false;
-				rb_p[player] = false;
-			}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_Y] == GLFW_PRESS) {
+			((Player*)players[player])->Taunt();
 
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS)
-			{
-				if (players[player]->GetStam() > 0.0f) {
-					players[player]->Roll();
-					dodge1 = false;
-					dodge1t = 0.1;
-				}
-			}
+		}
 
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
+		static bool r_stick_down[2] = { false, false };
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_PRESS && !r_stick_down[player]) {
+			players[player]->ToggleCamLock();
+			r_stick_down[player] = true;
+		}
+		else if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_THUMB] == GLFW_RELEASE) {
+			r_stick_down[player] = false;
+		}
 
-				//block1 = true;
+		static bool rb_p[2] = { false, false };
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_PRESS && !rb_p[player])
+		{
+			if (players[player]->GetStam() > 0.0f) {
 
 				//glm::vec3 p1 = glm::vec3();
 				//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
 				//p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
 
-				//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
-				//audioEngine->PlayEvent("Block");
+
+
+				//players[player]->addChild(new Attack(Amesh, Amat, basicCubeHB, p1, ((SkelMesh*)players[player]->GetMesh())->GetSkeleton()->Find("l_arm1")));
+
+				//std::cout << "OOF\n";
+				//players[player]->dmgSTAM(15.0f);
+				players[player]->Attack();
+				atk1 = true;
+				rb_p[player] = true;
+			}
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER] == GLFW_RELEASE)
+		{
+			atk1 = false;
+			rb_p[player] = false;
+		}
+
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_B] == GLFW_PRESS)
+		{
+			if (players[player]->GetStam() > 0.0f) {
+				players[player]->Roll();
+				dodge1 = false;
+				dodge1t = 0.1;
+			}
+		}
+
+		static bool lb_p[2] = { false, false };
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_PRESS) { //dylanote
+
+			//block1 = true;
+
+			//glm::vec3 p1 = glm::vec3();
+			//p1.x += 1 * cos(glm::radians((players[player]->GetTransform().rotation.y)));
+			//p1.z += 1 * -sin(glm::radians((players[player]->GetTransform().rotation.y)));
+
+			//players[player]->addChild(new Shield(Amesh, Bmat, basicCubeHB, p1, player));
+			//audioEngine->PlayEvent("Block");
+			if (!players[player]->IsLocked()) {
 				players[player]->Block();
 
 				switch (player) {
@@ -1095,32 +1085,26 @@ void PlayScene::ControllerInput(unsigned int controller, int player, float dt)
 					guardButton2 = true;
 					break;
 				}
-				//std::cout << "Parry God\n";
 			}
-			if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE) {
+			lb_p[player] = true;
 
+			//std::cout << "Parry God\n";
+		}
+		if (state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER] == GLFW_RELEASE && lb_p[player]) {
+			lb_p[player] = false;
 
-				switch (player) {
-				case 0:
-					if (guardButton1) {
-						players[player]->Idle();
-						//players[player]->SetState();
-						guardButton1 = false;
-					}
-					break;
-				case 1:
-					if (guardButton2) {
-						players[player]->Idle();
-						//players[player]->SetState();
-						guardButton2 = false;
-					}
-					break;
-				}
-
-				//players[player]->DestroyChild(0);
+			if (players[player]->GetState() == blocking && players[player]->GetFrameState() == Hold) {
+				((SkelMesh*)players[player]->GetMesh())->NextFrame(0);
 			}
+			else {
+				players[player]->Idle();
+			}
+
+
+			//players[player]->DestroyChild(0);
 		}
 	}
+}
 
 
 bool PlayScene::loaded = false;

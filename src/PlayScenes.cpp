@@ -684,8 +684,8 @@ void OnePlayer::LoadScene()
 	//weapons.push_back(Hurt_Sword);
 	shields.push_back(new Object(shield_mesh, defaultTex, shieldSphereHB, glm::vec3(0.0f, 0.0f, 0.0f), gladiatorSkel2->Find("l_hand"), P1_mesh));
 
-	weapons[0]->Scale({ 0.9f, 0.9f, 0.9f });
-	weapons[0]->SetRotation({ 0.0f, 90.0f, 90.0f });
+	//weapons[0]->Scale({ 0.9f, 0.9f, 0.9f });
+	//weapons[0]->SetRotation({ 0.0f, 90.0f, 90.0f });
 
 	shields[0]->SetPosition({ 0.f, 0.f, 0.0f });
 	shields[0]->Scale({ 0.8f, 0.8f, 0.8f });
@@ -1104,6 +1104,7 @@ void TwoPlayer::Update(float dt)
 				}
 
 				//problem -> weapon hitdetect is not seeing the shield
+
 				//if (players[c]->GetState() == attacking && players[c]->GetWeapon()->HitDetect(players[p]->GetShield()) && !players[c]->GetWeapon()->getCooldown()) {
 				//	if (players[p]->GetShield()->hitbox->GetType() == COLLISION_TYPE::shield) {
 				//		std::cout << "Blocked!\n";
@@ -1121,35 +1122,72 @@ void TwoPlayer::Update(float dt)
 					if (players[p]->hitbox->GetType() == entity) { //Making sure we hit the right hitbox
 						std::cout << "Hit!\n";
 
-						if (players[p]->GetFrameState() == FrameStates::Block && players[p]->isInfront(players[p]->getFaceDir(), players[c]->GetPosition() - players[p]->GetPosition())) { //Are we blocking? Are we infront of the enemy?
+						if (players[p]->GetState() == blocking && players[p]->isInfront(players[p]->getFaceDir(), players[c]->GetPosition() - players[p]->GetPosition())) { //Are we blocking? Are we infront of the enemy?
 
-							std::cout << "Blocked!\n";
+							if (players[p]->GetFrameState() == FrameStates::Hold) {
+								std::cout << "Blocked!\n"; 
 
-							if (players[p]->GetShield() != nullptr) { //If he has a shield.
+								if (players[p]->GetShield() != nullptr) { //If he has a shield.
 
-								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
-								players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+									audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+									audioEngine.LoadEvent("Block", "{1058aacd-0878-4ea8-be1c-e68f1e06cbc4}");
+									audioEngine.PlayEvent("Block");
+									players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetShield()->GetReduction() * players[c]->GetWeapon()->GetDamage())); 
+									players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
 
-								players[c]->GetWeapon()->setCooldown(true);
-							}
-							else { // Use weapons stuff
+									players[c]->GetWeapon()->setCooldown(true);
+								}
+								else { // Use weapons stuff
 
-								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - ( players[p]->GetWeapon()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
-								players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * ((players[p]->GetWeapon()->GetStaminaCost() + 15.0f) * 0.01f) );
+									players[p]->dmgHP(players[c]->GetWeapon()->GetDamage() - (players[p]->GetWeapon()->GetReduction() * players[c]->GetWeapon()->GetDamage()));
+									players[p]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * 2.0f);
 
-								players[c]->GetWeapon()->setCooldown(true);
+									players[c]->GetWeapon()->setCooldown(true);
 
+								}
+
+								if (players[p]->GetStam() < 0.0f)
+									players[p]->Deflected();
+							} 
+							else if (players[p]->GetFrameState() == FrameStates::Deflect) {
+								players[c]->dmgSTAM(players[c]->GetWeapon()->GetDamage() * players[p]->GetShield()->GetStaminaCost());
+								//curScore += (5 * taunted[c] * comboMult[c]);
+								//combo[c] = true;
+								//comboTime[c] = MAX_COMBO;
+								//comboMult[c] += 0.5f;
+
+								if (players[c]->GetStam() <= 0)
+									players[c]->Deflected();
 							}
 						}
 						else //Clean hit.
-						{
-							players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
-							players[c]->GetWeapon()->setCooldown(true);
-						audioEngine->PlayEvent("Hit");
-						curScore += (5 * taunted[c] * comboMult[c]);
-						combo[c] = true;
-						comboTime[c] = MAX_COMBO;
-						comboMult[c] += 0.5f;
+						{ 
+							static bool rollCool[2] = { false, false };
+
+							if (players[p]->GetFrameState() != FrameStates::Roll) {
+								players[p]->dmgHP(players[c]->GetWeapon()->GetDamage());
+								players[p]->Hitstun();
+								players[c]->GetWeapon()->setCooldown(true);
+								audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+								audioEngine.LoadEvent("Hit", "{3830d309-eab3-4e2d-9cc2-2b00807daf5c}");
+								audioEngine.PlayEvent("Hit"); 
+								curScore += (20 * taunted[c] * comboMult[c]);
+								combo[c] = true;
+								comboTime[c] = MAX_COMBO;
+								comboMult[c] += 0.5f;
+							}
+							else if(players[p]->GetState() == rolling){
+								if (!rollCool[p]) {
+									curScore += (5 * taunted[p] * comboMult[p]);
+									combo[p] = true;
+									comboTime[p] = MAX_COMBO;
+									comboMult[p] += 0.5f;
+									rollCool[p] = true;
+								}
+							}
+							else {
+								rollCool[p] = false;
+							}
 						}
 					}
 				
@@ -1177,13 +1215,15 @@ void TwoPlayer::Update(float dt)
 		if (glfwJoystickPresent(c) && glfwJoystickIsGamepad(c)) {
 			Cam[c]->Move(players[c]->phys.move, dt);
 
-			players[c]->ApplyMove();
+			if(players[c]->GetState() != dying)
+				players[c]->ApplyMove();
 
 			Cam[c]->SetTarget(players[c]->GetPosition() + glm::vec3(0.0f, 1.5f, 0.0f));
 		}
 	}
 
-	
+
+	audioEngine.Update();
 
 	//for (int a = 0; a < attacks.size(); a++)
 	//{
@@ -1241,14 +1281,14 @@ void TwoPlayer::Update(float dt)
 		{
 			P2wins++;
 			winannounce = true;
-			audioEngine->PlayEvent("P2 Wins");
+			audioEngine.PlayEvent("P2 Wins");
 			
 		}
 		if (players[1]->GetHP() <= 0 && winannounce == false)
 		{
 			P1wins++;
 			winannounce = true;
-			audioEngine->PlayEvent("P1 Wins");
+			audioEngine.PlayEvent("P1 Wins");
 		}
 		deathtimer -= dt;
 		if (deathtimer <= 0)
@@ -1256,10 +1296,11 @@ void TwoPlayer::Update(float dt)
 			RoundCount++;
 			if (P2wins >= 3 || P1wins >= 3)
 			{
-				audioEngine->PlayEvent("Glory");
+				audioEngine.PlayEvent("Glory");
 				RoundCount = 1;
 				P1wins = 0;
 				P2wins = 0;
+				audioEngine.Shutdown();
 				Game::CURRENT->setScene(SCENES::CHARACTER_SCENE);
 			}
 			scoreSub = 1.0f;
@@ -1267,7 +1308,7 @@ void TwoPlayer::Update(float dt)
 			//setScene(MainMenu);
 			Reset();
 		}
-	}
+	} 
 
 	// Crowd Stuff
 	subIncreaser -= dt;
@@ -1276,9 +1317,16 @@ void TwoPlayer::Update(float dt)
 		scoreSub++;
 	}
 
+	if (curScore <= 0)
+	{
+		players[PLAYER_1]->dmgHP(1 * dt);
+		players[PLAYER_2]->dmgHP(1 * dt);
+	}
+
 	if (curScore > MAX_SCORE)
 		curScore = MAX_SCORE;
 
+	//if (curScore > 0) 
 	curScore -= dt * scoreSub;
 
 	if (curScore < 0.0f) {
@@ -1292,6 +1340,10 @@ void TwoPlayer::Update(float dt)
 		CrowdBoi->setScore(curScore);
 	}
 }
+ 
+//int PlayScene::P2wins = 0;
+//int PlayScene::P1wins = 0;
+//int PlayScene::RoundCount = 1;
 
 void TwoPlayer::Draw()
 {
@@ -1414,6 +1466,17 @@ void TwoPlayer::Draw()
 		Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Player 1 Wins", SCREEN_HEIGHT / 2.f, SCREEN_WIDTH / 2.f, 1.0, glm::vec3(1.f, 0.f, 0.f));
 
 	}
+	//std::string output1 = Name1[0] + " " + Name1[1] + " " + Name1[2];
+	//std::string output2 = Name2[0] + " " + Name2[1] + " " + Name2[2];
+
+	// + " Wins: " + std::to_string(P1wins);
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name1[0] + " " + Name1[1] + " " + Name1[2], 10, 580, 0.40, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Wins: " + std::to_string(P1wins), 50, 490, 0.60, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, Name2[0] + " " + Name2[1] + " " + Name2[2], 470, 580, 0.40, glm::vec3(1.f, 1.f, 1.f));
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Wins: " + std::to_string(P2wins), 670, 490, 0.60, glm::vec3(1.f, 1.f, 1.f));
+
+	Textcontroller->RenderText(TextRenderer::TEXTSHADER, "Round: " + std::to_string(RoundCount), 360, 450, 0.60, glm::vec3(1.f, 1.f, 1.f));
+
 	glEnable(GL_DEPTH_TEST);
 }
 
@@ -1434,28 +1497,23 @@ void TwoPlayer::LoadScene()
 
 	post_pass.push_back(new PostProcess({ main_pass[0]->GetOutput(), light_buff[0]->GetOutput(), particle_buff[0]->GetOutput(), main_pass[1]->GetOutput(), light_buff[1]->GetOutput(), particle_buff[1]->GetOutput() }, new Shader("Shaders/PostProcess/PostProcess.vert", "Shaders/PostProcess/Merge2.frag")));
 
-	//audioEngine.Init();
+	//audioEngine.Init(); 
 
-	switch (RoundCount)
-	{
-	case 1:
-		audioEngine->PlayEvent("Round 1");
-		break;
-	case 2:
-		audioEngine->PlayEvent("Round 2");
-		break;
-	case 3:
-		audioEngine->PlayEvent("Round 3");
-		break;
-	case 4:
-		audioEngine->PlayEvent("Round 4");
-		break;
-	case 5:
-		audioEngine->PlayEvent("Final Round");
-		break;
+	audioEngine.Init();
 
-	}
 
+	audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+	audioEngine.LoadEvent("BiggerBiggerCrowed", "{a36c2fde-3e9f-4557-8e4c-8a516095b57e}");
+	audioEngine.PlayEvent("BiggerBiggerCrowed");
+	//audioEngine.LoadEvent("BattleMusic", "{5d5be828-f39b-4d9e-9bf2-ea581daa0e20}");
+	//audioEngine.PlayEvent("BattleMusic"); 
+
+	//audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+	//audioEngine.LoadEvent("Engine_Start", "{329a5270-2532-46b0-9b28-7f1f2b627efa}");
+	//audioEngine.LoadEvent("Engine_Running_2", "{25d4404c-7bfe-49cc-a5d6-4c558667375d}");
+	//audioEngine.LoadEvent("GlassBreak", "{0cda6a63-08d1-49f6-9d08-aa9890357558}");
+	//
+	//audioEngine.PlayEvent("Engine_Running_2");
 	morphShader = new Shader("Shaders/Basic_Morph - NM.vert", "Shaders/Basic_Shader - NM.frag");
 
 	shaderObj = new Shader("Shaders/Basic_Shader.vert", "Shaders/Geo_pass.frag");
@@ -1521,10 +1579,9 @@ void TwoPlayer::LoadScene()
 	//lights.push_back(new PointLight({ 0.0f, 30.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.014f, 0.0007f));
 	//lights.push_back(new PointLight({ -4.0f, 1.0f, 4.0f }, { 1.0f, 1.0f, 1.0f }, 0.1f, 0.5f, 1.0f, 0.07f, 0.017f));
 
-	Mesh* Square = new Mesh("d6.obj");
+	Mesh* Square = new Mesh("d6.obj"); 
 	Mesh* d20 = new Mesh("d20.obj");
 	Mesh* boi = new Mesh("gladiator.obj");
-	
 
 	Mesh* arena = new Mesh("Caulitreeum.obj");
 
@@ -1617,13 +1674,16 @@ void TwoPlayer::LoadScene()
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
 
 	std::vector<std::string> OneHand_LC = {"sword_1", "sword_2", "sword_3"};
+	std::vector<std::string> Spear1H_LC = { "1HSpear1", "1HSpear2", "1HSpear3" };
+	std::vector<std::string> Spear2H_LC = { "2HSpear1", "2HSpear2"};
+	std::vector<std::string> Hammer_LC = { "Hammer1", "Hammer2", "Hammer3" };
 
 	//Object* P1_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P1_MESH);
 	//Object* P2_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P2_MESH);
 
 	for (int p = 0; p <= PLAYER_2; p++) {
-		Weapon* weapon;
-		Shield* shield;
+		Weapon* weapon = nullptr;
+		Shield* shield = nullptr;
 
 		SkelMesh* mesh;
 
@@ -1643,7 +1703,7 @@ void TwoPlayer::LoadScene()
 			if (HammerMat == nullptr) {
 				HammerMat = new Material("Weapons/tex/warhammer.png");
 			}
-			weapon = new Weapon(HammerMesh, HammerMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, "", "", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(HammerMesh, HammerMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Hammer_LC, "HammerIdle", "2HBlock", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->SetRotation({90.0f, 90.0f, 0.0f});
 			weapon->Scale({1.2f, 1.2f, 1.2f});
 			
@@ -1657,7 +1717,16 @@ void TwoPlayer::LoadScene()
 			if (SpearMat == nullptr) {
 				SpearMat = new Material("Weapons/tex/spear.png");
 			}
-			weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, "", "", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			if (_Shields[p] == SHIELD_NONE)
+			{
+				weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Spear2H_LC, "2HSpearIdle", "2HBlock", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+
+			}
+			else
+			{
+				weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, "", "", 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+
+			}
 			weapon->SetRotation({ 90.0f, 90.0f, 0.0f });
 
 			break;
@@ -1694,7 +1763,7 @@ void TwoPlayer::LoadScene()
 				BucklerMat = new Material("Weapons/tex/buckler.png");
 			}
 
-			shield = new Shield(BucklerMesh, BucklerMat, shieldSphereHB, { -0.30f, 0.1f, 0.05f }, "", 0.6f, 0.25f, gladiatorSkel->Find("l_hand"), mesh);
+			shield = new Shield(BucklerMesh, BucklerMat, shieldSphereHB, { -0.30f, 0.1f, 0.05f }, "blockB", 0.5f, 1.4f, gladiatorSkel->Find("l_hand"), mesh);
 			shield->SetRotation({ 0.0f, 0.0f, 270.0f });
 			shield->Scale({0.85f, 0.85f, 0.85f});
 			break;
@@ -1709,7 +1778,7 @@ void TwoPlayer::LoadScene()
 				ShieldMat = new Material("Weapons/tex/shield.png");
 			}
 
-			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { -0.25f, 0.1f, 0.05f }, "", 0.6f, 0.25f, gladiatorSkel->Find("l_arm2"), mesh);
+			shield = new Shield(ShieldMesh, ShieldMat, shieldSphereHB, { -0.25f, 0.1f, 0.05f }, "blockS", 0.8f, 0.60f, gladiatorSkel->Find("l_arm2"), mesh);
 			shield->Scale(glm::vec3(0.85f));
 			shield->SetRotation({ 0.0f, 0.0f, 265.0f });
 			break;
@@ -1724,22 +1793,22 @@ void TwoPlayer::LoadScene()
 		}
 	}
 
-	UI* hpBG = new UI(260, 10, { 55.0f, 554.5f, -1.0f }, blackBarMat);
-	UI* stamBG = new UI(260, 10, { 55.0f, 534.50f, -1.0f }, blackBarMat);
-	UI* crowdBG = new UI(80, 71, { 360.0f, 514.0f, -1.0f }, blackBarMat);
+	UI* hpBG = new UI(260, 10, { 55.0f, 544.5f, -1.0f }, blackBarMat);
+	UI* stamBG = new UI(260, 10, { 55.0f, 524.50f, -1.0f }, blackBarMat);
+	UI* crowdBG = new UI(80, 71, { 360.0f, 504.0f, -1.0f }, blackBarMat);
 
-	UI* hpBG2 = new UI(260, 10, { 487.5f, 554.5f, -1.0f }, blackBarMat);
-	UI* stamBG2 = new UI(260, 10, { 487.5f, 534.5f, -1.0f }, blackBarMat);
-	CrowdBoi = new CrowdBar((Player*)players[PLAYER_1], glm::vec2(361, 515), crowdBarMat, crowdBG);
+	UI* hpBG2 = new UI(260, 10, { 487.5f, 544.5f, -1.0f }, blackBarMat);
+	UI* stamBG2 = new UI(260, 10, { 487.5f, 524.5f, -1.0f }, blackBarMat);
+	CrowdBoi = new CrowdBar((Player*)players[PLAYER_1], glm::vec2(361, 505), crowdBarMat, crowdBG);
 
 	ui = {
-		new UI(801.5, 100, glm::vec3(0.0f, 500.0f, 0.0f), mainUI),
-		new HealthBar((Player*)players[PLAYER_1], glm::vec2(60, 557), hpBarMat, hpBG),
-		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(60, 537), stamBarMat, stamBG),
+		new UI(801.5, 100, glm::vec3(0.0f, 490.0f, 0.0f), mainUI),
+		new HealthBar((Player*)players[PLAYER_1], glm::vec2(60, 547), hpBarMat, hpBG),
+		new StaminaBar((Player*)players[PLAYER_1], glm::vec2(60, 527), stamBarMat, stamBG),
 		CrowdBoi,
 
-		new HealthBar((Player*)players[PLAYER_2], glm::vec2(492.5, 557.5), hpBarMat, hpBG2),
-		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(492.5, 537.5), stamBarMat, stamBG2)
+		new HealthBar((Player*)players[PLAYER_2], glm::vec2(492.5, 547.5), hpBarMat, hpBG2),
+		new StaminaBar((Player*)players[PLAYER_2], glm::vec2(492.5, 527.5), stamBarMat, stamBG2)
 	};
 
 	Material* toddMed = new Material("particles/toddMED.png");
@@ -1814,6 +1883,43 @@ void TwoPlayer::Reset() {
 	particle_engines[1].ClearParticles();
 
 	deathtimer = DEATH_TIME;
+
+	switch (RoundCount)
+	{
+	case 1:
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round1", "{287449cd-0f8c-4e01-b817-f7de974921f7}");
+		audioEngine.PlayEvent("Round1");
+
+		//audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		//audioEngine.LoadEvent("Engine_Start", "{329a5270-2532-46b0-9b28-7f1f2b627efa}");
+		//audioEngine.LoadEvent("Engine_Running_2", "{25d4404c-7bfe-49cc-a5d6-4c558667375d}");
+		//audioEngine.LoadEvent("GlassBreak", "{0cda6a63-08d1-49f6-9d08-aa9890357558}");
+		//
+		//audioEngine.PlayEvent("Engine_Running_2");
+		break;
+	case 2:
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round2", "{a95cb409-79f2-4131-9f69-7530899d00fd}");
+		audioEngine.PlayEvent("Round2");
+		break;
+	case 3:
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round3", "{8ac23920-72c4-4867-8ae6-c36fb8de6214}");
+		audioEngine.PlayEvent("Round3");
+		break;
+	case 4:
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("Round4", "{1b41bcb5-c7e2-4032-9c7f-ea1f7fe37002}");
+		audioEngine.PlayEvent("Round4");
+		break;
+	case 5:
+		audioEngine.LoadBank("CarCrash", FMOD_STUDIO_LOAD_BANK_NORMAL);
+		audioEngine.LoadEvent("FinalRound", "{c692a986-0db6-40d6-8b67-b9a049bdc6a3}");
+		audioEngine.PlayEvent("FinalRound");
+		break;
+
+	}
 
 	winannounce = false;
 }

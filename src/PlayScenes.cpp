@@ -1558,6 +1558,7 @@ void TwoPlayer::LoadScene()
 	shieldSphereHB->SetScale(glm::vec3(0.1f, 0.65f, 0.65f));
 
 	std::vector<std::string> OneHand_LC = {"sword_1", "sword_2", "sword_3"};
+	std::vector<std::string> Spear1H_LC = { "1HSpear1", "1HSpear2", "1HSpear3" };
 
 	//Object* P1_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P1_MESH);
 	//Object* P2_sword = new Object(SwordMesh, defaultTex, swordCapsuleHB, { -0.12f, -0.04f, -0.27f }, gladiatorSkel->Find("r_hand"), P2_MESH);
@@ -1598,7 +1599,7 @@ void TwoPlayer::LoadScene()
 			if (SpearMat == nullptr) {
 				SpearMat = new Material("Weapons/tex/spear.png");
 			}
-			weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), OneHand_LC, 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
+			weapon = new Weapon(SpearMesh, SpearMat, swordCapsuleHB, glm::vec3(-0.12f, 0.025f, -0.5f), Spear1H_LC, 15.0f, 25.0f, 0.20f, gladiatorSkel->Find("r_hand"), mesh);
 			weapon->SetRotation({ 90.0f, 90.0f, 0.0f });
 
 			break;

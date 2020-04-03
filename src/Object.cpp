@@ -440,10 +440,10 @@ void Player::Attack()
 		PlayAnim(this->weapon->GetAtkAnim(atk_combo), 0, 1.0f, 2.5f);
 		_mesh->SetIntensity(1, 0.0f);
 		this->dmgSTAM(weapon->GetStaminaCost());
-		state = attacking;
+		state = attacking; 
 	}
 	else if(GetFrameState() == FrameStates::Neutral && !anim_lock){
-		if (atk_combo < this->weapon->GetNumLightAttacks() - 1) {
+		if (atk_combo < this->weapon->GetNumLightAttacks() - 1) { 
 			weapon->setCooldown(false);
 			atk_combo++;
 			anim_lock = true;

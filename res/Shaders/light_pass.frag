@@ -125,6 +125,7 @@ void main(){
 		float shadow = ShadowCalc(fragPos, c);
 	
 		result += p_ambient + shadow * (p_diffuse + p_specular + p_rim) * attenuation;
+		//result += shadow * (p_rim) * attenuation;;
 		//pointColor = vec3(shadow, shadow, shadow);
 	}
 

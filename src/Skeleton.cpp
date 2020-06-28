@@ -9,6 +9,7 @@
 #include<sstream>
 #include <math.h>
 #include <stack>
+#include <chrono>
 
 ChannelType StringToChnlTp(std::string name)
 {
@@ -452,6 +453,8 @@ int Skeleton::LoadFromFile(std::string f)
 			int yeetval = 1;
 			int yootval = 1;
 			while (!file.eof()) {
+				auto start_time = std::chrono::high_resolution_clock().now();
+
 				std::queue<float> values;
 				std::stringstream line;
 				std::string temp;
@@ -504,6 +507,11 @@ int Skeleton::LoadFromFile(std::string f)
 				}
 				root->LoadAnimFrame(values, anim, num_frames);
 				num_frames++;
+
+				auto end_time = std::chrono::high_resolution_clock().now();
+				auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+
+				std::cout << duration.count() << std::endl;
 			}
 		}
 		else {
